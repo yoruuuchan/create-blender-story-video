@@ -75,6 +75,10 @@
       font: inherit;
     }
 
+    [hidden] {
+      display: none !important;
+    }
+
     .skip-link {
       position: fixed;
       top: 10px;
@@ -193,6 +197,7 @@
     }
 
     .demo-strip {
+      --strip-color: var(--warning);
       display: flex;
       align-items: center;
       justify-content: space-between;
@@ -200,9 +205,22 @@
       margin-bottom: 18px;
       padding: 12px 14px 12px 16px;
       color: #cfe3ec;
-      border: 1px solid rgba(255, 197, 107, 0.24);
+      border: 1px solid color-mix(in srgb, var(--strip-color) 30%, transparent);
       border-radius: var(--radius-sm);
-      background: linear-gradient(90deg, rgba(255, 197, 107, 0.08), rgba(255, 197, 107, 0.025));
+      background: linear-gradient(
+        90deg,
+        color-mix(in srgb, var(--strip-color) 9%, transparent),
+        color-mix(in srgb, var(--strip-color) 3%, transparent)
+      );
+    }
+
+    .demo-strip[data-tone="live"],
+    .demo-strip[data-tone="success"] {
+      --strip-color: var(--success);
+    }
+
+    .demo-strip[data-tone="danger"] {
+      --strip-color: var(--danger);
     }
 
     .demo-note {
@@ -218,13 +236,13 @@
       height: 7px;
       flex: 0 0 auto;
       content: "";
-      background: var(--warning);
+      background: var(--strip-color);
       border-radius: 50%;
-      box-shadow: 0 0 14px rgba(255, 197, 107, 0.6);
+      box-shadow: 0 0 14px var(--strip-color);
     }
 
     .demo-note strong {
-      color: var(--warning);
+      color: var(--strip-color);
       font-family: var(--font-mono);
       font-size: 11px;
       letter-spacing: 0.1em;
@@ -391,6 +409,12 @@
       background: rgba(121, 230, 174, 0.09);
     }
 
+    .status-pill[data-tone="danger"] {
+      color: var(--danger);
+      border-color: rgba(255, 122, 134, 0.28);
+      background: rgba(255, 122, 134, 0.09);
+    }
+
     .progress-main {
       display: grid;
       grid-template-columns: 180px minmax(0, 1fr);
@@ -528,10 +552,7 @@
 
     .preview-card {
       min-height: 470px;
-      background:
-        linear-gradient(to bottom, rgba(6, 18, 25, 0.06), rgba(6, 18, 25, 0.38)),
-        repeating-linear-gradient(90deg, transparent 0 19px, rgba(181, 230, 235, 0.16) 19px 20px),
-        linear-gradient(to bottom, #8cb9bf 0 43%, #d9ebed 43% 49%, #0b6d79 49% 100%);
+      background: #050d12;
     }
 
     .preview-card img {
@@ -696,6 +717,14 @@
       content: "";
       background: var(--success);
       border-radius: 50%;
+    }
+
+    .health-note[data-tone="warning"]::before {
+      background: var(--warning);
+    }
+
+    .health-note[data-tone="danger"]::before {
+      background: var(--danger);
     }
 
     .recovery-list {
@@ -889,6 +918,16 @@
       box-shadow: 0 0 14px rgba(255, 197, 107, 0.35);
     }
 
+    .pipeline-step[data-state="failed"] {
+      color: var(--danger);
+    }
+
+    .pipeline-step[data-state="failed"] .step-dot {
+      border-color: var(--danger);
+      background: var(--danger);
+      box-shadow: 0 0 14px rgba(255, 122, 134, 0.35);
+    }
+
     .step-name {
       font-size: 13px;
     }
@@ -897,6 +936,51 @@
       font-family: var(--font-mono);
       font-size: 10px;
       text-transform: uppercase;
+    }
+
+    .qa-panel {
+      margin-top: 20px;
+      padding-top: 17px;
+      border-top: 1px solid var(--line-soft);
+    }
+
+    .qa-panel h3 {
+      margin: 0 0 10px;
+      color: var(--muted);
+      font-size: 11px;
+      font-weight: 500;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .qa-list {
+      display: grid;
+      gap: 8px;
+      margin: 0;
+      padding: 0;
+      list-style: none;
+    }
+
+    .qa-list li {
+      display: grid;
+      grid-template-columns: 8px 1fr;
+      gap: 10px;
+      align-items: start;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .qa-list li::before {
+      width: 6px;
+      height: 6px;
+      margin-top: 6px;
+      content: "";
+      background: var(--danger);
+      border-radius: 50%;
+    }
+
+    .qa-list[data-passed="true"] li::before {
+      background: var(--success);
     }
 
     .footer {
@@ -1097,12 +1181,12 @@
       </div>
     </header>
 
-    <div class="demo-strip">
+    <div class="demo-strip" id="data-strip" data-tone="warning" role="status" aria-live="polite">
       <div class="demo-note">
-        <strong>INTERACTIVE DEMO</strong>
-        <span>当前全部为模拟数据，尚未连接 Blender 或达芬奇。</span>
+        <strong id="source-title">CONNECTING</strong>
+        <span id="source-note">正在读取本机持久化状态与磁盘证据…</span>
       </div>
-      <div class="state-switch" role="group" aria-label="切换演示状态">
+      <div class="state-switch" id="demo-controls" role="group" aria-label="切换演示状态" hidden>
         <button type="button" data-scenario="rendering" aria-pressed="true">渲染中</button>
         <button type="button" data-scenario="cooldown" aria-pressed="false">冷却恢复</button>
         <button type="button" data-scenario="editing" aria-pressed="false">剪辑中</button>
@@ -1115,9 +1199,9 @@
         <article class="card progress-card">
           <div class="card-heading">
             <div>
-              <p class="eyebrow">Active production · poolcore</p>
+              <p class="eyebrow" id="project-label">Active production · connecting</p>
               <h1 id="task-title">正在渲染 Shot 03</h1>
-              <span class="file-path">PROJECT_ROOT\blender\approved.blend</span>
+              <span class="file-path" id="project-file">正在读取项目文件…</span>
             </div>
             <span class="status-pill" id="status-pill" data-tone="live">渲染中</span>
           </div>
@@ -1134,14 +1218,14 @@
             >
               <div class="progress-ring-content">
                 <strong id="progress-percent">57.4%</strong>
-                <span>总体进度</span>
+                <span>渲染帧进度</span>
               </div>
             </div>
 
             <div class="progress-details">
               <div class="frame-count">
                 <span id="frame-current">517</span>
-                <small>/ 900 frames</small>
+                <small id="frame-total">/ 900 frames</small>
               </div>
               <div class="linear-progress" aria-hidden="true"><span></span></div>
               <div class="stat-grid">
@@ -1151,11 +1235,11 @@
                 </div>
                 <div class="stat">
                   <span>画面规格</span>
-                  <strong>2160 × 3840</strong>
+                  <strong id="output-resolution">2160 × 3840</strong>
                 </div>
                 <div class="stat">
                   <span>输出标准</span>
-                  <strong>30 FPS · Rec.709</strong>
+                  <strong id="output-standard">30 FPS · H.265 · Rec.709</strong>
                 </div>
               </div>
               <div class="batch-line">
@@ -1167,7 +1251,7 @@
         </article>
 
         <article class="card preview-card" aria-label="最近有效渲染帧">
-          <img src="./latest-frame.png" width="324" height="576" alt="项目提供的最近有效渲染帧" onerror="this.hidden=true">
+          <img id="preview-image" src="../renders/shot_03_preview.png" width="324" height="576" alt="最近一张已完整解码的渲染帧">
           <div class="preview-top">
             <span class="preview-label">LATEST VALID FRAME</span>
             <span class="preview-label" id="preview-state">LIVE</span>
@@ -1195,28 +1279,28 @@
           <div class="metrics">
             <div class="metric">
               <span class="metric-label">GPU</span>
-              <div class="metric-value"><span id="gpu-value">88</span><small>%</small></div>
+              <div class="metric-value"><span id="gpu-value">88</span><small id="gpu-unit">%</small></div>
               <div class="metric-bar" role="progressbar" aria-label="GPU 使用率" aria-valuemin="0" aria-valuemax="100" aria-valuenow="88">
                 <span id="gpu-bar" style="--value: 88%"></span>
               </div>
             </div>
             <div class="metric">
               <span class="metric-label">VRAM</span>
-              <div class="metric-value"><span id="vram-value">7.1</span><small>/ 8 GB</small></div>
+              <div class="metric-value"><span id="vram-value">7.1</span><small id="vram-unit">/ 8 GB</small></div>
               <div class="metric-bar" role="progressbar" aria-label="显存使用率" aria-valuemin="0" aria-valuemax="100" aria-valuenow="89">
                 <span id="vram-bar" style="--value: 89%"></span>
               </div>
             </div>
             <div class="metric">
               <span class="metric-label">GPU TEMP</span>
-              <div class="metric-value"><span id="temp-value">72</span><small>°C</small></div>
+              <div class="metric-value"><span id="temp-value">72</span><small id="temp-unit">°C</small></div>
               <div class="metric-bar" role="progressbar" aria-label="GPU 温度相对阈值" aria-valuemin="0" aria-valuemax="100" aria-valuenow="72">
                 <span id="temp-bar" style="--value: 72%; --metric-color: var(--warning)"></span>
               </div>
             </div>
             <div class="metric">
               <span class="metric-label">MEMORY</span>
-              <div class="metric-value"><span id="memory-value">21.6</span><small>/ 32 GB</small></div>
+              <div class="metric-value"><span id="memory-value">21.6</span><small id="memory-unit">/ 32 GB</small></div>
               <div class="metric-bar" role="progressbar" aria-label="内存使用率" aria-valuemin="0" aria-valuemax="100" aria-valuenow="68">
                 <span id="memory-bar" style="--value: 68%; --metric-color: var(--success)"></span>
               </div>
@@ -1266,10 +1350,10 @@
               <p class="eyebrow">Shot queue</p>
               <h2>镜头队列</h2>
             </div>
-            <span class="section-caption">5 SHOTS · 900 FRAMES</span>
+            <span class="section-caption" id="queue-caption">5 SHOTS · 900 FRAMES</span>
           </div>
 
-          <div class="queue" role="list" aria-label="各镜头渲染状态">
+          <div class="queue" id="shot-queue" role="list" aria-label="各镜头渲染状态">
             <div class="queue-row" role="listitem" tabindex="0">
               <span class="shot-name">SHOT 01</span>
               <span class="shot-frames">001–180</span>
@@ -1359,12 +1443,18 @@
               <span class="step-meta">QUEUED</span>
             </div>
           </div>
+          <div class="qa-panel">
+            <h3>Final delivery QA</h3>
+            <ul class="qa-list" id="qa-list">
+              <li>正在读取最终媒体规格…</li>
+            </ul>
+          </div>
         </article>
       </section>
     </main>
 
     <footer class="footer">
-      <span>刷新频率 5s · 最近写入 2s 前 · 数据源 render-state.json</span>
+      <span id="footer-source">刷新频率 5s · 正在连接本机状态服务</span>
       <span>本页面故障不会中断渲染监督器</span>
     </footer>
   </div>
@@ -1498,14 +1588,24 @@
     };
 
     const elements = {
+      dataStrip: document.querySelector("#data-strip"),
+      sourceTitle: document.querySelector("#source-title"),
+      sourceNote: document.querySelector("#source-note"),
+      demoControls: document.querySelector("#demo-controls"),
+      projectLabel: document.querySelector("#project-label"),
+      projectFile: document.querySelector("#project-file"),
       taskTitle: document.querySelector("#task-title"),
       statusPill: document.querySelector("#status-pill"),
       progressRing: document.querySelector("#progress-ring"),
       progressPercent: document.querySelector("#progress-percent"),
       frameCurrent: document.querySelector("#frame-current"),
+      frameTotal: document.querySelector("#frame-total"),
       eta: document.querySelector("#eta"),
       batch: document.querySelector("#batch"),
       heartbeat: document.querySelector("#heartbeat"),
+      outputResolution: document.querySelector("#output-resolution"),
+      outputStandard: document.querySelector("#output-standard"),
+      previewImage: document.querySelector("#preview-image"),
       previewState: document.querySelector("#preview-state"),
       previewShot: document.querySelector("#preview-shot"),
       previewFrame: document.querySelector("#preview-frame"),
@@ -1514,12 +1614,16 @@
       healthNote: document.querySelector("#health-note"),
       pidCaption: document.querySelector("#pid-caption"),
       gpuValue: document.querySelector("#gpu-value"),
+      gpuUnit: document.querySelector("#gpu-unit"),
       gpuBar: document.querySelector("#gpu-bar"),
       vramValue: document.querySelector("#vram-value"),
+      vramUnit: document.querySelector("#vram-unit"),
       vramBar: document.querySelector("#vram-bar"),
       tempValue: document.querySelector("#temp-value"),
+      tempUnit: document.querySelector("#temp-unit"),
       tempBar: document.querySelector("#temp-bar"),
       memoryValue: document.querySelector("#memory-value"),
+      memoryUnit: document.querySelector("#memory-unit"),
       memoryBar: document.querySelector("#memory-bar"),
       lastValidFrame: document.querySelector("#last-valid-frame"),
       batchRetries: document.querySelector("#batch-retries"),
@@ -1527,13 +1631,19 @@
       resumeState: document.querySelector("#resume-state"),
       activeShotBar: document.querySelector("#active-shot-bar"),
       activeShotProgress: document.querySelector("#active-shot-progress"),
-      activeShotState: document.querySelector("#active-shot-state")
+      activeShotState: document.querySelector("#active-shot-state"),
+      queueCaption: document.querySelector("#queue-caption"),
+      shotQueue: document.querySelector("#shot-queue"),
+      qaList: document.querySelector("#qa-list"),
+      footerSource: document.querySelector("#footer-source")
     };
 
     function updateMetric(bar, value, textElement, textValue) {
-      bar.style.setProperty("--value", `${value}%`);
-      bar.parentElement.setAttribute("aria-valuenow", String(Math.round(value)));
-      textElement.textContent = String(textValue);
+      const available = Number.isFinite(value);
+      const percent = available ? Math.max(0, Math.min(100, value)) : 0;
+      bar.style.setProperty("--value", `${percent}%`);
+      bar.parentElement.setAttribute("aria-valuenow", String(Math.round(percent)));
+      textElement.textContent = available ? String(textValue) : "—";
     }
 
     function updatePipeline(activeStage, activeTone) {
@@ -1549,7 +1659,13 @@
           label = "DONE";
         } else if (index === activeIndex) {
           state = activeTone;
-          label = activeTone === "done" ? "VERIFIED" : activeTone === "warning" ? "COOLDOWN" : "ACTIVE";
+          label = activeTone === "done"
+            ? "VERIFIED"
+            : activeTone === "warning"
+              ? "COOLDOWN"
+              : activeTone === "failed"
+                ? "FAILED"
+                : "ACTIVE";
         }
 
         if (activeStage === "delivery" && activeTone === "done") {
@@ -1601,6 +1717,367 @@
       });
     }
 
+    const statusLabels = {
+      render: {
+        idle: "渲染待续跑",
+        running: "渲染中",
+        cooldown: "冷却恢复",
+        failed: "渲染失败",
+        complete: "渲染完成"
+      },
+      edit: {
+        idle: "等待剪辑",
+        running: "剪辑 / 编码中",
+        cooldown: "等待恢复",
+        failed: "剪辑失败",
+        complete: "剪辑完成"
+      },
+      delivery: {
+        idle: "等待最终质检",
+        running: "质检中",
+        cooldown: "等待恢复",
+        failed: "质检未通过",
+        complete: "已完成"
+      }
+    };
+
+    const shotLabels = {
+      verified: "已验证",
+      inventory_complete: "帧齐全",
+      partial: "未完成",
+      queued: "等待"
+    };
+
+    let lastGoodSummary = null;
+    let lastGoodAt = 0;
+    let pollTimer = 0;
+    let previewKey = "";
+
+    function toneFor(status) {
+      if (status === "complete") return "success";
+      if (status === "failed") return "danger";
+      if (status === "cooldown" || status === "idle") return "warning";
+      return "live";
+    }
+
+    function stageTone(data) {
+      if (data.status === "failed") return "failed";
+      if (data.status === "cooldown") return "warning";
+      if (data.status === "complete") return "done";
+      return "active";
+    }
+
+    function formatEta(seconds) {
+      if (!Number.isFinite(seconds)) return "估算中";
+      const safe = Math.max(0, Math.round(seconds));
+      const hours = Math.floor(safe / 3600);
+      const minutes = Math.floor((safe % 3600) / 60);
+      const secs = safe % 60;
+      return [hours, minutes, secs].map((part) => String(part).padStart(2, "0")).join(":");
+    }
+
+    function formatAge(seconds) {
+      if (!Number.isFinite(seconds)) return "刚刚";
+      if (seconds < 60) return `${Math.max(0, Math.round(seconds))} 秒前`;
+      if (seconds < 3600) return `${Math.round(seconds / 60)} 分钟前`;
+      return `${Math.round(seconds / 3600)} 小时前`;
+    }
+
+    function displayNumber(value, digits = 0) {
+      return Number.isFinite(value) ? Number(value).toFixed(digits) : "—";
+    }
+
+    function setSourceState(data, clientStale = false) {
+      const stale = clientStale || data?.health?.stale === true;
+      if (stale) {
+        elements.dataStrip.dataset.tone = "danger";
+        elements.sourceTitle.textContent = "DATA STALE";
+        const seconds = lastGoodAt ? Math.round((Date.now() - lastGoodAt) / 1000) : null;
+        elements.sourceNote.textContent = `状态连接已中断；保留最后一次有效数据（${formatAge(seconds)}）。`;
+        return;
+      }
+
+      const tone = data.status === "failed" ? "danger" : "live";
+      elements.dataStrip.dataset.tone = tone;
+      if (data.source === "derived") {
+        elements.sourceTitle.textContent = "REAL · DERIVED";
+        elements.sourceNote.textContent = "真实磁盘证据；未发现统一状态 JSON，恢复计数等字段可能不可用。";
+      } else {
+        elements.sourceTitle.textContent = data.source === "mixed" ? "REAL · MIXED" : "REAL · LIVE";
+        elements.sourceNote.textContent = "正在读取持久化任务状态与磁盘校验结果；页面为只读观察面。";
+      }
+    }
+
+    function renderShotQueue(data) {
+      const shots = Array.isArray(data.shots) ? data.shots : [];
+      elements.queueCaption.textContent = `${shots.length} SHOTS · ${data.progress.total} FRAMES`;
+      elements.shotQueue.replaceChildren();
+
+      shots.forEach((shot) => {
+        const row = document.createElement("div");
+        row.className = "queue-row";
+        row.setAttribute("role", "listitem");
+        row.tabIndex = 0;
+        row.dataset.active = String(shot.id === data.current.shot_id && !shot.inventory_complete);
+
+        const name = document.createElement("span");
+        name.className = "shot-name";
+        name.textContent = shot.label;
+
+        const frames = document.createElement("span");
+        frames.className = "shot-frames";
+        frames.textContent = `${String(shot.start).padStart(3, "0")}–${String(shot.end).padStart(3, "0")}`;
+
+        const progress = document.createElement("span");
+        progress.className = "shot-progress";
+        const track = document.createElement("span");
+        track.className = "shot-progress-track";
+        const fill = document.createElement("span");
+        fill.style.setProperty("--shot-progress", `${shot.percent}%`);
+        if (!shot.inventory_complete) fill.style.setProperty("--shot-color", "var(--accent)");
+        track.append(fill);
+        const percent = document.createElement("small");
+        percent.textContent = `${shot.percent.toFixed(1)}%`;
+        progress.append(track, percent);
+
+        const state = document.createElement("span");
+        state.className = "shot-state";
+        state.textContent = shotLabels[shot.status] || shot.status;
+        row.append(name, frames, progress, state);
+        elements.shotQueue.append(row);
+      });
+    }
+
+    function renderQa(data) {
+      const delivery = data.delivery || {};
+      let items = Array.isArray(delivery.issues) ? [...delivery.issues] : [];
+      if (delivery.qa_passed) {
+        const actual = delivery.actual || {};
+        items = [
+          `${String(actual.codec || "HEVC").toUpperCase()} · ${actual.width}×${actual.height} · ${displayNumber(actual.fps)} fps`,
+          "Rec.709、全片解码与 SHA-256 均已记录"
+        ];
+      } else if (!items.length) {
+        items = ["等待最终媒体校验记录"];
+      }
+
+      elements.qaList.dataset.passed = String(delivery.qa_passed === true);
+      elements.qaList.replaceChildren();
+      items.slice(0, 6).forEach((message) => {
+        const item = document.createElement("li");
+        item.textContent = message;
+        elements.qaList.append(item);
+      });
+    }
+
+    function renderPipeline(data) {
+      const renderDone = data.progress.all_frames_present;
+      const editDone = data.delivery?.exists === true;
+      document.querySelectorAll(".pipeline-step").forEach((step) => {
+        const name = step.dataset.step;
+        let state = "queued";
+        let label = "QUEUED";
+        if (["idea", "storyboard", "scene"].includes(name)) {
+          state = "done";
+          label = "DONE";
+        } else if (name === "render") {
+          if (renderDone) {
+            state = "done";
+            label = data.progress.all_frames_verified ? "VERIFIED" : "INVENTORY OK";
+          } else if (data.stage === "render") {
+            state = stageTone(data);
+            label = data.status === "running" ? "ACTIVE" : data.status.toUpperCase();
+          }
+        } else if (name === "edit") {
+          if (editDone) {
+            state = "done";
+            label = "MEDIA EXISTS";
+          } else if (data.stage === "edit") {
+            state = stageTone(data);
+            label = data.status === "running" ? "ACTIVE" : data.status.toUpperCase();
+          }
+        } else if (name === "delivery" && data.stage === "delivery") {
+          state = stageTone(data);
+          label = data.status === "complete" ? "VERIFIED" : data.status.toUpperCase();
+        }
+        step.dataset.state = state;
+        step.querySelector(".step-meta").textContent = label;
+      });
+    }
+
+    function applySummary(data) {
+      const progress = data.progress || {};
+      const health = data.health || {};
+      const gpu = health.gpu || {};
+      const memory = health.memory || {};
+      const recovery = data.recovery || {};
+      const preview = data.preview || {};
+      const delivery = data.delivery || {};
+      const actual = delivery.actual || {};
+      const expected = data.expected || {};
+      const percent = Number.isFinite(progress.percent) ? progress.percent : 0;
+      const tone = toneFor(data.status);
+
+      document.documentElement.style.setProperty("--progress", `${percent}%`);
+      elements.projectLabel.textContent = `Active production · ${data.project_name}`;
+      elements.projectFile.textContent = data.project_file || "项目文件未记录";
+      elements.taskTitle.textContent = data.title;
+      elements.statusPill.textContent = statusLabels[data.stage]?.[data.status] || data.status;
+      elements.statusPill.dataset.tone = tone;
+      elements.progressRing.setAttribute("aria-valuenow", String(percent));
+      elements.progressPercent.textContent = `${percent.toFixed(1)}%`;
+      elements.frameCurrent.textContent = String(progress.current ?? "—");
+      elements.frameTotal.textContent = `/ ${progress.total ?? "—"} frames`;
+      elements.eta.textContent = data.status === "complete" ? "00:00:00" : formatEta(progress.eta_seconds);
+      elements.batch.textContent = progress.all_frames_present
+        ? "FRAME INVENTORY · COMPLETE"
+        : data.current?.batch || data.current?.shot_id || "BATCH · NOT RECORDED";
+      elements.heartbeat.textContent = health.heartbeat_at
+        ? `监督器心跳 · ${formatAge(health.heartbeat_age_seconds)}`
+        : "磁盘状态扫描 · 刚刚";
+      elements.outputResolution.textContent = `${expected.width || "—"} × ${expected.height || "—"}`;
+      elements.outputStandard.textContent =
+        `${expected.fps || "—"} FPS · ${String(expected.codec || "—").toUpperCase()} · Rec.709`;
+
+      elements.previewState.textContent = preview.available ? "DECODED" : "UNAVAILABLE";
+      elements.previewShot.textContent = preview.shot_id
+        ? preview.shot_id.replace("_", " ").toUpperCase()
+        : "最近有效帧不可用";
+      elements.previewFrame.textContent = preview.filename || preview.reason || "—";
+      elements.frameTime.textContent = Number.isFinite(data.current?.median_frame_seconds)
+        ? `${data.current.median_frame_seconds.toFixed(1)} s / frame`
+        : progress.all_frames_present
+          ? "帧清单完整"
+          : "帧耗时未记录";
+      if (preview.available && preview.url) {
+        const nextKey = `${preview.filename}|${preview.version}`;
+        if (nextKey !== previewKey) {
+          elements.previewImage.src = `${preview.url}?v=${encodeURIComponent(preview.version)}`;
+          previewKey = nextKey;
+        }
+        elements.previewImage.hidden = false;
+      } else {
+        elements.previewImage.hidden = true;
+      }
+
+      updateMetric(elements.gpuBar, gpu.percent, elements.gpuValue, displayNumber(gpu.percent));
+      elements.gpuUnit.textContent = "%";
+      updateMetric(
+        elements.vramBar,
+        gpu.vram_percent,
+        elements.vramValue,
+        displayNumber(gpu.vram_used_gb, 1)
+      );
+      elements.vramUnit.textContent = Number.isFinite(gpu.vram_total_gb)
+        ? `/ ${displayNumber(gpu.vram_total_gb, 1)} GB`
+        : "GB";
+      updateMetric(
+        elements.tempBar,
+        gpu.temperature_c,
+        elements.tempValue,
+        displayNumber(gpu.temperature_c)
+      );
+      elements.tempUnit.textContent = "°C";
+      updateMetric(
+        elements.memoryBar,
+        memory.percent,
+        elements.memoryValue,
+        displayNumber(memory.used_gb, 1)
+      );
+      elements.memoryUnit.textContent = Number.isFinite(memory.total_gb)
+        ? `/ ${displayNumber(memory.total_gb, 1)} GB`
+        : "GB";
+
+      const active = Array.isArray(health.active_pids) ? health.active_pids : [];
+      elements.pidCaption.textContent = active.length ? `PID ${active.join(", ")}` : "PID —";
+      elements.machineCaption.textContent = active.length ? "发现活动生产进程" : "当前无 Blender / Resolve / FFmpeg";
+      if (data.status === "failed") {
+        elements.healthNote.textContent = "设备状态正常；当前阻塞来自交付规格质检。";
+        elements.healthNote.dataset.tone = "danger";
+      } else if (!health.gpu || !health.memory) {
+        elements.healthNote.textContent = "部分设备指标不可用，页面不会据此猜测任务状态。";
+        elements.healthNote.dataset.tone = "warning";
+      } else {
+        elements.healthNote.textContent = active.length
+          ? "设备指标来自本机只读采样。"
+          : "生产设备当前空闲。";
+        elements.healthNote.dataset.tone = "live";
+      }
+
+      elements.lastValidFrame.textContent = Number.isFinite(data.current?.last_valid_frame)
+        ? String(data.current.last_valid_frame).padStart(6, "0")
+        : "—";
+      elements.batchRetries.textContent = Number.isFinite(recovery.batch_retry_count)
+        ? String(recovery.batch_retry_count)
+        : "未记录";
+      elements.crashCount.textContent = Number.isFinite(recovery.total_crash_count)
+        ? `${recovery.total_crash_count} 次`
+        : "未记录";
+      elements.resumeState.textContent = recovery.auto_resume_enabled === true
+        ? "ARMED"
+        : recovery.auto_resume_enabled === false
+          ? "DISABLED"
+          : "NOT RECORDED";
+
+      renderShotQueue(data);
+      renderPipeline(data);
+      renderQa(data);
+      setSourceState(data);
+
+      const actualLabel = delivery.exists
+        ? `${delivery.filename} · ${actual.width || "—"}×${actual.height || "—"} · ${String(actual.codec || "未知").toUpperCase()}`
+        : "尚无最终成片";
+      elements.footerSource.textContent =
+        `刷新频率 5s · ${actualLabel} · 状态生成 ${new Date(data.generated_at).toLocaleTimeString("zh-CN", {hour12: false})}`;
+    }
+
+    function showPending() {
+      elements.taskTitle.textContent = "正在读取真实制作状态";
+      elements.projectLabel.textContent = "Active production · connecting";
+      elements.projectFile.textContent = "只读连接建立中…";
+      elements.statusPill.textContent = "连接中";
+      elements.statusPill.dataset.tone = "warning";
+      elements.progressPercent.textContent = "—";
+      elements.frameCurrent.textContent = "—";
+      elements.eta.textContent = "估算中";
+      elements.previewState.textContent = "WAITING";
+      elements.machineCaption.textContent = "正在读取设备指标";
+      elements.healthNote.textContent = "页面不会启动、停止或重试生产任务。";
+      elements.shotQueue.replaceChildren();
+    }
+
+    async function fetchStatus() {
+      const controller = new AbortController();
+      const timeout = window.setTimeout(() => controller.abort(), 8000);
+      try {
+        const response = await fetch("/api/status", {
+          cache: "no-store",
+          signal: controller.signal,
+          headers: {"Accept": "application/json"}
+        });
+        if (!response.ok) throw new Error(`HTTP ${response.status}`);
+        const data = await response.json();
+        if (data.schema_version !== 1) throw new Error("Unsupported status schema");
+        lastGoodSummary = data;
+        lastGoodAt = Date.now();
+        applySummary(data);
+      } catch (error) {
+        if (lastGoodSummary) {
+          setSourceState(lastGoodSummary, true);
+        } else {
+          elements.dataStrip.dataset.tone = "danger";
+          elements.sourceTitle.textContent = "SERVICE OFFLINE";
+          elements.sourceNote.textContent = "无法读取本机状态服务；未显示模拟数据。可用 ?demo=1 查看界面演示。";
+          elements.statusPill.textContent = "未连接";
+          elements.statusPill.dataset.tone = "danger";
+        }
+      } finally {
+        window.clearTimeout(timeout);
+        const delay = document.hidden ? 15000 : 5000;
+        pollTimer = window.setTimeout(fetchStatus, delay);
+      }
+    }
+
     document.querySelectorAll("[data-scenario]").forEach((button) => {
       button.addEventListener("click", () => applyScenario(button.dataset.scenario));
     });
@@ -1616,6 +2093,24 @@
 
     updateClock();
     window.setInterval(updateClock, 1000);
+
+    const demoMode = new URLSearchParams(window.location.search).get("demo") === "1";
+    if (demoMode) {
+      elements.demoControls.hidden = false;
+      elements.dataStrip.dataset.tone = "warning";
+      elements.sourceTitle.textContent = "INTERACTIVE DEMO";
+      elements.sourceNote.textContent = "当前为明确标记的模拟状态，不作为生产完成证据。";
+      applyScenario("rendering");
+    } else {
+      showPending();
+      fetchStatus();
+      document.addEventListener("visibilitychange", () => {
+        if (!document.hidden) {
+          window.clearTimeout(pollTimer);
+          fetchStatus();
+        }
+      });
+    }
   </script>
 </body>
 </html>
