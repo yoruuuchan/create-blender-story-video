@@ -8,6 +8,7 @@ import csv
 import json
 import math
 import mimetypes
+import os
 import re
 import shutil
 import subprocess
@@ -209,19 +210,23 @@ class Monitor:
             )
             frame_numbers = set()
             if directory.is_dir():
-                for path in directory.iterdir():
-                    match = FRAME_PATTERN.match(path.name)
-                    if not match or not path.is_file():
+                for entry in os.scandir(directory):
+                    match = FRAME_PATTERN.match(entry.name)
+                    if not match or not entry.is_file(follow_symlinks=False):
                         continue
                     frame_number = int(match.group(1))
                     if shot["start"] <= frame_number <= shot["end"]:
                         frame_numbers.add(frame_number)
-                        try:
-                            stat = path.stat()
-                        except OSError:
-                            continue
-                        preview_candidates.append((frame_number, stat.st_mtime, shot["id"], path))
-                        newest_evidence = max(newest_evidence or stat.st_mtime, stat.st_mtime)
+                        preview_candidates.append(
+                            (frame_number, shot["id"], Path(entry.path))
+                        )
+                try:
+                    directory_mtime = directory.stat().st_mtime
+                    newest_evidence = max(
+                        newest_evidence or directory_mtime, directory_mtime
+                    )
+                except OSError:
+                    pass
 
             expected_numbers = set(range(shot["start"], shot["end"] + 1))
             total = len(expected_numbers)
@@ -265,7 +270,8 @@ class Monitor:
                 "reason": "Pillow 未安装，未暴露未经完整解码的预览帧",
             }
 
-        for frame_number, mtime, shot_id, path in sorted(candidates, reverse=True)[:12]:
+        ordered = sorted(candidates, key=lambda item: item[0], reverse=True)
+        for frame_number, shot_id, path in ordered[:12]:
             try:
                 stat = path.stat()
             except OSError:
