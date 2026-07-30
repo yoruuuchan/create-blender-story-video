@@ -1,4 +1,4 @@
 interface:
   display_name: "Blender Story Video"
-  short_description: "三种创作模式完成 4K Blender 短片与达芬奇成片验收"
-  default_prompt: "Use $create-blender-story-video to turn my idea or reference into a verified 4K 30 fps H.265 Rec.709 Blender film edited in DaVinci Resolve."
+  short_description: "三种模式完成可恢复、可监控的 4K Blender 与达芬奇短片"
+  default_prompt: "Use $create-blender-story-video to turn my idea or reference into a verified 4K Blender film with resilient rendering, a read-only progress dashboard, and DaVinci Resolve editing."

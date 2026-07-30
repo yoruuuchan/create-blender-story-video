@@ -1,8 +1,8 @@
 # Create Blender Story Video
 
-面向 Codex 与 Claude Code 的端到端 3D 视频制作 Skill：把一句创意或视觉参考推进为风格锁定、分镜、AI 参考图、Blender 场景、可恢复渲染、DaVinci Resolve 剪辑和经过媒体校验的成片。
+面向 Codex 与 Claude Code 的端到端 3D 视频制作 Skill：把一句创意或视觉参考推进为风格锁定、分镜、AI 参考图、Blender 场景、可恢复渲染、只读进度监控、DaVinci Resolve 剪辑和经过媒体校验的成片。
 
-An Agent Skill for Codex and Claude Code that turns an idea or visual reference into a style-locked storyboard, reference images, a Blender production, resilient rendering, DaVinci Resolve editing, and a verified final video.
+An Agent Skill for Codex and Claude Code that turns an idea or visual reference into a style-locked storyboard, reference images, a Blender production, resilient rendering, a read-only progress dashboard, DaVinci Resolve editing, and a verified final video.
 
 ## 默认交付
 
@@ -19,8 +19,19 @@ An Agent Skill for Codex and Claude Code that turns an idea or visual reference 
 3. 生成风格母图和逐镜头参考图。
 4. 使用 Blender MCP 与可复现脚本建模、布光、放置摄像机并完成阶段验收。
 5. 使用短批次、持久化状态和独立监督进程完成可断点、可重启恢复的逐帧渲染。
-6. 选择当前更方便且经过验证的 Resolve MCP 或官方脚本 API 完成剪辑。
-7. 验证帧数、编码、色彩标签、全片解码和 SHA-256 后交付。
+6. 按需启用本地只读页面，查看帧进度、最近画面、硬件负载、恢复次数和剪辑阶段。
+7. 选择当前更方便且经过验证的 Resolve MCP 或官方脚本 API 完成剪辑。
+8. 验证帧数、编码、色彩标签、全片解码和 SHA-256 后交付。
+
+## 可选监控页
+
+Skill 内置无框架 HTML 模板：
+
+```text
+skills/create-blender-story-video/assets/render-monitor-dashboard/index.html
+```
+
+页面默认只在本机读取脱敏后的状态摘要，是观察面而不是控制面；关闭页面不会影响 Blender、Resolve 或渲染监督进程。若要通过 Cloudflare 域名远程查看，应额外配置只读数据传输与身份保护，不直接公开本机路径、日志或命令入口。
 
 ## 安装
 
@@ -66,7 +77,11 @@ skills/create-blender-story-video/
 ├── SKILL.md
 ├── agents/
 │   └── openai.yaml
+├── assets/
+│   └── render-monitor-dashboard/
+│       └── index.html
 └── references/
+    ├── monitor-dashboard.md
     ├── reference-gates.md
     ├── render-and-delivery.md
     ├── resolve-routing.md

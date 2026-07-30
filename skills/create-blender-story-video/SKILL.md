@@ -1,6 +1,6 @@
 ---
 name: create-blender-story-video
-description: 将一句视频创意或既有视觉参考推进为风格锁定、分镜、AI 参考图、Blender MCP 建模与摄像机、低负载可断点渲染、DaVinci Resolve MCP 或脚本 API 剪辑，以及经过媒体校验的 4K 30 fps H.265 Rec.709 MP4。支持自主创作、共同创作和参考复刻三种模式。用于制作 3D 短片、竖屏氛围片、产品或概念视频，或把想法、参考图、Blender、达芬奇串成可重复工作流时。
+description: 将一句视频创意或既有视觉参考推进为风格锁定、分镜、AI 参考图、Blender MCP 建模与摄像机、低负载可断点渲染、只读渲染与剪辑监控页、DaVinci Resolve MCP 或脚本 API 剪辑，以及经过媒体校验的 4K 30 fps H.265 Rec.709 MP4。支持自主创作、共同创作和参考复刻三种模式。用于制作 3D 短片、竖屏氛围片、产品或概念视频，把想法、参考图、Blender、达芬奇串成可重复工作流，或为长时间渲染与剪辑建立安全进度页面时。
 ---
 
 # Create Blender Story Video
@@ -17,6 +17,7 @@ description: 将一句视频创意或既有视觉参考推进为风格锁定、�
 - 同时使用参考图对照和可测量的场景事实验收 Blender 结果；不要把视觉模型判断或 MCP 成功返回当成唯一证据。
 - 正式渲染输出逐帧 PNG，不直接输出 MP4。只有完整校验帧序列后才编码镜头视频。
 - 让正式渲染由独立监督进程管理，把心跳、批次、重试和已验证帧写入磁盘；Blender、Codex 或整机重启后都从真实状态恢复，不依赖前台会话。
+- 监控页是可选的只读观察面，不是控制面。页面或本地服务退出不得影响 Blender、Resolve 或渲染监督进程；默认只监听 `127.0.0.1`。
 - DaVinci Resolve MCP 和官方脚本 API 均可使用。选择当前已验证、覆盖任务完整且步骤更少的入口，不固定偏好；不要自行安装第三方 MCP，也不要在 Resolve 连接失败时静默换成其他剪辑器。
 - 保存源文件、脚本、日志、帧序列和项目备份。不要把唯一成果留在 Blender 或 Resolve 的未保存会话中。
 
@@ -69,6 +70,8 @@ production-renders/shot_01/frame_000001.png
 render/render-state.json
 render/resume-render.ps1
 render/logs/
+monitor/index.html
+monitor/summary.json
 edit/*.lua
 edit/resolve-run.json
 backups/
@@ -186,7 +189,13 @@ workflow-retrospective.md
 
 完整校验帧数、编号、尺寸、颜色模式和每张 PNG 的可解码性后，再编码镜头 MP4。
 
-### 6. 使用 Resolve 剪辑
+### 6. 可选只读监控页
+
+用户要求查看长时间渲染或剪辑状态时，完整读取 [monitor-dashboard.md](references/monitor-dashboard.md)。复制 `assets/render-monitor-dashboard/index.html` 到项目的 `monitor/`，由项目内轻量服务把 `render/render-state.json`、`shot-status.json` 和 `edit/resolve-run.json` 归一化为原子更新的 `monitor/summary.json`。
+
+页面每 2–5 秒读取一次状态，只展示进度、最近有效帧、ETA、心跳、资源负载、恢复次数、镜头队列、Resolve 阶段和最终媒体校验。第一版不提供启动、停止、重试或任意命令入口。若用户明确要求通过 Cloudflare 域名远程查看，先按参考文件执行数据脱敏、身份保护和只读传输设计；不要把本机路径、命令行、原始日志或控制接口公开。
+
+### 7. 使用 Resolve 剪辑
 
 进入 Resolve 前完整读取 [resolve-routing.md](references/resolve-routing.md)。同时探测 Resolve MCP 和项目内 Lua/Python 官方脚本 API，选择当前连接更稳定、覆盖操作完整且需要未验证步骤更少的入口。
 
@@ -194,7 +203,7 @@ workflow-retrospective.md
 
 若两个接口都不可用，停在“已验证镜头 MP4”状态并报告具体阻塞；不要擅自安装第三方 MCP，也不要改用 Remotion、剪映或手工 GUI。
 
-### 7. 验证并交付
+### 8. 验证并交付
 
 至少验证：
 
