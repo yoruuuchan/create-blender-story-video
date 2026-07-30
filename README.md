@@ -25,7 +25,7 @@ An Agent Skill for Codex and Claude Code that turns an idea or visual reference 
 
 ## 可选监控页
 
-Skill 内置无框架页面、只读 Python 状态服务与配置样例：
+Skill 内置采用 KUNLUN Design System 的无框架页面、只读 Python 状态服务与配置样例：
 
 ```text
 skills/create-blender-story-video/assets/render-monitor-dashboard/
@@ -34,7 +34,7 @@ skills/create-blender-story-video/assets/render-monitor-dashboard/
 └── monitor-config.example.json
 ```
 
-复制配置样例为 `monitor-config.json` 并填写项目路径后，运行 `python3 server.py --project-root <项目目录>`。服务默认只监听 `127.0.0.1:4876`，只开放状态、健康检查和最近已完整解码帧的 GET 路由；关闭页面或服务不会影响 Blender、Resolve 或渲染监督进程。若要通过 Cloudflare 域名远程查看，应额外配置只读数据传输与身份保护，不直接公开本机路径、日志或命令入口。
+复制配置样例为 `monitor-config.json` 并填写项目路径后，运行 `python3 server.py --project-root <项目目录>`，再打开 `http://127.0.0.1:4876/`；若改用其他端口，以启动日志打印的 URL 为准。服务默认只监听回环地址，只开放状态、健康检查和最近已完整解码帧的 GET 路由；关闭页面或服务不会影响 Blender、Resolve 或渲染监督进程。若要通过 Cloudflare 域名远程查看，应额外配置只读数据传输与身份保护，不直接公开本机路径、日志或命令入口。
 
 ## 安装
 

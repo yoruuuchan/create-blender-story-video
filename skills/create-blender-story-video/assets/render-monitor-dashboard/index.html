@@ -4,42 +4,100 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="color-scheme" content="dark">
-  <meta name="theme-color" content="#071018">
-  <title>Render Watch · 渲染与剪辑监控</title>
+  <meta name="theme-color" content="#04060a">
+  <title>KUNLUN // Render Watch</title>
   <style>
+    @import url("https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=VT323&family=Orbitron:wght@500;700;900&family=Noto+Sans+SC:wght@400;500;700&display=swap");
+
     :root {
-      --bg: #071018;
-      --bg-deep: #04090e;
-      --surface: #0b1721;
-      --surface-high: #10212d;
-      --surface-soft: #0d1b25;
-      --line: #203442;
-      --line-soft: rgba(138, 174, 194, 0.13);
-      --text: #edf7fb;
-      --muted: #91a8b5;
-      --quiet: #627b89;
-      --accent: #6fe5ff;
-      --accent-strong: #32c8ec;
-      --accent-soft: rgba(111, 229, 255, 0.12);
-      --success: #79e6ae;
-      --warning: #ffc56b;
-      --danger: #ff7a86;
-      --progress: 57.4%;
-      --radius-lg: 24px;
-      --radius-md: 17px;
-      --radius-sm: 11px;
-      --shadow: 0 24px 72px rgba(0, 0, 0, 0.3);
-      --font-sans: "Fira Sans", "Segoe UI", "Microsoft YaHei UI", sans-serif;
-      --font-mono: "Fira Code", "Cascadia Code", "SFMono-Regular", Consolas, monospace;
+      --bg-void: #04060a;
+      --bg-base: #06080d;
+      --bg-surface: #0a0f17;
+      --bg-panel: #0d1320;
+      --bg-elevated: #131a2a;
+      --bg-inset: #02040a;
+      --neutral-50: #f5f9ff;
+      --neutral-100: #e3eaf3;
+      --neutral-200: #c2cdda;
+      --neutral-300: #95a3b4;
+      --neutral-400: #6c7a8c;
+      --neutral-500: #4d5a6e;
+      --neutral-600: #364154;
+      --neutral-700: #232c3d;
+      --neutral-800: #161e2c;
+      --cyan-200: #a7ecff;
+      --cyan-300: #5fd9ff;
+      --cyan-400: #1fc8ff;
+      --cyan-500: #00b8ff;
+      --cyan-600: #0098d4;
+      --cyan-700: #0075a8;
+      --cyan-800: #00547a;
+      --blue-500: #2a5fd6;
+      --amber-300: #ffd166;
+      --amber-500: #ffb000;
+      --amber-700: #b07300;
+      --red-300: #ff7878;
+      --red-500: #ff3a3a;
+      --red-700: #b22020;
+      --green-300: #5cffb8;
+      --green-500: #00e891;
+      --green-700: #008f55;
+      --text-primary: var(--neutral-100);
+      --text-secondary: var(--neutral-300);
+      --text-tertiary: var(--neutral-400);
+      --text-disabled: var(--neutral-500);
+      --text-signal: var(--cyan-300);
+      --border: #1a2540;
+      --border-strong: #2a3a5c;
+      --border-signal: var(--cyan-700);
+      --border-warn: var(--amber-700);
+      --border-danger: var(--red-700);
+      --accent: var(--cyan-500);
+      --accent-glow: rgba(0, 184, 255, 0.45);
+      --accent-glow-soft: rgba(0, 184, 255, 0.18);
+      --warn-glow: rgba(255, 176, 0, 0.4);
+      --danger-glow: rgba(255, 58, 58, 0.4);
+      --success-glow: rgba(0, 232, 145, 0.4);
+      --font-mono: "JetBrains Mono", "Noto Sans SC", "Cascadia Mono", ui-monospace, monospace;
+      --font-display: "Orbitron", "JetBrains Mono", "Noto Sans SC", "Cascadia Mono", monospace;
+      --font-crt: "VT323", "JetBrains Mono", "Noto Sans SC", monospace;
+      --tracking-wide: 0.06em;
+      --tracking-wider: 0.12em;
+      --tracking-widest: 0.22em;
+      --space-1: 4px;
+      --space-2: 8px;
+      --space-3: 12px;
+      --space-4: 16px;
+      --space-5: 20px;
+      --space-6: 24px;
+      --space-8: 32px;
+      --clip-sm: polygon(6px 0, 100% 0, 100% calc(100% - 6px), calc(100% - 6px) 100%, 0 100%, 0 6px);
+      --clip-md: polygon(12px 0, 100% 0, 100% calc(100% - 12px), calc(100% - 12px) 100%, 0 100%, 0 12px);
+      --clip-all: polygon(10px 0, calc(100% - 10px) 0, 100% 10px, 100% calc(100% - 10px), calc(100% - 10px) 100%, 10px 100%, 0 calc(100% - 10px), 0 10px);
+      --glow-cyan-sm: 0 0 8px var(--accent-glow-soft);
+      --glow-cyan-md: 0 0 16px var(--accent-glow), 0 0 2px var(--cyan-400);
+      --glow-amber-md: 0 0 16px var(--warn-glow), 0 0 2px var(--amber-300);
+      --glow-red-md: 0 0 16px var(--danger-glow), 0 0 2px var(--red-300);
+      --glow-green-md: 0 0 16px var(--success-glow), 0 0 2px var(--green-300);
+      --text-glow-cyan: 0 0 6px rgba(0, 184, 255, 0.7);
+      --text-glow-amber: 0 0 6px rgba(255, 176, 0, 0.7);
+      --text-glow-red: 0 0 6px rgba(255, 58, 58, 0.7);
+      --progress: 0%;
+      --dur-fast: 120ms;
+      --dur-normal: 180ms;
+      --ease-out: cubic-bezier(0.2, 0.7, 0.2, 1);
     }
 
-    * {
+    *,
+    *::before,
+    *::after {
       box-sizing: border-box;
     }
 
     html {
-      background: var(--bg-deep);
-      scroll-behavior: smooth;
+      min-width: 320px;
+      min-height: 100%;
+      background: var(--bg-void);
     }
 
     body {
@@ -47,32 +105,39 @@
       min-height: 100dvh;
       margin: 0;
       overflow-x: hidden;
-      color: var(--text);
-      font-family: var(--font-sans);
-      font-size: 16px;
-      line-height: 1.5;
+      color: var(--text-primary);
+      font-family: var(--font-mono);
+      font-size: 14px;
+      line-height: 1.45;
       background:
-        radial-gradient(circle at 18% -10%, rgba(50, 200, 236, 0.11), transparent 34rem),
-        radial-gradient(circle at 90% 8%, rgba(40, 94, 133, 0.14), transparent 30rem),
-        linear-gradient(145deg, var(--bg-deep), var(--bg) 55%, #08131b);
+        radial-gradient(circle at 48% -18%, rgba(0, 184, 255, 0.13), transparent 36rem),
+        linear-gradient(rgba(120, 180, 255, 0.05) 1px, transparent 1px) 0 0 / 40px 40px,
+        linear-gradient(90deg, rgba(120, 180, 255, 0.05) 1px, transparent 1px) 0 0 / 40px 40px,
+        var(--bg-base);
     }
 
     body::before {
       position: fixed;
       inset: 0;
-      z-index: -1;
+      z-index: 100;
       content: "";
       pointer-events: none;
-      opacity: 0.28;
-      background-image:
-        linear-gradient(var(--line-soft) 1px, transparent 1px),
-        linear-gradient(90deg, var(--line-soft) 1px, transparent 1px);
-      background-size: 64px 64px;
-      mask-image: linear-gradient(to bottom, black, transparent 72%);
+      opacity: 0.55;
+      background: repeating-linear-gradient(
+        to bottom,
+        transparent 0,
+        transparent 2px,
+        rgba(0, 184, 255, 0.025) 2px,
+        rgba(0, 184, 255, 0.025) 3px
+      );
     }
 
-    button {
+    button,
+    input,
+    select,
+    textarea {
       font: inherit;
+      color: inherit;
     }
 
     [hidden] {
@@ -81,14 +146,14 @@
 
     .skip-link {
       position: fixed;
-      top: 10px;
-      left: 10px;
-      z-index: 100;
+      top: 8px;
+      left: 8px;
+      z-index: 200;
       padding: 10px 14px;
-      color: #041015;
+      color: var(--bg-void);
       font-weight: 700;
-      background: var(--accent);
-      border-radius: 8px;
+      background: var(--cyan-400);
+      clip-path: var(--clip-sm);
       transform: translateY(-180%);
     }
 
@@ -97,277 +162,326 @@
     }
 
     .shell {
-      width: min(1500px, calc(100% - 40px));
+      position: relative;
+      z-index: 1;
+      width: min(1480px, calc(100% - 40px));
       margin: 0 auto;
-      padding: 28px 0 40px;
+      padding: 20px 0 32px;
     }
 
     .topbar {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      gap: 24px;
-      min-height: 64px;
-      margin-bottom: 22px;
+      gap: 20px;
+      min-height: 54px;
+      margin-bottom: 12px;
+      padding: 8px 12px 8px 8px;
+      border: 1px solid var(--border);
+      border-left-color: var(--cyan-700);
+      background: rgba(13, 19, 32, 0.72);
+      backdrop-filter: blur(7px);
+      clip-path: var(--clip-sm);
     }
 
     .brand {
       display: flex;
       align-items: center;
-      gap: 13px;
+      min-width: 0;
+      gap: 12px;
     }
 
     .brand-mark {
-      position: relative;
-      width: 42px;
-      height: 42px;
+      display: grid;
+      width: 36px;
+      height: 36px;
       flex: 0 0 auto;
-      border: 1px solid rgba(111, 229, 255, 0.52);
-      border-radius: 13px;
-      background: linear-gradient(145deg, rgba(111, 229, 255, 0.18), rgba(111, 229, 255, 0.03));
-      box-shadow: inset 0 0 22px rgba(111, 229, 255, 0.08), 0 0 24px rgba(111, 229, 255, 0.08);
-    }
-
-    .brand-mark::before,
-    .brand-mark::after {
-      position: absolute;
-      content: "";
-      background: var(--accent);
-      border-radius: 999px;
-    }
-
-    .brand-mark::before {
-      width: 18px;
-      height: 2px;
-      top: 13px;
-      left: 11px;
-      box-shadow: 0 7px 0 rgba(111, 229, 255, 0.7), 0 14px 0 rgba(111, 229, 255, 0.4);
-    }
-
-    .brand-mark::after {
-      width: 4px;
-      height: 4px;
-      top: 12px;
-      right: 8px;
-      box-shadow: 0 7px 0 rgba(111, 229, 255, 0.7), 0 14px 0 rgba(111, 229, 255, 0.4);
+      place-items: center;
+      color: var(--bg-void);
+      font-family: var(--font-display);
+      font-size: 17px;
+      font-weight: 900;
+      background: var(--cyan-500);
+      box-shadow: var(--glow-cyan-md);
+      clip-path: var(--clip-all);
     }
 
     .brand-copy {
       display: grid;
+      min-width: 0;
       gap: 1px;
     }
 
     .brand-copy strong {
-      font-family: var(--font-mono);
+      overflow: hidden;
+      font-family: var(--font-display);
       font-size: 15px;
-      letter-spacing: 0.14em;
+      font-weight: 900;
+      letter-spacing: var(--tracking-widest);
+      text-overflow: ellipsis;
+      white-space: nowrap;
     }
 
     .brand-copy span {
-      color: var(--muted);
-      font-size: 13px;
+      color: var(--cyan-300);
+      font-family: "Noto Sans SC", var(--font-mono);
+      font-size: 9px;
+      letter-spacing: 0.38em;
+      text-transform: uppercase;
     }
 
     .top-meta {
       display: flex;
       align-items: center;
       justify-content: flex-end;
-      gap: 18px;
+      gap: 12px;
+      color: var(--text-tertiary);
+      font-size: 10px;
+      letter-spacing: var(--tracking-wider);
+      text-transform: uppercase;
     }
 
     .read-only {
-      padding: 7px 10px;
-      color: var(--muted);
-      font-family: var(--font-mono);
-      font-size: 11px;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-      border: 1px solid var(--line);
-      border-radius: 999px;
-      background: rgba(8, 19, 27, 0.7);
+      padding: 5px 8px;
+      border: 1px solid var(--border-strong);
+      background: var(--bg-inset);
+      clip-path: var(--clip-sm);
     }
 
     .clock {
-      min-width: 104px;
-      color: var(--text);
-      font-family: var(--font-mono);
-      font-size: 14px;
+      min-width: 76px;
+      color: var(--cyan-300);
+      font-family: var(--font-crt);
+      font-size: 20px;
       font-variant-numeric: tabular-nums;
       text-align: right;
+      text-shadow: var(--text-glow-cyan);
     }
 
-    .demo-strip {
-      --strip-color: var(--warning);
+    .source-strip {
+      --source-color: var(--amber-500);
       display: flex;
       align-items: center;
       justify-content: space-between;
-      gap: 18px;
-      margin-bottom: 18px;
-      padding: 12px 14px 12px 16px;
-      color: #cfe3ec;
-      border: 1px solid color-mix(in srgb, var(--strip-color) 30%, transparent);
-      border-radius: var(--radius-sm);
-      background: linear-gradient(
-        90deg,
-        color-mix(in srgb, var(--strip-color) 9%, transparent),
-        color-mix(in srgb, var(--strip-color) 3%, transparent)
-      );
+      gap: 16px;
+      min-height: 42px;
+      margin-bottom: 12px;
+      padding: 8px 12px;
+      border: 1px solid var(--border-warn);
+      border-left: 3px solid var(--source-color);
+      color: var(--text-secondary);
+      background: linear-gradient(90deg, rgba(255, 176, 0, 0.08), var(--bg-panel) 42%);
+      clip-path: var(--clip-sm);
     }
 
-    .demo-strip[data-tone="live"],
-    .demo-strip[data-tone="success"] {
-      --strip-color: var(--success);
+    .source-strip[data-tone="live"],
+    .source-strip[data-tone="success"] {
+      --source-color: var(--cyan-400);
+      border-color: var(--cyan-700);
+      background: linear-gradient(90deg, rgba(0, 184, 255, 0.08), var(--bg-panel) 42%);
     }
 
-    .demo-strip[data-tone="danger"] {
-      --strip-color: var(--danger);
+    .source-strip[data-tone="danger"] {
+      --source-color: var(--red-500);
+      border-color: var(--red-700);
+      background: linear-gradient(90deg, rgba(255, 58, 58, 0.09), var(--bg-panel) 42%);
     }
 
-    .demo-note {
+    .source-message {
       display: flex;
       align-items: center;
-      gap: 10px;
       min-width: 0;
-      font-size: 13px;
+      gap: 10px;
+      font-size: 12px;
     }
 
-    .demo-note::before {
-      width: 7px;
-      height: 7px;
+    .source-message::before {
+      content: "▸";
+      color: var(--source-color);
+      font-weight: 700;
+      text-shadow: 0 0 6px var(--source-color);
+    }
+
+    .source-code {
       flex: 0 0 auto;
-      content: "";
-      background: var(--strip-color);
-      border-radius: 50%;
-      box-shadow: 0 0 14px var(--strip-color);
+      color: var(--source-color);
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: var(--tracking-widest);
+      text-transform: uppercase;
     }
 
-    .demo-note strong {
-      color: var(--strip-color);
-      font-family: var(--font-mono);
-      font-size: 11px;
-      letter-spacing: 0.1em;
-    }
-
-    .state-switch {
-      display: flex;
-      gap: 4px;
-      padding: 4px;
-      overflow-x: auto;
-      border: 1px solid var(--line);
-      border-radius: 12px;
-      background: rgba(5, 13, 19, 0.68);
-      scrollbar-width: none;
-    }
-
-    .state-switch::-webkit-scrollbar {
-      display: none;
-    }
-
-    .state-switch button {
-      min-height: 38px;
-      padding: 0 13px;
-      color: var(--muted);
+    .source-text {
+      overflow: hidden;
+      text-overflow: ellipsis;
       white-space: nowrap;
+    }
+
+    .demo-controls {
+      display: flex;
+      flex: 0 0 auto;
+      gap: 4px;
+    }
+
+    .demo-controls button {
+      min-height: 36px;
+      padding: 0 10px;
       cursor: pointer;
-      border: 0;
-      border-radius: 8px;
-      background: transparent;
-      transition: color 180ms ease, background 180ms ease;
+      border: 1px solid var(--border-strong);
+      color: var(--text-secondary);
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: var(--tracking-wider);
+      text-transform: uppercase;
+      background: var(--bg-inset);
+      clip-path: var(--clip-sm);
+      transition: color var(--dur-fast), border-color var(--dur-fast), background var(--dur-fast);
     }
 
-    .state-switch button:hover {
-      color: var(--text);
-      background: rgba(255, 255, 255, 0.04);
+    .demo-controls button:hover,
+    .demo-controls button[aria-pressed="true"] {
+      color: var(--cyan-200);
+      border-color: var(--cyan-600);
+      background: rgba(0, 184, 255, 0.1);
     }
 
-    .state-switch button[aria-pressed="true"] {
-      color: var(--text);
-      background: var(--surface-high);
-      box-shadow: inset 0 0 0 1px rgba(111, 229, 255, 0.14);
-    }
-
-    .state-switch button:focus-visible,
-    .queue-row:focus-visible {
-      outline: 3px solid rgba(111, 229, 255, 0.6);
-      outline-offset: 2px;
+    .dashboard {
+      display: grid;
+      gap: 12px;
     }
 
     .hero-grid {
       display: grid;
-      grid-template-columns: minmax(0, 1.55fr) minmax(300px, 0.65fr);
-      gap: 18px;
-      margin-bottom: 18px;
+      grid-template-columns: minmax(0, 1.62fr) minmax(310px, 0.62fr);
+      gap: 12px;
     }
 
-    .card {
+    .panel {
       position: relative;
+      min-width: 0;
       overflow: hidden;
-      border: 1px solid var(--line);
-      border-radius: var(--radius-lg);
-      background: linear-gradient(150deg, rgba(15, 32, 43, 0.98), rgba(9, 21, 30, 0.98));
-      box-shadow: var(--shadow);
+      color: var(--text-primary);
+      border: 1px solid var(--border-strong);
+      background: var(--bg-panel);
+      clip-path: var(--clip-md);
     }
 
-    .card::after {
-      position: absolute;
-      top: 0;
-      right: 0;
-      left: 0;
-      height: 1px;
-      content: "";
-      pointer-events: none;
-      background: linear-gradient(90deg, transparent, rgba(111, 229, 255, 0.22), transparent);
+    .panel[data-tone="signal"] {
+      border-color: var(--cyan-700);
+      box-shadow: var(--glow-cyan-sm);
     }
 
-    .progress-card {
-      min-height: 470px;
-      padding: 30px;
+    .panel[data-tone="warn"] {
+      border-color: var(--amber-700);
+      box-shadow: var(--glow-amber-md);
     }
 
-    .card-heading,
-    .section-heading {
+    .panel[data-tone="danger"] {
+      border-color: var(--red-700);
+      box-shadow: var(--glow-red-md);
+    }
+
+    .panel[data-tone="success"] {
+      border-color: var(--green-700);
+      box-shadow: var(--glow-green-md);
+    }
+
+    .panel-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      min-height: 36px;
+      padding: 8px 14px;
+      border-bottom: 1px solid var(--border);
+      background: linear-gradient(180deg, var(--bg-elevated), var(--bg-panel));
+    }
+
+    .panel-title {
+      display: flex;
+      align-items: center;
+      min-width: 0;
+      gap: 8px;
+      color: var(--text-signal);
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: var(--tracking-widest);
+      text-transform: uppercase;
+      text-shadow: var(--text-glow-cyan);
+    }
+
+    .panel-title::before {
+      content: "▣";
+      color: var(--cyan-400);
+    }
+
+    .panel-meta {
+      overflow: hidden;
+      color: var(--text-tertiary);
+      font-size: 9px;
+      letter-spacing: var(--tracking-wide);
+      text-overflow: ellipsis;
+      text-transform: uppercase;
+      white-space: nowrap;
+    }
+
+    .panel-body {
+      min-width: 0;
+      padding: 18px;
+    }
+
+    .panel-foot {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      min-height: 30px;
+      padding: 6px 14px;
+      border-top: 1px solid var(--border);
+      color: var(--text-tertiary);
+      font-size: 9px;
+      letter-spacing: var(--tracking-wide);
+      text-transform: uppercase;
+      background: var(--bg-inset);
+    }
+
+    .mission-head {
       display: flex;
       align-items: flex-start;
       justify-content: space-between;
       gap: 20px;
+      padding-bottom: 16px;
+      border-bottom: 1px dashed var(--border-strong);
     }
 
-    .eyebrow {
-      margin: 0 0 7px;
-      color: var(--muted);
-      font-family: var(--font-mono);
-      font-size: 11px;
-      letter-spacing: 0.11em;
+    .mission-eyebrow {
+      margin: 0 0 8px;
+      color: var(--cyan-400);
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: var(--tracking-widest);
       text-transform: uppercase;
-    }
-
-    h1,
-    h2,
-    p {
-      margin-top: 0;
+      text-shadow: var(--text-glow-cyan);
     }
 
     h1 {
-      max-width: 740px;
-      margin-bottom: 6px;
-      font-size: clamp(26px, 3vw, 44px);
-      line-height: 1.08;
-      letter-spacing: -0.04em;
+      max-width: 760px;
+      margin: 0;
+      font-family: var(--font-display);
+      font-size: clamp(23px, 2.7vw, 38px);
+      font-weight: 700;
+      line-height: 1.12;
+      letter-spacing: var(--tracking-wide);
+      text-transform: uppercase;
     }
 
-    h2 {
-      margin-bottom: 0;
-      font-size: 18px;
-      letter-spacing: -0.015em;
-    }
-
-    .file-path {
+    .project-file {
       display: block;
-      max-width: 680px;
+      max-width: 720px;
+      margin-top: 8px;
       overflow: hidden;
-      color: var(--muted);
-      font-family: var(--font-mono);
-      font-size: 12px;
+      color: var(--text-tertiary);
+      font-size: 11px;
       text-overflow: ellipsis;
       white-space: nowrap;
     }
@@ -375,158 +489,171 @@
     .status-pill {
       display: inline-flex;
       align-items: center;
+      min-height: 30px;
+      flex: 0 0 auto;
       gap: 8px;
-      min-height: 34px;
-      padding: 0 12px;
-      color: var(--accent);
-      font-family: var(--font-mono);
-      font-size: 12px;
-      border: 1px solid rgba(111, 229, 255, 0.28);
-      border-radius: 999px;
-      background: var(--accent-soft);
-      white-space: nowrap;
+      padding: 4px 11px;
+      border: 1px solid var(--cyan-700);
+      color: var(--cyan-300);
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: var(--tracking-widest);
+      text-transform: uppercase;
+      background: rgba(0, 184, 255, 0.06);
+      clip-path: var(--clip-sm);
     }
 
-    .status-pill::before {
+    .status-dot {
       width: 7px;
       height: 7px;
-      content: "";
       background: currentColor;
       border-radius: 50%;
-      box-shadow: 0 0 12px currentColor;
-      animation: breathe 1.8s ease-in-out infinite;
+      box-shadow: 0 0 6px currentColor;
+      animation: kl-pulse 1.1s steps(2, end) infinite;
     }
 
-    .status-pill[data-tone="warning"] {
-      color: var(--warning);
-      border-color: rgba(255, 197, 107, 0.26);
-      background: rgba(255, 197, 107, 0.09);
+    .status-pill[data-status="idle"] {
+      color: var(--text-tertiary);
+      border-color: var(--border-strong);
+      background: var(--bg-elevated);
     }
 
-    .status-pill[data-tone="success"] {
-      color: var(--success);
-      border-color: rgba(121, 230, 174, 0.26);
-      background: rgba(121, 230, 174, 0.09);
+    .status-pill[data-status="warn"] {
+      color: var(--amber-300);
+      border-color: var(--amber-700);
+      background: rgba(255, 176, 0, 0.06);
     }
 
-    .status-pill[data-tone="danger"] {
-      color: var(--danger);
-      border-color: rgba(255, 122, 134, 0.28);
-      background: rgba(255, 122, 134, 0.09);
+    .status-pill[data-status="error"] {
+      color: var(--red-300);
+      border-color: var(--red-700);
+      background: rgba(255, 58, 58, 0.07);
+      text-shadow: var(--text-glow-red);
     }
 
-    .progress-main {
+    .status-pill[data-status="success"] {
+      color: var(--green-300);
+      border-color: var(--green-700);
+      background: rgba(0, 232, 145, 0.06);
+    }
+
+    .progress-layout {
       display: grid;
-      grid-template-columns: 180px minmax(0, 1fr);
+      grid-template-columns: minmax(150px, 0.45fr) minmax(0, 1.55fr);
       align-items: center;
-      gap: 34px;
-      margin-top: 48px;
+      gap: 28px;
+      padding-top: 24px;
     }
 
-    .progress-ring {
-      position: relative;
-      display: grid;
-      width: 180px;
-      height: 180px;
-      place-items: center;
-      border-radius: 50%;
-      background:
-        radial-gradient(circle at center, var(--surface) 61%, transparent 62%),
-        conic-gradient(var(--accent) var(--progress), rgba(111, 229, 255, 0.09) 0);
-      box-shadow: 0 0 55px rgba(111, 229, 255, 0.08);
-      transition: background 240ms ease;
-    }
-
-    .progress-ring::after {
-      position: absolute;
-      inset: 18px;
-      content: "";
-      border: 1px solid rgba(111, 229, 255, 0.1);
-      border-radius: 50%;
-    }
-
-    .progress-ring-content {
-      position: relative;
-      z-index: 1;
-      display: grid;
-      gap: 2px;
-      text-align: center;
-    }
-
-    .progress-ring strong {
-      font-family: var(--font-mono);
-      font-size: 31px;
-      font-variant-numeric: tabular-nums;
-      letter-spacing: -0.05em;
-    }
-
-    .progress-ring span {
-      color: var(--muted);
-      font-size: 12px;
-    }
-
-    .progress-details {
+    .progress-readout {
       min-width: 0;
+      padding: 8px 16px 10px;
+      border-left: 2px solid var(--cyan-500);
+      background: linear-gradient(90deg, rgba(0, 184, 255, 0.08), transparent);
+    }
+
+    .progress-readout strong {
+      display: block;
+      color: var(--neutral-50);
+      font-family: var(--font-crt);
+      font-size: clamp(62px, 7vw, 102px);
+      font-weight: 400;
+      line-height: 0.82;
+      font-variant-numeric: tabular-nums;
+      text-shadow: var(--text-glow-cyan);
+    }
+
+    .progress-readout span {
+      display: block;
+      margin-top: 10px;
+      color: var(--text-tertiary);
+      font-size: 9px;
+      letter-spacing: var(--tracking-widest);
+      text-transform: uppercase;
     }
 
     .frame-count {
-      margin-bottom: 18px;
-      font-family: var(--font-mono);
-      font-size: clamp(24px, 3vw, 36px);
+      display: flex;
+      align-items: baseline;
+      gap: 8px;
+      margin-bottom: 10px;
       font-variant-numeric: tabular-nums;
-      letter-spacing: -0.04em;
     }
 
-    .frame-count small {
-      color: var(--quiet);
-      font-size: 14px;
-      letter-spacing: 0;
+    .frame-count strong {
+      color: var(--cyan-300);
+      font-family: var(--font-display);
+      font-size: 24px;
+      letter-spacing: var(--tracking-wide);
     }
 
-    .linear-progress {
-      height: 7px;
-      margin-bottom: 24px;
-      overflow: hidden;
-      border-radius: 999px;
-      background: rgba(111, 229, 255, 0.09);
-    }
-
-    .linear-progress span {
-      display: block;
-      width: var(--progress);
-      height: 100%;
-      border-radius: inherit;
-      background: linear-gradient(90deg, var(--accent-strong), var(--accent));
-      box-shadow: 0 0 16px rgba(111, 229, 255, 0.36);
-      transition: width 240ms ease;
-    }
-
-    .stat-grid {
-      display: grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-      gap: 10px;
-    }
-
-    .stat {
-      min-width: 0;
-      padding: 13px 14px;
-      border: 1px solid var(--line-soft);
-      border-radius: var(--radius-sm);
-      background: rgba(4, 12, 18, 0.34);
-    }
-
-    .stat span {
-      display: block;
-      margin-bottom: 5px;
-      color: var(--quiet);
+    .frame-count span {
+      color: var(--text-tertiary);
       font-size: 11px;
     }
 
-    .stat strong {
+    .progress-track {
+      position: relative;
+      height: 9px;
+      overflow: hidden;
+      border: 1px solid var(--border-strong);
+      background:
+        repeating-linear-gradient(90deg, transparent 0 18px, rgba(6, 8, 13, 0.82) 18px 20px),
+        var(--bg-inset);
+    }
+
+    .progress-fill {
+      width: var(--progress);
+      height: 100%;
+      background:
+        repeating-linear-gradient(90deg, var(--cyan-500) 0 18px, var(--cyan-800) 18px 20px);
+      box-shadow: var(--glow-cyan-md);
+      transition: width var(--dur-normal) var(--ease-out);
+    }
+
+    .progress-fill[data-tone="danger"] {
+      background: repeating-linear-gradient(90deg, var(--red-500) 0 18px, var(--red-700) 18px 20px);
+      box-shadow: var(--glow-red-md);
+    }
+
+    .progress-fill[data-tone="success"] {
+      background: repeating-linear-gradient(90deg, var(--green-500) 0 18px, var(--green-700) 18px 20px);
+      box-shadow: var(--glow-green-md);
+    }
+
+    .mission-stats {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      margin-top: 16px;
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .mission-stat {
+      min-width: 0;
+      padding: 11px 12px;
+      border-right: 1px solid var(--border);
+    }
+
+    .mission-stat:last-child {
+      border-right: 0;
+    }
+
+    .mission-stat span {
+      display: block;
+      margin-bottom: 5px;
+      color: var(--text-tertiary);
+      font-size: 9px;
+      letter-spacing: var(--tracking-wider);
+      text-transform: uppercase;
+    }
+
+    .mission-stat strong {
       display: block;
       overflow: hidden;
-      font-family: var(--font-mono);
-      font-size: 13px;
+      color: var(--text-primary);
+      font-size: 12px;
+      font-weight: 600;
       font-variant-numeric: tabular-nums;
       text-overflow: ellipsis;
       white-space: nowrap;
@@ -536,504 +663,570 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
-      gap: 16px;
-      margin-top: 24px;
-      padding-top: 18px;
-      color: var(--muted);
-      font-size: 12px;
-      border-top: 1px solid var(--line-soft);
+      gap: 14px;
+      margin-top: 13px;
+      color: var(--text-tertiary);
+      font-size: 10px;
+      letter-spacing: var(--tracking-wide);
+      text-transform: uppercase;
     }
 
     .batch-line code {
-      color: var(--text);
+      color: var(--cyan-300);
       font-family: var(--font-mono);
-      font-size: 12px;
+      text-shadow: var(--text-glow-cyan);
     }
 
-    .preview-card {
-      min-height: 470px;
-      background: #050d12;
+    .preview-panel {
+      display: flex;
+      min-height: 448px;
+      flex-direction: column;
     }
 
-    .preview-card img {
+    .preview-body {
+      position: relative;
+      min-height: 0;
+      flex: 1;
+      overflow: hidden;
+      background:
+        linear-gradient(rgba(0, 184, 255, 0.035) 1px, transparent 1px) 0 0 / 24px 24px,
+        linear-gradient(90deg, rgba(0, 184, 255, 0.035) 1px, transparent 1px) 0 0 / 24px 24px,
+        var(--bg-inset);
+    }
+
+    .preview-body::after {
+      position: absolute;
+      inset: 0;
+      z-index: 2;
+      content: "";
+      pointer-events: none;
+      background:
+        linear-gradient(to bottom, rgba(4, 6, 10, 0.35), transparent 25%, transparent 70%, rgba(4, 6, 10, 0.78)),
+        repeating-linear-gradient(to bottom, transparent 0 2px, rgba(0, 184, 255, 0.035) 2px 3px);
+    }
+
+    .preview-image {
       position: absolute;
       inset: 0;
       width: 100%;
       height: 100%;
       object-fit: cover;
-      object-position: center;
-      filter: saturate(0.82) contrast(1.04) brightness(0.76);
-      transition: filter 240ms ease;
+      filter: saturate(0.72) contrast(1.08) brightness(0.78) hue-rotate(4deg);
     }
 
-    .preview-card:hover img {
-      filter: saturate(0.95) contrast(1.04) brightness(0.82);
-    }
-
-    .preview-card::before {
+    .preview-empty {
       position: absolute;
       inset: 0;
-      z-index: 1;
-      content: "";
-      pointer-events: none;
-      background:
-        linear-gradient(to bottom, rgba(4, 12, 17, 0.58), transparent 32%, transparent 65%, rgba(4, 10, 14, 0.84)),
-        linear-gradient(90deg, rgba(4, 12, 17, 0.18), transparent 30%);
+      display: grid;
+      place-items: center;
+      color: var(--cyan-800);
+      font-family: var(--font-crt);
+      font-size: 28px;
+      letter-spacing: var(--tracking-wider);
+      text-align: center;
     }
 
-    .preview-top,
-    .preview-bottom {
+    .hud-corner {
+      position: absolute;
+      z-index: 3;
+      width: 13px;
+      height: 13px;
+      border: 1px solid var(--cyan-400);
+      pointer-events: none;
+    }
+
+    .hud-corner.tl { top: 12px; left: 12px; border-right: 0; border-bottom: 0; }
+    .hud-corner.tr { top: 12px; right: 12px; border-left: 0; border-bottom: 0; }
+    .hud-corner.bl { bottom: 12px; left: 12px; border-right: 0; border-top: 0; }
+    .hud-corner.br { right: 12px; bottom: 12px; border-left: 0; border-top: 0; }
+
+    .preview-overlay {
       position: absolute;
       right: 20px;
+      bottom: 18px;
       left: 20px;
-      z-index: 2;
+      z-index: 4;
       display: flex;
-      align-items: center;
+      align-items: flex-end;
       justify-content: space-between;
       gap: 12px;
     }
 
-    .preview-top {
-      top: 20px;
+    .preview-copy {
+      min-width: 0;
     }
 
-    .preview-bottom {
-      bottom: 19px;
-      align-items: flex-end;
-    }
-
-    .preview-label {
-      display: inline-flex;
-      align-items: center;
-      min-height: 30px;
-      padding: 0 10px;
-      color: var(--text);
-      font-family: var(--font-mono);
-      font-size: 10px;
-      letter-spacing: 0.08em;
-      border: 1px solid rgba(255, 255, 255, 0.18);
-      border-radius: 999px;
-      background: rgba(4, 12, 17, 0.58);
-      backdrop-filter: blur(9px);
-    }
-
-    .preview-copy strong {
+    .preview-copy strong,
+    .preview-copy span {
       display: block;
-      margin-bottom: 3px;
-      font-size: 17px;
-    }
-
-    .preview-copy span,
-    .frame-time {
-      color: rgba(237, 247, 251, 0.72);
-      font-family: var(--font-mono);
-      font-size: 11px;
-      font-variant-numeric: tabular-nums;
-    }
-
-    .details-grid {
-      display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 18px;
-      margin-bottom: 18px;
-    }
-
-    .detail-card {
-      padding: 24px;
-    }
-
-    .section-caption {
-      color: var(--quiet);
-      font-family: var(--font-mono);
-      font-size: 11px;
+      overflow: hidden;
+      text-overflow: ellipsis;
       white-space: nowrap;
     }
 
-    .metrics {
+    .preview-copy strong {
+      color: var(--neutral-50);
+      font-family: var(--font-display);
+      font-size: 15px;
+      letter-spacing: var(--tracking-wide);
+      text-shadow: 0 1px 8px #000;
+      text-transform: uppercase;
+    }
+
+    .preview-copy span {
+      margin-top: 4px;
+      color: var(--cyan-300);
+      font-size: 10px;
+      text-shadow: 0 1px 6px #000;
+    }
+
+    .preview-badge {
+      padding: 3px 8px;
+      border: 1px solid var(--cyan-700);
+      color: var(--cyan-300);
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: var(--tracking-widest);
+      text-transform: uppercase;
+      background: rgba(2, 4, 10, 0.78);
+      clip-path: var(--clip-sm);
+    }
+
+    .kpi-grid {
       display: grid;
       grid-template-columns: repeat(4, minmax(0, 1fr));
-      gap: 10px;
-      margin-top: 22px;
+      gap: 12px;
     }
 
-    .metric {
+    .kpi-card {
+      position: relative;
       min-width: 0;
-      padding: 14px;
-      border: 1px solid var(--line-soft);
-      border-radius: var(--radius-sm);
-      background: rgba(4, 12, 18, 0.28);
+      overflow: hidden;
+      padding: 15px 16px 14px;
+      border: 1px solid var(--border-strong);
+      background: var(--bg-panel);
+      clip-path: var(--clip-sm);
     }
 
-    .metric-label {
+    .kpi-label {
+      margin-bottom: 8px;
+      color: var(--cyan-400);
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: var(--tracking-widest);
+      text-transform: uppercase;
+      text-shadow: var(--text-glow-cyan);
+    }
+
+    .kpi-readout {
+      display: flex;
+      align-items: baseline;
+      gap: 7px;
+    }
+
+    .kpi-value {
+      overflow: hidden;
+      color: var(--neutral-50);
+      font-family: var(--font-display);
+      font-size: clamp(24px, 3vw, 36px);
+      font-weight: 900;
+      font-variant-numeric: tabular-nums;
+      letter-spacing: var(--tracking-wide);
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .kpi-unit {
+      overflow: hidden;
+      color: var(--text-tertiary);
+      font-size: 10px;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .metric-track {
+      height: 5px;
+      margin-top: 13px;
+      overflow: hidden;
+      border: 1px solid var(--border);
+      background: var(--bg-inset);
+    }
+
+    .metric-fill {
+      width: 0%;
+      height: 100%;
+      background: var(--cyan-500);
+      box-shadow: var(--glow-cyan-sm);
+      transition: width var(--dur-normal) var(--ease-out);
+    }
+
+    .metric-fill[data-tone="warn"] {
+      background: var(--amber-500);
+      box-shadow: var(--glow-amber-md);
+    }
+
+    .metric-fill[data-tone="danger"] {
+      background: var(--red-500);
+      box-shadow: var(--glow-red-md);
+    }
+
+    .kpi-meta {
+      display: flex;
+      justify-content: space-between;
+      gap: 8px;
+      margin-top: 8px;
+      color: var(--text-tertiary);
+      font-size: 9px;
+      letter-spacing: var(--tracking-wide);
+      text-transform: uppercase;
+    }
+
+    .ops-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1.35fr) minmax(330px, 0.65fr);
+      gap: 12px;
+    }
+
+    .recovery-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      border-bottom: 1px solid var(--border);
+      background: var(--bg-inset);
+    }
+
+    .recovery-cell {
+      min-width: 0;
+      padding: 11px 14px;
+      border-right: 1px solid var(--border);
+    }
+
+    .recovery-cell:last-child {
+      border-right: 0;
+    }
+
+    .recovery-cell span {
       display: block;
-      margin-bottom: 9px;
-      color: var(--muted);
+      margin-bottom: 4px;
+      color: var(--text-tertiary);
+      font-size: 9px;
+      letter-spacing: var(--tracking-wider);
+      text-transform: uppercase;
+    }
+
+    .recovery-cell code {
+      display: block;
+      overflow: hidden;
+      color: var(--cyan-300);
+      font-family: var(--font-mono);
+      font-size: 12px;
+      font-variant-numeric: tabular-nums;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .shot-table {
+      display: grid;
+    }
+
+    .shot-head,
+    .shot-row {
+      display: grid;
+      grid-template-columns: minmax(150px, 1.25fr) 98px minmax(130px, 1fr) 88px;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .shot-head {
+      min-height: 32px;
+      padding: 0 14px;
+      border-bottom: 1px solid var(--cyan-700);
+      color: var(--text-tertiary);
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: var(--tracking-widest);
+      text-transform: uppercase;
+      background: var(--bg-elevated);
+    }
+
+    .shot-row {
+      min-height: 48px;
+      padding: 7px 14px;
+      border-bottom: 1px solid var(--border);
+      color: var(--text-secondary);
       font-size: 11px;
     }
 
-    .metric-value {
-      display: flex;
-      align-items: baseline;
-      gap: 4px;
-      margin-bottom: 10px;
-      font-family: var(--font-mono);
-      font-size: 20px;
-      font-variant-numeric: tabular-nums;
-    }
-
-    .metric-value small {
-      color: var(--quiet);
-      font-size: 10px;
-    }
-
-    .metric-bar {
-      height: 4px;
-      overflow: hidden;
-      border-radius: 99px;
-      background: rgba(255, 255, 255, 0.06);
-    }
-
-    .metric-bar span {
-      display: block;
-      width: var(--value);
-      height: 100%;
-      border-radius: inherit;
-      background: var(--metric-color, var(--accent));
-      transition: width 240ms ease;
-    }
-
-    .health-note {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      margin-top: 16px;
-      color: var(--muted);
-      font-size: 12px;
-    }
-
-    .health-note::before {
-      width: 6px;
-      height: 6px;
-      content: "";
-      background: var(--success);
-      border-radius: 50%;
-    }
-
-    .health-note[data-tone="warning"]::before {
-      background: var(--warning);
-    }
-
-    .health-note[data-tone="danger"]::before {
-      background: var(--danger);
-    }
-
-    .recovery-list {
-      display: grid;
-      gap: 0;
-      margin: 18px 0 0;
-      padding: 0;
-      list-style: none;
-    }
-
-    .recovery-list li {
-      display: grid;
-      grid-template-columns: 11px 1fr auto;
-      align-items: center;
-      gap: 12px;
-      min-height: 46px;
-      color: var(--muted);
-      border-bottom: 1px solid var(--line-soft);
-    }
-
-    .recovery-list li:last-child {
+    .shot-row:last-child {
       border-bottom: 0;
     }
 
-    .recovery-list i {
-      width: 7px;
-      height: 7px;
-      background: var(--success);
-      border-radius: 50%;
-    }
-
-    .recovery-list strong {
-      color: var(--text);
-      font-size: 13px;
-      font-weight: 500;
-    }
-
-    .recovery-list code {
-      color: var(--quiet);
-      font-family: var(--font-mono);
-      font-size: 11px;
-      font-variant-numeric: tabular-nums;
-    }
-
-    .bottom-grid {
-      display: grid;
-      grid-template-columns: minmax(0, 1.15fr) minmax(330px, 0.85fr);
-      gap: 18px;
-    }
-
-    .queue-card,
-    .pipeline-card {
-      padding: 24px;
-    }
-
-    .queue {
-      display: grid;
-      gap: 7px;
-      margin-top: 18px;
-    }
-
-    .queue-row {
-      display: grid;
-      grid-template-columns: 64px minmax(110px, 1fr) minmax(130px, 1.6fr) 78px;
-      align-items: center;
-      gap: 14px;
-      min-height: 48px;
-      padding: 0 13px;
-      color: var(--muted);
-      border: 1px solid transparent;
-      border-radius: 10px;
-      background: rgba(4, 12, 18, 0.25);
-    }
-
-    .queue-row[data-active="true"] {
-      color: var(--text);
-      border-color: rgba(111, 229, 255, 0.18);
-      background: rgba(111, 229, 255, 0.07);
+    .shot-row[data-active="true"] {
+      color: var(--text-primary);
+      background: linear-gradient(90deg, rgba(0, 184, 255, 0.08), transparent);
+      box-shadow: inset 2px 0 0 var(--cyan-500);
     }
 
     .shot-name {
-      color: var(--text);
-      font-family: var(--font-mono);
-      font-size: 12px;
+      overflow: hidden;
+      color: var(--cyan-400);
+      font-weight: 700;
+      letter-spacing: var(--tracking-wide);
+      text-overflow: ellipsis;
+      white-space: nowrap;
     }
 
-    .shot-frames {
-      font-family: var(--font-mono);
-      font-size: 11px;
+    .shot-range {
+      color: var(--text-tertiary);
       font-variant-numeric: tabular-nums;
     }
 
     .shot-progress {
       display: flex;
       align-items: center;
-      gap: 10px;
+      gap: 8px;
     }
 
     .shot-progress-track {
-      height: 4px;
+      height: 5px;
       flex: 1;
       overflow: hidden;
-      border-radius: 99px;
-      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid var(--border);
+      background: var(--bg-inset);
     }
 
-    .shot-progress-track span {
-      display: block;
-      width: var(--shot-progress);
+    .shot-progress-fill {
+      width: var(--shot-progress, 0%);
       height: 100%;
-      background: var(--shot-color, var(--success));
-      border-radius: inherit;
+      background: var(--cyan-500);
+      box-shadow: var(--glow-cyan-sm);
     }
 
     .shot-progress small {
-      min-width: 35px;
-      color: var(--quiet);
-      font-family: var(--font-mono);
-      font-size: 10px;
+      min-width: 38px;
+      color: var(--text-tertiary);
+      font-size: 9px;
+      font-variant-numeric: tabular-nums;
       text-align: right;
     }
 
     .shot-state {
       justify-self: end;
-      font-size: 11px;
+      color: var(--text-secondary);
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: var(--tracking-wider);
+      text-transform: uppercase;
     }
 
     .pipeline {
       display: grid;
-      gap: 0;
-      margin-top: 18px;
+      padding: 8px 16px 14px;
     }
 
     .pipeline-step {
       position: relative;
       display: grid;
-      grid-template-columns: 22px 1fr auto;
+      grid-template-columns: 20px minmax(0, 1fr) auto;
       align-items: center;
-      gap: 12px;
-      min-height: 47px;
-      color: var(--quiet);
+      gap: 10px;
+      min-height: 40px;
+      color: var(--text-tertiary);
     }
 
     .pipeline-step:not(:last-child)::after {
       position: absolute;
-      top: 30px;
-      bottom: -8px;
-      left: 7px;
+      top: 26px;
+      bottom: -6px;
+      left: 6px;
       width: 1px;
       content: "";
-      background: var(--line);
+      background: var(--border-strong);
     }
 
-    .step-dot {
+    .stage-node {
       position: relative;
       z-index: 1;
-      width: 15px;
-      height: 15px;
-      border: 2px solid var(--line);
-      border-radius: 50%;
-      background: var(--surface);
+      width: 13px;
+      height: 13px;
+      border: 1px solid var(--border-strong);
+      background: var(--bg-inset);
+      clip-path: var(--clip-sm);
     }
 
-    .pipeline-step[data-state="done"] {
-      color: var(--muted);
-    }
-
-    .pipeline-step[data-state="done"] .step-dot {
-      border-color: var(--success);
-      background: var(--success);
-      box-shadow: inset 0 0 0 3px var(--surface);
-    }
-
-    .pipeline-step[data-state="active"] {
-      color: var(--text);
-    }
-
-    .pipeline-step[data-state="active"] .step-dot {
-      border-color: var(--accent);
-      background: var(--accent);
-      box-shadow: 0 0 14px rgba(111, 229, 255, 0.42);
-    }
-
-    .pipeline-step[data-state="warning"] {
-      color: var(--warning);
-    }
-
-    .pipeline-step[data-state="warning"] .step-dot {
-      border-color: var(--warning);
-      background: var(--warning);
-      box-shadow: 0 0 14px rgba(255, 197, 107, 0.35);
-    }
-
-    .pipeline-step[data-state="failed"] {
-      color: var(--danger);
-    }
-
-    .pipeline-step[data-state="failed"] .step-dot {
-      border-color: var(--danger);
-      background: var(--danger);
-      box-shadow: 0 0 14px rgba(255, 122, 134, 0.35);
-    }
-
-    .step-name {
-      font-size: 13px;
-    }
-
-    .step-meta {
-      font-family: var(--font-mono);
-      font-size: 10px;
-      text-transform: uppercase;
-    }
-
-    .qa-panel {
-      margin-top: 20px;
-      padding-top: 17px;
-      border-top: 1px solid var(--line-soft);
-    }
-
-    .qa-panel h3 {
-      margin: 0 0 10px;
-      color: var(--muted);
+    .stage-name {
+      overflow: hidden;
       font-size: 11px;
-      font-weight: 500;
-      letter-spacing: 0.08em;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .stage-state {
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: var(--tracking-wider);
       text-transform: uppercase;
+    }
+
+    .pipeline-step.is-done {
+      color: var(--text-secondary);
+    }
+
+    .pipeline-step.is-done .stage-node {
+      border-color: var(--green-700);
+      background: var(--green-500);
+      box-shadow: var(--glow-green-md);
+    }
+
+    .pipeline-step.is-active {
+      color: var(--cyan-300);
+    }
+
+    .pipeline-step.is-active .stage-node {
+      border-color: var(--cyan-400);
+      background: var(--cyan-500);
+      box-shadow: var(--glow-cyan-md);
+      animation: kl-pulse 0.9s steps(2, end) infinite;
+    }
+
+    .pipeline-step.is-warn {
+      color: var(--amber-300);
+    }
+
+    .pipeline-step.is-warn .stage-node {
+      border-color: var(--amber-300);
+      background: var(--amber-500);
+      box-shadow: var(--glow-amber-md);
+    }
+
+    .pipeline-step.is-error {
+      color: var(--red-300);
+      text-shadow: var(--text-glow-red);
+    }
+
+    .pipeline-step.is-error .stage-node {
+      border-color: var(--red-300);
+      background: var(--red-500);
+      box-shadow: var(--glow-red-md);
+      animation: kl-blink 0.65s steps(2, end) infinite;
+    }
+
+    .qa-terminal {
+      margin: 0 14px 14px;
+      overflow: hidden;
+      border: 1px solid var(--cyan-700);
+      background: var(--bg-void);
+      clip-path: var(--clip-sm);
+    }
+
+    .qa-terminal[data-tone="danger"] {
+      border-color: var(--red-700);
+    }
+
+    .qa-terminal[data-tone="success"] {
+      border-color: var(--green-700);
+    }
+
+    .terminal-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      min-height: 30px;
+      padding: 5px 10px;
+      border-bottom: 1px solid var(--border);
+      color: var(--text-tertiary);
+      font-size: 9px;
+      letter-spacing: var(--tracking-widest);
+      text-transform: uppercase;
+      background: linear-gradient(180deg, var(--bg-elevated), var(--bg-panel));
+    }
+
+    .terminal-head strong {
+      color: var(--cyan-300);
+      font-weight: 700;
+      text-shadow: var(--text-glow-cyan);
+    }
+
+    .terminal-head strong::before {
+      content: "▸ ";
     }
 
     .qa-list {
       display: grid;
-      gap: 8px;
+      gap: 4px;
+      min-height: 110px;
       margin: 0;
-      padding: 0;
+      padding: 12px 14px;
+      color: var(--cyan-300);
+      font-size: 11px;
+      line-height: 1.55;
       list-style: none;
+      background: repeating-linear-gradient(to bottom, transparent 0 2px, rgba(0, 184, 255, 0.025) 2px 3px);
     }
 
     .qa-list li {
       display: grid;
-      grid-template-columns: 8px 1fr;
-      gap: 10px;
-      align-items: start;
-      color: var(--muted);
-      font-size: 12px;
+      grid-template-columns: 20px minmax(0, 1fr);
+      gap: 5px;
     }
 
     .qa-list li::before {
-      width: 6px;
-      height: 6px;
-      margin-top: 6px;
-      content: "";
-      background: var(--danger);
-      border-radius: 50%;
+      content: "[⨯]";
+      color: var(--red-500);
+      text-shadow: var(--text-glow-red);
+    }
+
+    .qa-list[data-passed="true"] li {
+      color: var(--green-300);
     }
 
     .qa-list[data-passed="true"] li::before {
-      background: var(--success);
+      content: "[✓]";
+      color: var(--green-500);
+      text-shadow: none;
     }
 
     .footer {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      gap: 20px;
-      padding: 18px 4px 0;
-      color: var(--quiet);
-      font-family: var(--font-mono);
-      font-size: 10px;
+      gap: 18px;
+      padding: 12px 4px 0;
+      color: var(--text-tertiary);
+      font-size: 9px;
+      letter-spacing: var(--tracking-wide);
+      text-transform: uppercase;
     }
 
     .footer span:last-child {
       text-align: right;
     }
 
-    @keyframes breathe {
-      0%,
-      100% {
-        opacity: 0.45;
-        transform: scale(0.82);
+    @keyframes kl-pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.42; }
+    }
+
+    @keyframes kl-blink {
+      0%, 49% { opacity: 1; }
+      50%, 100% { opacity: 0.2; }
+    }
+
+    @media (max-width: 1100px) {
+      .hero-grid,
+      .ops-grid {
+        grid-template-columns: 1fr;
       }
-      50% {
-        opacity: 1;
-        transform: scale(1);
+
+      .preview-panel {
+        min-height: 540px;
       }
     }
 
-    @media (max-width: 1080px) {
-      .hero-grid {
-        grid-template-columns: minmax(0, 1.3fr) minmax(280px, 0.7fr);
-      }
-
-      .progress-main {
-        grid-template-columns: 150px minmax(0, 1fr);
-        gap: 24px;
-      }
-
-      .progress-ring {
-        width: 150px;
-        height: 150px;
-      }
-
-      .metrics {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-      }
-    }
-
-    @media (max-width: 840px) {
+    @media (max-width: 780px) {
       .shell {
-        width: min(100% - 28px, 720px);
-        padding-top: 18px;
+        width: min(100% - 24px, 720px);
+        padding-top: 12px;
       }
 
       .topbar {
@@ -1044,106 +1237,131 @@
         display: none;
       }
 
-      .demo-strip {
+      .source-strip {
         align-items: stretch;
         flex-direction: column;
       }
 
-      .state-switch {
-        width: 100%;
+      .source-text {
+        white-space: normal;
       }
 
-      .state-switch button {
+      .demo-controls {
+        overflow-x: auto;
+      }
+
+      .demo-controls button {
+        min-height: 44px;
         flex: 1 0 auto;
       }
 
-      .hero-grid,
-      .details-grid,
-      .bottom-grid {
+      .progress-layout {
         grid-template-columns: 1fr;
       }
 
-      .preview-card {
-        min-height: 520px;
+      .progress-readout {
+        max-width: 260px;
+      }
+
+      .kpi-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .recovery-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .recovery-cell:nth-child(2) {
+        border-right: 0;
+      }
+
+      .recovery-cell:nth-child(-n + 2) {
+        border-bottom: 1px solid var(--border);
+      }
+
+      .shot-head,
+      .shot-row {
+        grid-template-columns: minmax(0, 1fr) 78px;
+      }
+
+      .shot-head span:nth-child(3),
+      .shot-head span:nth-child(4) {
+        display: none;
+      }
+
+      .shot-progress {
+        grid-column: 1 / -1;
+      }
+
+      .shot-state {
+        justify-self: end;
+      }
+
+      .preview-panel {
+        min-height: 500px;
       }
     }
 
-    @media (max-width: 560px) {
+    @media (max-width: 520px) {
       .shell {
-        width: min(100% - 20px, 520px);
+        width: min(100% - 16px, 500px);
       }
 
-      .topbar {
-        margin-bottom: 16px;
+      .brand-copy strong {
+        font-size: 12px;
       }
 
       .brand-copy span {
         display: none;
       }
 
-      .clock {
-        min-width: auto;
-        font-size: 12px;
+      .top-meta {
+        gap: 6px;
       }
 
-      .progress-card,
-      .detail-card,
-      .queue-card,
-      .pipeline-card {
-        padding: 20px;
-        border-radius: 19px;
+      .panel-body {
+        padding: 14px;
       }
 
-      .card-heading {
-        align-items: flex-start;
+      .mission-head {
+        align-items: stretch;
         flex-direction: column;
-        gap: 14px;
       }
 
-      .progress-main {
+      .status-pill {
+        align-self: flex-start;
+      }
+
+      .mission-stats {
         grid-template-columns: 1fr;
-        justify-items: center;
-        margin-top: 32px;
       }
 
-      .progress-details {
-        width: 100%;
+      .mission-stat {
+        border-right: 0;
+        border-bottom: 1px solid var(--border);
       }
 
-      .frame-count {
-        text-align: center;
+      .mission-stat:last-child {
+        border-bottom: 0;
       }
 
-      .stat-grid {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-      }
-
-      .stat:last-child {
-        grid-column: 1 / -1;
-      }
-
-      .batch-line {
-        align-items: flex-start;
-        flex-direction: column;
-        gap: 4px;
-      }
-
-      .metrics {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-      }
-
-      .queue-row {
-        grid-template-columns: 58px minmax(90px, 1fr) 65px;
-      }
-
-      .shot-progress {
-        display: none;
-      }
-
+      .batch-line,
+      .panel-foot,
       .footer {
         align-items: flex-start;
         flex-direction: column;
-        gap: 4px;
+      }
+
+      .kpi-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .preview-panel {
+        min-height: min(620px, 74vh);
+      }
+
+      .panel-meta {
+        max-width: 45%;
       }
 
       .footer span:last-child {
@@ -1155,11 +1373,17 @@
       *,
       *::before,
       *::after {
-        scroll-behavior: auto !important;
-        animation-duration: 0.01ms !important;
+        animation-duration: 0.001ms !important;
         animation-iteration-count: 1 !important;
-        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+        transition-duration: 0.001ms !important;
       }
+    }
+
+    button:focus-visible,
+    a:focus-visible {
+      outline: 2px solid var(--cyan-300);
+      outline-offset: 3px;
     }
   </style>
 </head>
@@ -1168,285 +1392,257 @@
 
   <div class="shell">
     <header class="topbar">
-      <div class="brand" aria-label="Render Watch">
-        <span class="brand-mark" aria-hidden="true"></span>
+      <div class="brand" aria-label="KUNLUN Render Watch">
+        <span class="brand-mark" aria-hidden="true">K</span>
         <span class="brand-copy">
-          <strong>RENDER WATCH</strong>
-          <span>Blender × DaVinci Resolve</span>
+          <strong>KUNLUN // RENDER WATCH</strong>
+          <span>渲 染 监 控 · 生 产 节 点</span>
         </span>
       </div>
       <div class="top-meta">
-        <span class="read-only">read-only monitor</span>
+        <span class="read-only">READ-ONLY · LOOPBACK</span>
         <time class="clock" id="clock">--:--:--</time>
       </div>
     </header>
 
-    <div class="demo-strip" id="data-strip" data-tone="warning" role="status" aria-live="polite">
-      <div class="demo-note">
-        <strong id="source-title">CONNECTING</strong>
-        <span id="source-note">正在读取本机持久化状态与磁盘证据…</span>
+    <div class="source-strip" id="source-strip" data-tone="warn" role="status" aria-live="polite">
+      <div class="source-message">
+        <strong class="source-code" id="source-code">CONNECTING</strong>
+        <span class="source-text" id="source-text">正在建立本机只读状态链路…</span>
       </div>
-      <div class="state-switch" id="demo-controls" role="group" aria-label="切换演示状态" hidden>
-        <button type="button" data-scenario="rendering" aria-pressed="true">渲染中</button>
-        <button type="button" data-scenario="cooldown" aria-pressed="false">冷却恢复</button>
-        <button type="button" data-scenario="editing" aria-pressed="false">剪辑中</button>
-        <button type="button" data-scenario="complete" aria-pressed="false">已完成</button>
+      <div class="demo-controls" id="demo-controls" role="group" aria-label="切换模拟状态" hidden>
+        <button type="button" data-scenario="rendering" aria-pressed="true">RENDER</button>
+        <button type="button" data-scenario="cooldown" aria-pressed="false">COOLDOWN</button>
+        <button type="button" data-scenario="editing" aria-pressed="false">EDIT</button>
+        <button type="button" data-scenario="complete" aria-pressed="false">COMPLETE</button>
       </div>
     </div>
 
-    <main id="main-content">
-      <section class="hero-grid" aria-label="任务总览">
-        <article class="card progress-card">
-          <div class="card-heading">
-            <div>
-              <p class="eyebrow" id="project-label">Active production · connecting</p>
-              <h1 id="task-title">正在渲染 Shot 03</h1>
-              <span class="file-path" id="project-file">正在读取项目文件…</span>
-            </div>
-            <span class="status-pill" id="status-pill" data-tone="live">渲染中</span>
-          </div>
-
-          <div class="progress-main">
-            <div
-              class="progress-ring"
-              id="progress-ring"
-              role="progressbar"
-              aria-label="总体制作进度"
-              aria-valuemin="0"
-              aria-valuemax="100"
-              aria-valuenow="57.4"
-            >
-              <div class="progress-ring-content">
-                <strong id="progress-percent">57.4%</strong>
-                <span>渲染帧进度</span>
+    <main class="dashboard" id="main-content">
+      <section class="hero-grid" aria-label="生产任务总览">
+        <article class="panel" id="mission-panel" data-tone="signal">
+          <header class="panel-head">
+            <span class="panel-title">MISSION CONTROL</span>
+            <span class="panel-meta" id="project-name">NODE // CONNECTING</span>
+          </header>
+          <div class="panel-body">
+            <div class="mission-head">
+              <div>
+                <p class="mission-eyebrow">// ACTIVE PRODUCTION · BLENDER × RESOLVE</p>
+                <h1 id="task-title">正在读取真实制作状态</h1>
+                <span class="project-file" id="project-file">PROJECT FILE // NOT RECORDED</span>
               </div>
+              <span class="status-pill" id="status-pill" data-status="busy">
+                <i class="status-dot" aria-hidden="true"></i>
+                <span id="status-text">UPLINK</span>
+              </span>
             </div>
 
-            <div class="progress-details">
-              <div class="frame-count">
-                <span id="frame-current">517</span>
-                <small id="frame-total">/ 900 frames</small>
+            <div class="progress-layout">
+              <div class="progress-readout">
+                <strong id="progress-percent">—</strong>
+                <span>// RENDER FRAME PROGRESS</span>
               </div>
-              <div class="linear-progress" aria-hidden="true"><span></span></div>
-              <div class="stat-grid">
-                <div class="stat">
-                  <span>预计剩余</span>
-                  <strong id="eta">02:14:36</strong>
+              <div>
+                <div class="frame-count">
+                  <strong id="frame-current">—</strong>
+                  <span id="frame-total">/ — FRAMES</span>
                 </div>
-                <div class="stat">
-                  <span>画面规格</span>
-                  <strong id="output-resolution">2160 × 3840</strong>
+                <div
+                  class="progress-track"
+                  role="progressbar"
+                  aria-label="渲染帧进度"
+                  aria-valuemin="0"
+                  aria-valuemax="100"
+                  aria-valuenow="0"
+                  id="progress-track"
+                >
+                  <div class="progress-fill" id="progress-fill"></div>
                 </div>
-                <div class="stat">
-                  <span>输出标准</span>
-                  <strong id="output-standard">30 FPS · H.265 · Rec.709</strong>
+                <div class="mission-stats">
+                  <div class="mission-stat">
+                    <span>// ETA</span>
+                    <strong id="eta">ESTIMATING</strong>
+                  </div>
+                  <div class="mission-stat">
+                    <span>// TARGET FRAME</span>
+                    <strong id="output-resolution">— × —</strong>
+                  </div>
+                  <div class="mission-stat">
+                    <span>// DELIVERY</span>
+                    <strong id="output-standard">30 FPS · HEVC · REC.709</strong>
+                  </div>
                 </div>
-              </div>
-              <div class="batch-line">
-                <span>当前批次 <code id="batch">BATCH 09 · 481–540</code></span>
-                <span id="heartbeat">监督器心跳 · 4 秒前</span>
+                <div class="batch-line">
+                  <span>BATCH <code id="batch">NOT RECORDED</code></span>
+                  <span id="heartbeat">STATUS SCAN // WAITING</span>
+                </div>
               </div>
             </div>
           </div>
+          <footer class="panel-foot">
+            <span id="frame-evidence">FRAME INVENTORY // WAITING</span>
+            <span>CONTROL ROUTES // DISABLED</span>
+          </footer>
         </article>
 
-        <article class="card preview-card" aria-label="最近有效渲染帧">
-          <img id="preview-image" src="../renders/shot_03_preview.png" width="324" height="576" alt="最近一张已完整解码的渲染帧">
-          <div class="preview-top">
-            <span class="preview-label">LATEST VALID FRAME</span>
-            <span class="preview-label" id="preview-state">LIVE</span>
-          </div>
-          <div class="preview-bottom">
-            <div class="preview-copy">
-              <strong id="preview-shot">Shot 03 · 入水点</strong>
-              <span id="preview-frame">frame_000517.png</span>
+        <article class="panel preview-panel" data-tone="signal" aria-label="最近完整解码帧">
+          <header class="panel-head">
+            <span class="panel-title">OPTICAL FEED</span>
+            <span class="panel-meta" id="preview-state">WAITING</span>
+          </header>
+          <div class="preview-body">
+            <img class="preview-image" id="preview-image" alt="最近一张已完整解码的渲染帧" hidden>
+            <div class="preview-empty" id="preview-empty">NO VALID FRAME<br>▮</div>
+            <span class="hud-corner tl" aria-hidden="true"></span>
+            <span class="hud-corner tr" aria-hidden="true"></span>
+            <span class="hud-corner bl" aria-hidden="true"></span>
+            <span class="hud-corner br" aria-hidden="true"></span>
+            <div class="preview-overlay">
+              <div class="preview-copy">
+                <strong id="preview-shot">FRAME CHANNEL // OFFLINE</strong>
+                <span id="preview-frame">—</span>
+              </div>
+              <span class="preview-badge" id="preview-meta">DECODE GATE</span>
             </div>
-            <span class="frame-time" id="frame-time">41.2 s / frame</span>
           </div>
         </article>
       </section>
 
-      <section class="details-grid" aria-label="设备与恢复状态">
-        <article class="card detail-card">
-          <div class="section-heading">
-            <div>
-              <p class="eyebrow">Machine health</p>
-              <h2>设备负载</h2>
-            </div>
-            <span class="section-caption" id="machine-caption">稳定 · 无降频</span>
+      <section class="kpi-grid" aria-label="设备负载">
+        <article class="kpi-card">
+          <div class="kpi-label">// GPU LOAD</div>
+          <div class="kpi-readout">
+            <strong class="kpi-value" id="gpu-value">—</strong>
+            <span class="kpi-unit" id="gpu-unit">%</span>
           </div>
-
-          <div class="metrics">
-            <div class="metric">
-              <span class="metric-label">GPU</span>
-              <div class="metric-value"><span id="gpu-value">88</span><small id="gpu-unit">%</small></div>
-              <div class="metric-bar" role="progressbar" aria-label="GPU 使用率" aria-valuemin="0" aria-valuemax="100" aria-valuenow="88">
-                <span id="gpu-bar" style="--value: 88%"></span>
-              </div>
-            </div>
-            <div class="metric">
-              <span class="metric-label">VRAM</span>
-              <div class="metric-value"><span id="vram-value">7.1</span><small id="vram-unit">/ 8 GB</small></div>
-              <div class="metric-bar" role="progressbar" aria-label="显存使用率" aria-valuemin="0" aria-valuemax="100" aria-valuenow="89">
-                <span id="vram-bar" style="--value: 89%"></span>
-              </div>
-            </div>
-            <div class="metric">
-              <span class="metric-label">GPU TEMP</span>
-              <div class="metric-value"><span id="temp-value">72</span><small id="temp-unit">°C</small></div>
-              <div class="metric-bar" role="progressbar" aria-label="GPU 温度相对阈值" aria-valuemin="0" aria-valuemax="100" aria-valuenow="72">
-                <span id="temp-bar" style="--value: 72%; --metric-color: var(--warning)"></span>
-              </div>
-            </div>
-            <div class="metric">
-              <span class="metric-label">MEMORY</span>
-              <div class="metric-value"><span id="memory-value">21.6</span><small id="memory-unit">/ 32 GB</small></div>
-              <div class="metric-bar" role="progressbar" aria-label="内存使用率" aria-valuemin="0" aria-valuemax="100" aria-valuenow="68">
-                <span id="memory-bar" style="--value: 68%; --metric-color: var(--success)"></span>
-              </div>
-            </div>
+          <div class="metric-track" role="progressbar" aria-label="GPU 使用率" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+            <div class="metric-fill" id="gpu-fill"></div>
           </div>
-          <div class="health-note" id="health-note">温度与显存仍在当前任务的安全区间内。</div>
+          <div class="kpi-meta"><span>ACCELERATOR</span><span id="gpu-meta">NO DATA</span></div>
         </article>
 
-        <article class="card detail-card">
-          <div class="section-heading">
-            <div>
-              <p class="eyebrow">Recovery supervisor</p>
-              <h2>断点与恢复</h2>
-            </div>
-            <span class="section-caption" id="pid-caption">PID 28416</span>
+        <article class="kpi-card">
+          <div class="kpi-label">// VRAM</div>
+          <div class="kpi-readout">
+            <strong class="kpi-value" id="vram-value">—</strong>
+            <span class="kpi-unit" id="vram-unit">GB</span>
           </div>
+          <div class="metric-track" role="progressbar" aria-label="显存使用率" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+            <div class="metric-fill" id="vram-fill"></div>
+          </div>
+          <div class="kpi-meta"><span>MEMORY BUS</span><span id="vram-meta">NO DATA</span></div>
+        </article>
 
-          <ul class="recovery-list">
-            <li>
-              <i aria-hidden="true"></i>
-              <strong>最近有效帧</strong>
-              <code id="last-valid-frame">000517</code>
-            </li>
-            <li>
-              <i aria-hidden="true"></i>
-              <strong>批次重试</strong>
-              <code id="batch-retries">0 / 2</code>
-            </li>
-            <li>
-              <i aria-hidden="true"></i>
-              <strong>崩溃后恢复</strong>
-              <code id="crash-count">1 次</code>
-            </li>
-            <li>
-              <i aria-hidden="true"></i>
-              <strong>自动续跑</strong>
-              <code id="resume-state">ARMED</code>
-            </li>
-          </ul>
+        <article class="kpi-card">
+          <div class="kpi-label">// GPU THERMAL</div>
+          <div class="kpi-readout">
+            <strong class="kpi-value" id="temp-value">—</strong>
+            <span class="kpi-unit">°C</span>
+          </div>
+          <div class="metric-track" role="progressbar" aria-label="GPU 温度" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+            <div class="metric-fill" id="temp-fill"></div>
+          </div>
+          <div class="kpi-meta"><span>THERMAL SENSOR</span><span id="temp-meta">NO DATA</span></div>
+        </article>
+
+        <article class="kpi-card">
+          <div class="kpi-label">// WSL MEMORY</div>
+          <div class="kpi-readout">
+            <strong class="kpi-value" id="memory-value">—</strong>
+            <span class="kpi-unit" id="memory-unit">GB</span>
+          </div>
+          <div class="metric-track" role="progressbar" aria-label="WSL 内存使用率" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+            <div class="metric-fill" id="memory-fill"></div>
+          </div>
+          <div class="kpi-meta"><span>LINUX VM</span><span id="memory-meta">NO DATA</span></div>
         </article>
       </section>
 
-      <section class="bottom-grid" aria-label="镜头队列与制作流程">
-        <article class="card queue-card">
-          <div class="section-heading">
-            <div>
-              <p class="eyebrow">Shot queue</p>
-              <h2>镜头队列</h2>
+      <section class="ops-grid" aria-label="镜头队列与制作流程">
+        <article class="panel">
+          <header class="panel-head">
+            <span class="panel-title">SHOT INVENTORY</span>
+            <span class="panel-meta" id="queue-caption">0 SHOTS · 0 FRAMES</span>
+          </header>
+          <div class="recovery-grid">
+            <div class="recovery-cell">
+              <span>// LAST VALID</span>
+              <code id="last-valid-frame">—</code>
             </div>
-            <span class="section-caption" id="queue-caption">5 SHOTS · 900 FRAMES</span>
-          </div>
-
-          <div class="queue" id="shot-queue" role="list" aria-label="各镜头渲染状态">
-            <div class="queue-row" role="listitem" tabindex="0">
-              <span class="shot-name">SHOT 01</span>
-              <span class="shot-frames">001–180</span>
-              <span class="shot-progress">
-                <span class="shot-progress-track"><span style="--shot-progress: 100%"></span></span>
-                <small>100%</small>
-              </span>
-              <span class="shot-state">已验证</span>
+            <div class="recovery-cell">
+              <span>// RETRIES</span>
+              <code id="batch-retries">NOT RECORDED</code>
             </div>
-            <div class="queue-row" role="listitem" tabindex="0">
-              <span class="shot-name">SHOT 02</span>
-              <span class="shot-frames">181–360</span>
-              <span class="shot-progress">
-                <span class="shot-progress-track"><span style="--shot-progress: 100%"></span></span>
-                <small>100%</small>
-              </span>
-              <span class="shot-state">已验证</span>
+            <div class="recovery-cell">
+              <span>// CRASHES</span>
+              <code id="crash-count">NOT RECORDED</code>
             </div>
-            <div class="queue-row" id="active-shot-row" role="listitem" tabindex="0" data-active="true">
-              <span class="shot-name">SHOT 03</span>
-              <span class="shot-frames">361–540</span>
-              <span class="shot-progress">
-                <span class="shot-progress-track"><span id="active-shot-bar" style="--shot-progress: 87%"></span></span>
-                <small id="active-shot-progress">87%</small>
-              </span>
-              <span class="shot-state" id="active-shot-state">渲染中</span>
-            </div>
-            <div class="queue-row" role="listitem" tabindex="0">
-              <span class="shot-name">SHOT 04</span>
-              <span class="shot-frames">541–720</span>
-              <span class="shot-progress">
-                <span class="shot-progress-track"><span style="--shot-progress: 0%; --shot-color: var(--quiet)"></span></span>
-                <small>0%</small>
-              </span>
-              <span class="shot-state">等待</span>
-            </div>
-            <div class="queue-row" role="listitem" tabindex="0">
-              <span class="shot-name">SHOT 05</span>
-              <span class="shot-frames">721–900</span>
-              <span class="shot-progress">
-                <span class="shot-progress-track"><span style="--shot-progress: 0%; --shot-color: var(--quiet)"></span></span>
-                <small>0%</small>
-              </span>
-              <span class="shot-state">等待</span>
+            <div class="recovery-cell">
+              <span>// AUTO RESUME</span>
+              <code id="resume-state">NOT RECORDED</code>
             </div>
           </div>
+          <div class="shot-table" role="table" aria-label="各镜头帧清单">
+            <div class="shot-head" role="row">
+              <span role="columnheader">SHOT NODE</span>
+              <span role="columnheader">RANGE</span>
+              <span role="columnheader">INVENTORY</span>
+              <span role="columnheader">STATE</span>
+            </div>
+            <div id="shot-queue" role="rowgroup"></div>
+          </div>
+          <footer class="panel-foot">
+            <span id="process-status">PROCESS SCAN // WAITING</span>
+            <span id="machine-status">TELEMETRY // WAITING</span>
+          </footer>
         </article>
 
-        <article class="card pipeline-card">
-          <div class="section-heading">
-            <div>
-              <p class="eyebrow">Production pipeline</p>
-              <h2>制作流程</h2>
+        <article class="panel" id="pipeline-panel">
+          <header class="panel-head">
+            <span class="panel-title">PRODUCTION PIPELINE</span>
+            <span class="panel-meta">4K · HEVC · REC.709</span>
+          </header>
+          <div class="pipeline" id="pipeline" aria-label="制作流程">
+            <div class="pipeline-step" data-step="idea">
+              <span class="stage-node" aria-hidden="true"></span>
+              <span class="stage-name">创意与风格锁定</span>
+              <span class="stage-state">QUEUED</span>
             </div>
-            <span class="section-caption">4K · H.265 · REC.709</span>
+            <div class="pipeline-step" data-step="storyboard">
+              <span class="stage-node" aria-hidden="true"></span>
+              <span class="stage-name">分镜与参考图</span>
+              <span class="stage-state">QUEUED</span>
+            </div>
+            <div class="pipeline-step" data-step="scene">
+              <span class="stage-node" aria-hidden="true"></span>
+              <span class="stage-name">Blender 场景构建</span>
+              <span class="stage-state">QUEUED</span>
+            </div>
+            <div class="pipeline-step" data-step="render">
+              <span class="stage-node" aria-hidden="true"></span>
+              <span class="stage-name">分批渲染与帧清单</span>
+              <span class="stage-state">QUEUED</span>
+            </div>
+            <div class="pipeline-step" data-step="edit">
+              <span class="stage-node" aria-hidden="true"></span>
+              <span class="stage-name">Resolve 剪辑与编码</span>
+              <span class="stage-state">QUEUED</span>
+            </div>
+            <div class="pipeline-step" data-step="delivery">
+              <span class="stage-node" aria-hidden="true"></span>
+              <span class="stage-name">交付规格与完整质检</span>
+              <span class="stage-state">QUEUED</span>
+            </div>
           </div>
 
-          <div class="pipeline" id="pipeline" aria-label="制作流程状态">
-            <div class="pipeline-step" data-step="idea" data-state="done">
-              <span class="step-dot" aria-hidden="true"></span>
-              <span class="step-name">创意与风格锁定</span>
-              <span class="step-meta">DONE</span>
+          <div class="qa-terminal" id="qa-terminal">
+            <div class="terminal-head">
+              <strong>delivery.qa</strong>
+              <span id="qa-meta">AWAITING PROBE</span>
             </div>
-            <div class="pipeline-step" data-step="storyboard" data-state="done">
-              <span class="step-dot" aria-hidden="true"></span>
-              <span class="step-name">分镜与参考图</span>
-              <span class="step-meta">DONE</span>
-            </div>
-            <div class="pipeline-step" data-step="scene" data-state="done">
-              <span class="step-dot" aria-hidden="true"></span>
-              <span class="step-name">Blender 场景构建</span>
-              <span class="step-meta">DONE</span>
-            </div>
-            <div class="pipeline-step" data-step="render" data-state="active">
-              <span class="step-dot" aria-hidden="true"></span>
-              <span class="step-name">分批渲染与校验</span>
-              <span class="step-meta">ACTIVE</span>
-            </div>
-            <div class="pipeline-step" data-step="edit" data-state="queued">
-              <span class="step-dot" aria-hidden="true"></span>
-              <span class="step-name">达芬奇剪辑</span>
-              <span class="step-meta">QUEUED</span>
-            </div>
-            <div class="pipeline-step" data-step="delivery" data-state="queued">
-              <span class="step-dot" aria-hidden="true"></span>
-              <span class="step-name">编码与最终质检</span>
-              <span class="step-meta">QUEUED</span>
-            </div>
-          </div>
-          <div class="qa-panel">
-            <h3>Final delivery QA</h3>
             <ul class="qa-list" id="qa-list">
-              <li>正在读取最终媒体规格…</li>
+              <li>正在读取最终媒体校验记录</li>
             </ul>
           </div>
         </article>
@@ -1454,298 +1650,101 @@
     </main>
 
     <footer class="footer">
-      <span id="footer-source">刷新频率 5s · 正在连接本机状态服务</span>
-      <span>本页面故障不会中断渲染监督器</span>
+      <span id="footer-source">REFRESH 05s · UPLINK NEGOTIATING</span>
+      <span>[ READ ONLY ] 页面故障不会中断 Blender、Resolve 或监督器</span>
     </footer>
   </div>
 
   <script>
-    const scenarios = {
-      rendering: {
-        title: "正在渲染 Shot 03",
-        status: "渲染中",
-        tone: "live",
-        progress: 57.4,
-        frame: 517,
-        eta: "02:14:36",
-        batch: "BATCH 09 · 481–540",
-        heartbeat: "监督器心跳 · 4 秒前",
-        previewState: "LIVE",
-        previewShot: "Shot 03 · 入水点",
-        previewFrame: "frame_000517.png",
-        frameTime: "41.2 s / frame",
-        machineCaption: "稳定 · 无降频",
-        healthNote: "温度与显存仍在当前任务的安全区间内。",
-        pid: "PID 28416",
-        gpu: 88,
-        vram: 7.1,
-        vramPercent: 89,
-        temp: 72,
-        memory: 21.6,
-        memoryPercent: 68,
-        lastValid: "000517",
-        retries: "0 / 2",
-        crashes: "1 次",
-        resume: "ARMED",
-        shotProgress: 87,
-        shotState: "渲染中",
-        stage: "render",
-        stageTone: "active"
-      },
-      cooldown: {
-        title: "GPU 冷却中，稍后自动续跑",
-        status: "冷却 00:42",
-        tone: "warning",
-        progress: 57.4,
-        frame: 517,
-        eta: "02:15:18",
-        batch: "BATCH 09 · PAUSED",
-        heartbeat: "监督器心跳 · 刚刚",
-        previewState: "VALID",
-        previewShot: "Shot 03 · 最近有效画面",
-        previewFrame: "frame_000517.png",
-        frameTime: "等待温度回落",
-        machineCaption: "保护性冷却",
-        healthNote: "监督器已释放 Blender 进程；达到阈值后从第 518 帧继续。",
-        pid: "PID —",
-        gpu: 8,
-        vram: 1.2,
-        vramPercent: 15,
-        temp: 64,
-        memory: 8.4,
-        memoryPercent: 26,
-        lastValid: "000517",
-        retries: "1 / 2",
-        crashes: "1 次",
-        resume: "COUNTDOWN",
-        shotProgress: 87,
-        shotState: "冷却中",
-        stage: "render",
-        stageTone: "warning"
-      },
-      editing: {
-        title: "达芬奇正在生成最终时间线",
-        status: "剪辑中",
-        tone: "live",
-        progress: 86.0,
-        frame: 900,
-        eta: "00:31:20",
-        batch: "TIMELINE · V03",
-        heartbeat: "Resolve 心跳 · 2 秒前",
-        previewState: "TIMELINE",
-        previewShot: "Master timeline · 00:00:17:08",
-        previewFrame: "poolcore_master_v03",
-        frameTime: "缓存 94%",
-        machineCaption: "媒体缓存正常",
-        healthNote: "900 帧已验证；正在合成声音、转场与字幕。",
-        pid: "RESOLVE PID 19308",
-        gpu: 42,
-        vram: 4.6,
-        vramPercent: 58,
-        temp: 61,
-        memory: 18.2,
-        memoryPercent: 57,
-        lastValid: "000900",
-        retries: "0 / 2",
-        crashes: "1 次",
-        resume: "STANDBY",
-        shotProgress: 100,
-        shotState: "已验证",
-        stage: "edit",
-        stageTone: "active"
-      },
-      complete: {
-        title: "成片已通过最终质检",
-        status: "已完成",
-        tone: "success",
-        progress: 100,
-        frame: 900,
-        eta: "00:00:00",
-        batch: "DELIVERY · VERIFIED",
-        heartbeat: "最终校验 · 已通过",
-        previewState: "MASTER",
-        previewShot: "Poolcore · Final master",
-        previewFrame: "poolcore-final-4k-hevc.mp4",
-        frameTime: "H.265 · Rec.709",
-        machineCaption: "设备空闲",
-        healthNote: "FFprobe、完整解码与文件哈希均已记录。",
-        pid: "PID —",
-        gpu: 3,
-        vram: 0.8,
-        vramPercent: 10,
-        temp: 43,
-        memory: 6.9,
-        memoryPercent: 22,
-        lastValid: "000900",
-        retries: "0 / 2",
-        crashes: "1 次",
-        resume: "COMPLETE",
-        shotProgress: 100,
-        shotState: "已验证",
-        stage: "delivery",
-        stageTone: "done"
-      }
-    };
+    const byId = (id) => document.getElementById(id);
 
     const elements = {
-      dataStrip: document.querySelector("#data-strip"),
-      sourceTitle: document.querySelector("#source-title"),
-      sourceNote: document.querySelector("#source-note"),
-      demoControls: document.querySelector("#demo-controls"),
-      projectLabel: document.querySelector("#project-label"),
-      projectFile: document.querySelector("#project-file"),
-      taskTitle: document.querySelector("#task-title"),
-      statusPill: document.querySelector("#status-pill"),
-      progressRing: document.querySelector("#progress-ring"),
-      progressPercent: document.querySelector("#progress-percent"),
-      frameCurrent: document.querySelector("#frame-current"),
-      frameTotal: document.querySelector("#frame-total"),
-      eta: document.querySelector("#eta"),
-      batch: document.querySelector("#batch"),
-      heartbeat: document.querySelector("#heartbeat"),
-      outputResolution: document.querySelector("#output-resolution"),
-      outputStandard: document.querySelector("#output-standard"),
-      previewImage: document.querySelector("#preview-image"),
-      previewState: document.querySelector("#preview-state"),
-      previewShot: document.querySelector("#preview-shot"),
-      previewFrame: document.querySelector("#preview-frame"),
-      frameTime: document.querySelector("#frame-time"),
-      machineCaption: document.querySelector("#machine-caption"),
-      healthNote: document.querySelector("#health-note"),
-      pidCaption: document.querySelector("#pid-caption"),
-      gpuValue: document.querySelector("#gpu-value"),
-      gpuUnit: document.querySelector("#gpu-unit"),
-      gpuBar: document.querySelector("#gpu-bar"),
-      vramValue: document.querySelector("#vram-value"),
-      vramUnit: document.querySelector("#vram-unit"),
-      vramBar: document.querySelector("#vram-bar"),
-      tempValue: document.querySelector("#temp-value"),
-      tempUnit: document.querySelector("#temp-unit"),
-      tempBar: document.querySelector("#temp-bar"),
-      memoryValue: document.querySelector("#memory-value"),
-      memoryUnit: document.querySelector("#memory-unit"),
-      memoryBar: document.querySelector("#memory-bar"),
-      lastValidFrame: document.querySelector("#last-valid-frame"),
-      batchRetries: document.querySelector("#batch-retries"),
-      crashCount: document.querySelector("#crash-count"),
-      resumeState: document.querySelector("#resume-state"),
-      activeShotBar: document.querySelector("#active-shot-bar"),
-      activeShotProgress: document.querySelector("#active-shot-progress"),
-      activeShotState: document.querySelector("#active-shot-state"),
-      queueCaption: document.querySelector("#queue-caption"),
-      shotQueue: document.querySelector("#shot-queue"),
-      qaList: document.querySelector("#qa-list"),
-      footerSource: document.querySelector("#footer-source")
+      sourceStrip: byId("source-strip"),
+      sourceCode: byId("source-code"),
+      sourceText: byId("source-text"),
+      demoControls: byId("demo-controls"),
+      missionPanel: byId("mission-panel"),
+      projectName: byId("project-name"),
+      projectFile: byId("project-file"),
+      taskTitle: byId("task-title"),
+      statusPill: byId("status-pill"),
+      statusText: byId("status-text"),
+      progressPercent: byId("progress-percent"),
+      progressTrack: byId("progress-track"),
+      progressFill: byId("progress-fill"),
+      frameCurrent: byId("frame-current"),
+      frameTotal: byId("frame-total"),
+      eta: byId("eta"),
+      outputResolution: byId("output-resolution"),
+      outputStandard: byId("output-standard"),
+      batch: byId("batch"),
+      heartbeat: byId("heartbeat"),
+      frameEvidence: byId("frame-evidence"),
+      previewImage: byId("preview-image"),
+      previewEmpty: byId("preview-empty"),
+      previewState: byId("preview-state"),
+      previewShot: byId("preview-shot"),
+      previewFrame: byId("preview-frame"),
+      previewMeta: byId("preview-meta"),
+      gpuValue: byId("gpu-value"),
+      gpuUnit: byId("gpu-unit"),
+      gpuFill: byId("gpu-fill"),
+      gpuMeta: byId("gpu-meta"),
+      vramValue: byId("vram-value"),
+      vramUnit: byId("vram-unit"),
+      vramFill: byId("vram-fill"),
+      vramMeta: byId("vram-meta"),
+      tempValue: byId("temp-value"),
+      tempFill: byId("temp-fill"),
+      tempMeta: byId("temp-meta"),
+      memoryValue: byId("memory-value"),
+      memoryUnit: byId("memory-unit"),
+      memoryFill: byId("memory-fill"),
+      memoryMeta: byId("memory-meta"),
+      lastValidFrame: byId("last-valid-frame"),
+      batchRetries: byId("batch-retries"),
+      crashCount: byId("crash-count"),
+      resumeState: byId("resume-state"),
+      queueCaption: byId("queue-caption"),
+      shotQueue: byId("shot-queue"),
+      processStatus: byId("process-status"),
+      machineStatus: byId("machine-status"),
+      pipelinePanel: byId("pipeline-panel"),
+      qaTerminal: byId("qa-terminal"),
+      qaMeta: byId("qa-meta"),
+      qaList: byId("qa-list"),
+      footerSource: byId("footer-source")
     };
-
-    function updateMetric(bar, value, textElement, textValue) {
-      const available = Number.isFinite(value);
-      const percent = available ? Math.max(0, Math.min(100, value)) : 0;
-      bar.style.setProperty("--value", `${percent}%`);
-      bar.parentElement.setAttribute("aria-valuenow", String(Math.round(percent)));
-      textElement.textContent = available ? String(textValue) : "—";
-    }
-
-    function updatePipeline(activeStage, activeTone) {
-      const order = ["idea", "storyboard", "scene", "render", "edit", "delivery"];
-      const activeIndex = order.indexOf(activeStage);
-
-      document.querySelectorAll(".pipeline-step").forEach((step, index) => {
-        let state = "queued";
-        let label = "QUEUED";
-
-        if (index < activeIndex) {
-          state = "done";
-          label = "DONE";
-        } else if (index === activeIndex) {
-          state = activeTone;
-          label = activeTone === "done"
-            ? "VERIFIED"
-            : activeTone === "warning"
-              ? "COOLDOWN"
-              : activeTone === "failed"
-                ? "FAILED"
-                : "ACTIVE";
-        }
-
-        if (activeStage === "delivery" && activeTone === "done") {
-          state = "done";
-          label = "DONE";
-        }
-
-        step.dataset.state = state;
-        step.querySelector(".step-meta").textContent = label;
-      });
-    }
-
-    function applyScenario(name) {
-      const data = scenarios[name];
-      document.documentElement.style.setProperty("--progress", `${data.progress}%`);
-
-      elements.taskTitle.textContent = data.title;
-      elements.statusPill.textContent = data.status;
-      elements.statusPill.dataset.tone = data.tone;
-      elements.progressRing.setAttribute("aria-valuenow", String(data.progress));
-      elements.progressPercent.textContent = `${data.progress.toFixed(1)}%`;
-      elements.frameCurrent.textContent = String(data.frame);
-      elements.eta.textContent = data.eta;
-      elements.batch.textContent = data.batch;
-      elements.heartbeat.textContent = data.heartbeat;
-      elements.previewState.textContent = data.previewState;
-      elements.previewShot.textContent = data.previewShot;
-      elements.previewFrame.textContent = data.previewFrame;
-      elements.frameTime.textContent = data.frameTime;
-      elements.machineCaption.textContent = data.machineCaption;
-      elements.healthNote.textContent = data.healthNote;
-      elements.pidCaption.textContent = data.pid;
-      elements.lastValidFrame.textContent = data.lastValid;
-      elements.batchRetries.textContent = data.retries;
-      elements.crashCount.textContent = data.crashes;
-      elements.resumeState.textContent = data.resume;
-      elements.activeShotBar.style.setProperty("--shot-progress", `${data.shotProgress}%`);
-      elements.activeShotProgress.textContent = `${data.shotProgress}%`;
-      elements.activeShotState.textContent = data.shotState;
-
-      updateMetric(elements.gpuBar, data.gpu, elements.gpuValue, data.gpu);
-      updateMetric(elements.vramBar, data.vramPercent, elements.vramValue, data.vram);
-      updateMetric(elements.tempBar, data.temp, elements.tempValue, data.temp);
-      updateMetric(elements.memoryBar, data.memoryPercent, elements.memoryValue, data.memory);
-      updatePipeline(data.stage, data.stageTone);
-
-      document.querySelectorAll("[data-scenario]").forEach((button) => {
-        button.setAttribute("aria-pressed", String(button.dataset.scenario === name));
-      });
-    }
 
     const statusLabels = {
       render: {
-        idle: "渲染待续跑",
-        running: "渲染中",
-        cooldown: "冷却恢复",
-        failed: "渲染失败",
-        complete: "渲染完成"
+        idle: "RENDER IDLE",
+        running: "RENDER ACTIVE",
+        cooldown: "COOLDOWN",
+        failed: "RENDER FAULT",
+        complete: "RENDER COMPLETE"
       },
       edit: {
-        idle: "等待剪辑",
-        running: "剪辑 / 编码中",
-        cooldown: "等待恢复",
-        failed: "剪辑失败",
-        complete: "剪辑完成"
+        idle: "EDIT QUEUED",
+        running: "EDIT ACTIVE",
+        cooldown: "EDIT PAUSED",
+        failed: "EDIT FAULT",
+        complete: "EDIT COMPLETE"
       },
       delivery: {
-        idle: "等待最终质检",
-        running: "质检中",
-        cooldown: "等待恢复",
-        failed: "质检未通过",
-        complete: "已完成"
+        idle: "QA PENDING",
+        running: "QA ACTIVE",
+        cooldown: "QA PAUSED",
+        failed: "QA REJECTED",
+        complete: "QA VERIFIED"
       }
     };
 
     const shotLabels = {
-      verified: "已验证",
-      inventory_complete: "帧齐全",
-      partial: "未完成",
-      queued: "等待"
+      verified: "VERIFIED",
+      inventory_complete: "INVENTORY OK",
+      partial: "PARTIAL",
+      queued: "QUEUED"
     };
 
     let lastGoodSummary = null;
@@ -1753,159 +1752,214 @@
     let pollTimer = 0;
     let previewKey = "";
 
-    function toneFor(status) {
-      if (status === "complete") return "success";
-      if (status === "failed") return "danger";
-      if (status === "cooldown" || status === "idle") return "warning";
-      return "live";
+    function clamp(value, min = 0, max = 100) {
+      return Math.max(min, Math.min(max, value));
     }
 
-    function stageTone(data) {
-      if (data.status === "failed") return "failed";
-      if (data.status === "cooldown") return "warning";
-      if (data.status === "complete") return "done";
-      return "active";
+    function finite(value) {
+      return Number.isFinite(value);
+    }
+
+    function number(value, digits = 0) {
+      return finite(value) ? Number(value).toFixed(digits) : "—";
+    }
+
+    function pad(value, width = 3) {
+      return String(value).padStart(width, "0");
     }
 
     function formatEta(seconds) {
-      if (!Number.isFinite(seconds)) return "估算中";
+      if (!finite(seconds)) return "ESTIMATING";
       const safe = Math.max(0, Math.round(seconds));
       const hours = Math.floor(safe / 3600);
       const minutes = Math.floor((safe % 3600) / 60);
       const secs = safe % 60;
-      return [hours, minutes, secs].map((part) => String(part).padStart(2, "0")).join(":");
+      return [hours, minutes, secs].map((part) => pad(part, 2)).join(":");
     }
 
     function formatAge(seconds) {
-      if (!Number.isFinite(seconds)) return "刚刚";
-      if (seconds < 60) return `${Math.max(0, Math.round(seconds))} 秒前`;
-      if (seconds < 3600) return `${Math.round(seconds / 60)} 分钟前`;
-      return `${Math.round(seconds / 3600)} 小时前`;
+      if (!finite(seconds)) return "NOW";
+      if (seconds < 60) return `${Math.max(0, Math.round(seconds))}s AGO`;
+      if (seconds < 3600) return `${Math.round(seconds / 60)}m AGO`;
+      return `${Math.round(seconds / 3600)}h AGO`;
     }
 
-    function displayNumber(value, digits = 0) {
-      return Number.isFinite(value) ? Number(value).toFixed(digits) : "—";
+    function statusTone(status) {
+      if (status === "complete") return "success";
+      if (status === "failed") return "danger";
+      if (status === "idle" || status === "cooldown") return "warn";
+      return "signal";
     }
 
-    function setSourceState(data, clientStale = false) {
-      const stale = clientStale || data?.health?.stale === true;
-      if (stale) {
-        elements.dataStrip.dataset.tone = "danger";
-        elements.sourceTitle.textContent = "DATA STALE";
-        const seconds = lastGoodAt ? Math.round((Date.now() - lastGoodAt) / 1000) : null;
-        elements.sourceNote.textContent = `状态连接已中断；保留最后一次有效数据（${formatAge(seconds)}）。`;
+    function pillStatus(status) {
+      if (status === "complete") return "success";
+      if (status === "failed") return "error";
+      if (status === "idle" || status === "cooldown") return "warn";
+      return "busy";
+    }
+
+    function setMetric(fill, valueElement, metaElement, value, percent, meta, tone = "signal") {
+      const available = value !== null && value !== undefined && finite(percent);
+      const safePercent = available ? clamp(percent) : 0;
+      valueElement.textContent = available ? String(value) : "—";
+      fill.style.width = `${safePercent}%`;
+      fill.dataset.tone = tone;
+      fill.parentElement.setAttribute("aria-valuenow", String(Math.round(safePercent)));
+      metaElement.textContent = available ? meta : "NO DATA";
+    }
+
+    function setSource(data, stale = false) {
+      if (stale || data?.health?.stale === true) {
+        const age = lastGoodAt ? (Date.now() - lastGoodAt) / 1000 : null;
+        elements.sourceStrip.dataset.tone = "danger";
+        elements.sourceCode.textContent = "DATA STALE";
+        elements.sourceText.textContent = `状态链路中断；保留最后一次有效数据 // ${formatAge(age)}`;
         return;
       }
 
-      const tone = data.status === "failed" ? "danger" : "live";
-      elements.dataStrip.dataset.tone = tone;
+      elements.sourceStrip.dataset.tone = data.status === "failed" ? "danger" : "live";
       if (data.source === "derived") {
-        elements.sourceTitle.textContent = "REAL · DERIVED";
-        elements.sourceNote.textContent = "真实磁盘证据；未发现统一状态 JSON，恢复计数等字段可能不可用。";
+        elements.sourceCode.textContent = "REAL · DERIVED";
+        elements.sourceText.textContent = "真实磁盘证据；统一状态 JSON 缺失，恢复计数等字段保持未记录。";
+      } else if (data.source === "simulated") {
+        elements.sourceStrip.dataset.tone = "warn";
+        elements.sourceCode.textContent = "SIMULATION";
+        elements.sourceText.textContent = "明确标记的界面演示数据，不作为生产完成证据。";
       } else {
-        elements.sourceTitle.textContent = data.source === "mixed" ? "REAL · MIXED" : "REAL · LIVE";
-        elements.sourceNote.textContent = "正在读取持久化任务状态与磁盘校验结果；页面为只读观察面。";
+        elements.sourceCode.textContent = data.source === "mixed" ? "REAL · MIXED" : "REAL · LIVE";
+        elements.sourceText.textContent = "持久化状态与磁盘校验已接入；观察面保持只读。";
       }
     }
 
-    function renderShotQueue(data) {
+    function renderShots(data) {
       const shots = Array.isArray(data.shots) ? data.shots : [];
-      elements.queueCaption.textContent = `${shots.length} SHOTS · ${data.progress.total} FRAMES`;
+      elements.queueCaption.textContent = `${shots.length} SHOTS · ${data.progress.total || 0} FRAMES`;
       elements.shotQueue.replaceChildren();
 
-      shots.forEach((shot) => {
+      for (const shot of shots) {
         const row = document.createElement("div");
-        row.className = "queue-row";
-        row.setAttribute("role", "listitem");
-        row.tabIndex = 0;
-        row.dataset.active = String(shot.id === data.current.shot_id && !shot.inventory_complete);
+        row.className = "shot-row";
+        row.dataset.active = String(shot.id === data.current?.shot_id && !shot.inventory_complete);
+        row.setAttribute("role", "row");
 
         const name = document.createElement("span");
         name.className = "shot-name";
+        name.setAttribute("role", "cell");
         name.textContent = shot.label;
 
-        const frames = document.createElement("span");
-        frames.className = "shot-frames";
-        frames.textContent = `${String(shot.start).padStart(3, "0")}–${String(shot.end).padStart(3, "0")}`;
+        const range = document.createElement("span");
+        range.className = "shot-range";
+        range.setAttribute("role", "cell");
+        range.textContent = `${pad(shot.start)}–${pad(shot.end)}`;
 
         const progress = document.createElement("span");
         progress.className = "shot-progress";
+        progress.setAttribute("role", "cell");
         const track = document.createElement("span");
         track.className = "shot-progress-track";
         const fill = document.createElement("span");
+        fill.className = "shot-progress-fill";
         fill.style.setProperty("--shot-progress", `${shot.percent}%`);
-        if (!shot.inventory_complete) fill.style.setProperty("--shot-color", "var(--accent)");
         track.append(fill);
         const percent = document.createElement("small");
-        percent.textContent = `${shot.percent.toFixed(1)}%`;
+        percent.textContent = `${number(shot.percent, 1)}%`;
         progress.append(track, percent);
 
         const state = document.createElement("span");
         state.className = "shot-state";
-        state.textContent = shotLabels[shot.status] || shot.status;
-        row.append(name, frames, progress, state);
+        state.setAttribute("role", "cell");
+        state.textContent = shotLabels[shot.status] || String(shot.status || "UNKNOWN").toUpperCase();
+        row.append(name, range, progress, state);
         elements.shotQueue.append(row);
+      }
+    }
+
+    function renderPipeline(data) {
+      const renderDone = data.progress?.all_frames_present === true;
+      const editDone = data.delivery?.exists === true;
+
+      document.querySelectorAll(".pipeline-step").forEach((step) => {
+        const name = step.dataset.step;
+        let className = "pipeline-step";
+        let label = "QUEUED";
+
+        if (["idea", "storyboard", "scene"].includes(name)) {
+          className += " is-done";
+          label = "DONE";
+        } else if (name === "render") {
+          if (renderDone) {
+            className += " is-done";
+            label = data.progress.all_frames_verified ? "VERIFIED" : "INVENTORY OK";
+          } else if (data.stage === "render") {
+            className += data.status === "failed"
+              ? " is-error"
+              : data.status === "cooldown" || data.status === "idle"
+                ? " is-warn"
+                : " is-active";
+            label = data.status.toUpperCase();
+          }
+        } else if (name === "edit") {
+          if (editDone) {
+            className += " is-done";
+            label = "MEDIA EXISTS";
+          } else if (data.stage === "edit") {
+            className += data.status === "failed"
+              ? " is-error"
+              : data.status === "cooldown" || data.status === "idle"
+                ? " is-warn"
+                : " is-active";
+            label = data.status.toUpperCase();
+          }
+        } else if (name === "delivery" && data.stage === "delivery") {
+          className += data.status === "complete"
+            ? " is-done"
+            : data.status === "failed"
+              ? " is-error"
+              : data.status === "idle" || data.status === "cooldown"
+                ? " is-warn"
+                : " is-active";
+          label = data.status === "complete" ? "VERIFIED" : data.status.toUpperCase();
+        }
+
+        step.className = className;
+        step.querySelector(".stage-state").textContent = label;
       });
+
+      const tone = statusTone(data.status);
+      elements.pipelinePanel.dataset.tone = tone === "signal" ? "" : tone;
     }
 
     function renderQa(data) {
       const delivery = data.delivery || {};
-      let items = Array.isArray(delivery.issues) ? [...delivery.issues] : [];
+      const actual = delivery.actual || {};
+      let issues = Array.isArray(delivery.issues) ? [...delivery.issues] : [];
+
       if (delivery.qa_passed) {
-        const actual = delivery.actual || {};
-        items = [
-          `${String(actual.codec || "HEVC").toUpperCase()} · ${actual.width}×${actual.height} · ${displayNumber(actual.fps)} fps`,
-          "Rec.709、全片解码与 SHA-256 均已记录"
+        issues = [
+          `${String(actual.codec || "HEVC").toUpperCase()} · ${actual.width}×${actual.height} · ${number(actual.fps)} FPS`,
+          "REC.709 · FULL DECODE · SHA-256 // VERIFIED"
         ];
-      } else if (!items.length) {
-        items = ["等待最终媒体校验记录"];
+      } else if (!issues.length) {
+        issues = ["等待最终媒体规格、全片解码与 SHA-256 记录"];
       }
 
       elements.qaList.dataset.passed = String(delivery.qa_passed === true);
+      elements.qaTerminal.dataset.tone = delivery.qa_passed ? "success" : delivery.spec_passed === false ? "danger" : "signal";
+      elements.qaMeta.textContent = delivery.qa_passed
+        ? "STATUS: VERIFIED"
+        : delivery.exists
+          ? "STATUS: ACTION REQUIRED"
+          : "STATUS: MEDIA ABSENT";
       elements.qaList.replaceChildren();
-      items.slice(0, 6).forEach((message) => {
+
+      for (const message of issues.slice(0, 6)) {
         const item = document.createElement("li");
         item.textContent = message;
         elements.qaList.append(item);
-      });
+      }
     }
 
-    function renderPipeline(data) {
-      const renderDone = data.progress.all_frames_present;
-      const editDone = data.delivery?.exists === true;
-      document.querySelectorAll(".pipeline-step").forEach((step) => {
-        const name = step.dataset.step;
-        let state = "queued";
-        let label = "QUEUED";
-        if (["idea", "storyboard", "scene"].includes(name)) {
-          state = "done";
-          label = "DONE";
-        } else if (name === "render") {
-          if (renderDone) {
-            state = "done";
-            label = data.progress.all_frames_verified ? "VERIFIED" : "INVENTORY OK";
-          } else if (data.stage === "render") {
-            state = stageTone(data);
-            label = data.status === "running" ? "ACTIVE" : data.status.toUpperCase();
-          }
-        } else if (name === "edit") {
-          if (editDone) {
-            state = "done";
-            label = "MEDIA EXISTS";
-          } else if (data.stage === "edit") {
-            state = stageTone(data);
-            label = data.status === "running" ? "ACTIVE" : data.status.toUpperCase();
-          }
-        } else if (name === "delivery" && data.stage === "delivery") {
-          state = stageTone(data);
-          label = data.status === "complete" ? "VERIFIED" : data.status.toUpperCase();
-        }
-        step.dataset.state = state;
-        step.querySelector(".step-meta").textContent = label;
-      });
-    }
-
-    function applySummary(data) {
+    function renderSummary(data) {
       const progress = data.progress || {};
       const health = data.health || {};
       const gpu = health.gpu || {};
@@ -1915,40 +1969,48 @@
       const delivery = data.delivery || {};
       const actual = delivery.actual || {};
       const expected = data.expected || {};
-      const percent = Number.isFinite(progress.percent) ? progress.percent : 0;
-      const tone = toneFor(data.status);
+      const percent = finite(progress.percent) ? clamp(progress.percent) : 0;
+      const tone = statusTone(data.status);
+
+      elements.missionPanel.dataset.tone = tone;
+      elements.projectName.textContent = `NODE // ${String(data.project_name || "UNKNOWN").toUpperCase()}`;
+      elements.projectFile.textContent = `PROJECT FILE // ${data.project_file || "NOT RECORDED"}`;
+      elements.taskTitle.textContent = data.title || "STATUS UNKNOWN";
+      elements.statusPill.dataset.status = pillStatus(data.status);
+      elements.statusText.textContent = statusLabels[data.stage]?.[data.status] || String(data.status || "UNKNOWN").toUpperCase();
 
       document.documentElement.style.setProperty("--progress", `${percent}%`);
-      elements.projectLabel.textContent = `Active production · ${data.project_name}`;
-      elements.projectFile.textContent = data.project_file || "项目文件未记录";
-      elements.taskTitle.textContent = data.title;
-      elements.statusPill.textContent = statusLabels[data.stage]?.[data.status] || data.status;
-      elements.statusPill.dataset.tone = tone;
-      elements.progressRing.setAttribute("aria-valuenow", String(percent));
-      elements.progressPercent.textContent = `${percent.toFixed(1)}%`;
-      elements.frameCurrent.textContent = String(progress.current ?? "—");
-      elements.frameTotal.textContent = `/ ${progress.total ?? "—"} frames`;
+      elements.progressPercent.textContent = `${number(percent, 1)}%`;
+      elements.progressTrack.setAttribute("aria-valuenow", String(Math.round(percent)));
+      elements.progressFill.dataset.tone = tone;
+      elements.frameCurrent.textContent = progress.current ?? "—";
+      elements.frameTotal.textContent = `/ ${progress.total ?? "—"} FRAMES`;
       elements.eta.textContent = data.status === "complete" ? "00:00:00" : formatEta(progress.eta_seconds);
+      elements.outputResolution.textContent = `${expected.width || "—"} × ${expected.height || "—"}`;
+      elements.outputStandard.textContent = `${expected.fps || "—"} FPS · ${String(expected.codec || "HEVC").toUpperCase()} · REC.709`;
       elements.batch.textContent = progress.all_frames_present
         ? "FRAME INVENTORY · COMPLETE"
-        : data.current?.batch || data.current?.shot_id || "BATCH · NOT RECORDED";
+        : data.current?.batch || data.current?.shot_id || "NOT RECORDED";
       elements.heartbeat.textContent = health.heartbeat_at
-        ? `监督器心跳 · ${formatAge(health.heartbeat_age_seconds)}`
-        : "磁盘状态扫描 · 刚刚";
-      elements.outputResolution.textContent = `${expected.width || "—"} × ${expected.height || "—"}`;
-      elements.outputStandard.textContent =
-        `${expected.fps || "—"} FPS · ${String(expected.codec || "—").toUpperCase()} · Rec.709`;
-
-      elements.previewState.textContent = preview.available ? "DECODED" : "UNAVAILABLE";
-      elements.previewShot.textContent = preview.shot_id
-        ? preview.shot_id.replace("_", " ").toUpperCase()
-        : "最近有效帧不可用";
-      elements.previewFrame.textContent = preview.filename || preview.reason || "—";
-      elements.frameTime.textContent = Number.isFinite(data.current?.median_frame_seconds)
-        ? `${data.current.median_frame_seconds.toFixed(1)} s / frame`
+        ? `SUPERVISOR HEARTBEAT // ${formatAge(health.heartbeat_age_seconds)}`
+        : "DISK STATUS SCAN // NOW";
+      elements.frameEvidence.textContent = progress.all_frames_verified
+        ? "FRAME SEQUENCE // VERIFIED"
         : progress.all_frames_present
-          ? "帧清单完整"
-          : "帧耗时未记录";
+          ? "FRAME INVENTORY // 100% PRESENT"
+          : `FRAME INVENTORY // ${number(percent, 1)}%`;
+
+      elements.previewState.textContent = preview.available ? "DECODE GATE: PASS" : "DECODE GATE: NO FRAME";
+      elements.previewShot.textContent = preview.shot_id
+        ? `CHANNEL // ${String(preview.shot_id).replace("_", "-").toUpperCase()}`
+        : "FRAME CHANNEL // OFFLINE";
+      elements.previewFrame.textContent = preview.filename || preview.reason || "—";
+      elements.previewMeta.textContent = finite(data.current?.median_frame_seconds)
+        ? `${number(data.current.median_frame_seconds, 1)}s / FRAME`
+        : progress.all_frames_present
+          ? "INVENTORY OK"
+          : "TIME UNSET";
+
       if (preview.available && preview.url) {
         const nextKey = `${preview.filename}|${preview.version}`;
         if (nextKey !== previewKey) {
@@ -1956,93 +2018,93 @@
           previewKey = nextKey;
         }
         elements.previewImage.hidden = false;
+        elements.previewEmpty.hidden = true;
       } else {
         elements.previewImage.hidden = true;
+        elements.previewEmpty.hidden = false;
       }
 
-      updateMetric(elements.gpuBar, gpu.percent, elements.gpuValue, displayNumber(gpu.percent));
+      const gpuTone = finite(gpu.temperature_c) && gpu.temperature_c >= 85
+        ? "danger"
+        : finite(gpu.temperature_c) && gpu.temperature_c >= 75
+          ? "warn"
+          : "signal";
+      setMetric(
+        elements.gpuFill,
+        elements.gpuValue,
+        elements.gpuMeta,
+        finite(gpu.percent) ? number(gpu.percent) : null,
+        gpu.percent,
+        "LIVE SAMPLE"
+      );
       elements.gpuUnit.textContent = "%";
-      updateMetric(
-        elements.vramBar,
-        gpu.vram_percent,
+      setMetric(
+        elements.vramFill,
         elements.vramValue,
-        displayNumber(gpu.vram_used_gb, 1)
+        elements.vramMeta,
+        finite(gpu.vram_used_gb) ? number(gpu.vram_used_gb, 1) : null,
+        gpu.vram_percent,
+        finite(gpu.vram_total_gb) ? `${number(gpu.vram_total_gb, 1)} GB TOTAL` : "NO TOTAL"
       );
-      elements.vramUnit.textContent = Number.isFinite(gpu.vram_total_gb)
-        ? `/ ${displayNumber(gpu.vram_total_gb, 1)} GB`
-        : "GB";
-      updateMetric(
-        elements.tempBar,
-        gpu.temperature_c,
+      elements.vramUnit.textContent = "GB";
+      setMetric(
+        elements.tempFill,
         elements.tempValue,
-        displayNumber(gpu.temperature_c)
+        elements.tempMeta,
+        finite(gpu.temperature_c) ? number(gpu.temperature_c) : null,
+        gpu.temperature_c,
+        gpuTone === "danger" ? "THERMAL CRITICAL" : gpuTone === "warn" ? "THERMAL WATCH" : "NOMINAL",
+        gpuTone
       );
-      elements.tempUnit.textContent = "°C";
-      updateMetric(
-        elements.memoryBar,
-        memory.percent,
+      setMetric(
+        elements.memoryFill,
         elements.memoryValue,
-        displayNumber(memory.used_gb, 1)
+        elements.memoryMeta,
+        finite(memory.used_gb) ? number(memory.used_gb, 1) : null,
+        memory.percent,
+        finite(memory.total_gb) ? `${number(memory.total_gb, 1)} GB TOTAL` : "NO TOTAL"
       );
-      elements.memoryUnit.textContent = Number.isFinite(memory.total_gb)
-        ? `/ ${displayNumber(memory.total_gb, 1)} GB`
-        : "GB";
+      elements.memoryUnit.textContent = "GB";
 
-      const active = Array.isArray(health.active_pids) ? health.active_pids : [];
-      elements.pidCaption.textContent = active.length ? `PID ${active.join(", ")}` : "PID —";
-      elements.machineCaption.textContent = active.length ? "发现活动生产进程" : "当前无 Blender / Resolve / FFmpeg";
-      if (data.status === "failed") {
-        elements.healthNote.textContent = "设备状态正常；当前阻塞来自交付规格质检。";
-        elements.healthNote.dataset.tone = "danger";
-      } else if (!health.gpu || !health.memory) {
-        elements.healthNote.textContent = "部分设备指标不可用，页面不会据此猜测任务状态。";
-        elements.healthNote.dataset.tone = "warning";
-      } else {
-        elements.healthNote.textContent = active.length
-          ? "设备指标来自本机只读采样。"
-          : "生产设备当前空闲。";
-        elements.healthNote.dataset.tone = "live";
-      }
-
-      elements.lastValidFrame.textContent = Number.isFinite(data.current?.last_valid_frame)
-        ? String(data.current.last_valid_frame).padStart(6, "0")
+      const pids = Array.isArray(health.active_pids) ? health.active_pids : [];
+      elements.processStatus.textContent = pids.length
+        ? `PROCESS SCAN // ACTIVE PID ${pids.join(",")}`
+        : "PROCESS SCAN // NO BLENDER · RESOLVE · FFMPEG";
+      elements.machineStatus.textContent = health.gpu && health.memory
+        ? "TELEMETRY // LIVE SAMPLE"
+        : "TELEMETRY // PARTIAL";
+      elements.lastValidFrame.textContent = finite(data.current?.last_valid_frame)
+        ? pad(data.current.last_valid_frame, 6)
         : "—";
-      elements.batchRetries.textContent = Number.isFinite(recovery.batch_retry_count)
+      elements.batchRetries.textContent = finite(recovery.batch_retry_count)
         ? String(recovery.batch_retry_count)
-        : "未记录";
-      elements.crashCount.textContent = Number.isFinite(recovery.total_crash_count)
-        ? `${recovery.total_crash_count} 次`
-        : "未记录";
+        : "NOT RECORDED";
+      elements.crashCount.textContent = finite(recovery.total_crash_count)
+        ? `${recovery.total_crash_count} EVENTS`
+        : "NOT RECORDED";
       elements.resumeState.textContent = recovery.auto_resume_enabled === true
         ? "ARMED"
         : recovery.auto_resume_enabled === false
           ? "DISABLED"
           : "NOT RECORDED";
 
-      renderShotQueue(data);
+      renderShots(data);
       renderPipeline(data);
       renderQa(data);
-      setSourceState(data);
+      setSource(data);
 
-      const actualLabel = delivery.exists
-        ? `${delivery.filename} · ${actual.width || "—"}×${actual.height || "—"} · ${String(actual.codec || "未知").toUpperCase()}`
-        : "尚无最终成片";
-      elements.footerSource.textContent =
-        `刷新频率 5s · ${actualLabel} · 状态生成 ${new Date(data.generated_at).toLocaleTimeString("zh-CN", {hour12: false})}`;
+      const media = delivery.exists
+        ? `${delivery.filename} · ${actual.width || "—"}×${actual.height || "—"} · ${String(actual.codec || "UNKNOWN").toUpperCase()}`
+        : "FINAL MEDIA // ABSENT";
+      const generated = data.generated_at
+        ? new Date(data.generated_at).toLocaleTimeString("zh-CN", {hour12: false})
+        : "—";
+      elements.footerSource.textContent = `REFRESH 05s · ${media} · STATUS ${generated}`;
     }
 
-    function showPending() {
+    function pendingState() {
       elements.taskTitle.textContent = "正在读取真实制作状态";
-      elements.projectLabel.textContent = "Active production · connecting";
-      elements.projectFile.textContent = "只读连接建立中…";
-      elements.statusPill.textContent = "连接中";
-      elements.statusPill.dataset.tone = "warning";
-      elements.progressPercent.textContent = "—";
-      elements.frameCurrent.textContent = "—";
-      elements.eta.textContent = "估算中";
-      elements.previewState.textContent = "WAITING";
-      elements.machineCaption.textContent = "正在读取设备指标";
-      elements.healthNote.textContent = "页面不会启动、停止或重试生产任务。";
+      elements.statusText.textContent = "UPLINK";
       elements.shotQueue.replaceChildren();
     }
 
@@ -2057,33 +2119,113 @@
         });
         if (!response.ok) throw new Error(`HTTP ${response.status}`);
         const data = await response.json();
-        if (data.schema_version !== 1) throw new Error("Unsupported status schema");
+        if (data.schema_version !== 1) throw new Error("Unsupported schema");
         lastGoodSummary = data;
         lastGoodAt = Date.now();
-        applySummary(data);
+        renderSummary(data);
       } catch (error) {
         if (lastGoodSummary) {
-          setSourceState(lastGoodSummary, true);
+          setSource(lastGoodSummary, true);
         } else {
-          elements.dataStrip.dataset.tone = "danger";
-          elements.sourceTitle.textContent = "SERVICE OFFLINE";
-          elements.sourceNote.textContent = "无法读取本机状态服务；未显示模拟数据。可用 ?demo=1 查看界面演示。";
-          elements.statusPill.textContent = "未连接";
-          elements.statusPill.dataset.tone = "danger";
+          elements.sourceStrip.dataset.tone = "danger";
+          elements.sourceCode.textContent = "UPLINK LOST";
+          elements.sourceText.textContent = "无法读取本机状态服务；未显示模拟数据。使用 ?demo=1 查看界面演示。";
+          elements.statusPill.dataset.status = "error";
+          elements.statusText.textContent = "OFFLINE";
         }
       } finally {
         window.clearTimeout(timeout);
-        const delay = document.hidden ? 15000 : 5000;
-        pollTimer = window.setTimeout(fetchStatus, delay);
+        pollTimer = window.setTimeout(fetchStatus, document.hidden ? 15000 : 5000);
       }
     }
 
-    document.querySelectorAll("[data-scenario]").forEach((button) => {
-      button.addEventListener("click", () => applyScenario(button.dataset.scenario));
-    });
+    function demoShots(current, complete = false) {
+      const ranges = [[1, 180], [181, 360], [361, 540], [541, 720], [721, 900]];
+      return ranges.map(([start, end], index) => {
+        const present = complete ? end - start + 1 : clamp(current - start + 1, 0, end - start + 1);
+        const total = end - start + 1;
+        return {
+          id: `shot_0${index + 1}`,
+          label: `SHOT 0${index + 1}`,
+          start,
+          end,
+          present,
+          total,
+          percent: 100 * present / total,
+          inventory_complete: present === total,
+          verified: complete,
+          status: complete ? "verified" : present === total ? "inventory_complete" : present > 0 ? "partial" : "queued"
+        };
+      });
+    }
+
+    function demoSummary(name) {
+      const states = {
+        rendering: {stage: "render", status: "running", current: 517, title: "Blender 正在渲染 SHOT-03"},
+        cooldown: {stage: "render", status: "cooldown", current: 517, title: "GPU 冷却中，监督器等待续跑"},
+        editing: {stage: "edit", status: "running", current: 900, title: "Resolve 正在构建最终时间线"},
+        complete: {stage: "delivery", status: "complete", current: 900, title: "成片已通过最终质检"}
+      };
+      const state = states[name];
+      const complete = state.current === 900;
+      const deliveryExists = name === "complete";
+      return {
+        schema_version: 1,
+        generated_at: new Date().toISOString(),
+        source: "simulated",
+        project_name: "DEMO-NODE",
+        project_file: "demo_scene.blend",
+        expected: {width: 2160, height: 3840, fps: 30, codec: "hevc"},
+        stage: state.stage,
+        status: state.status,
+        title: state.title,
+        progress: {
+          current: state.current,
+          total: 900,
+          percent: 100 * state.current / 900,
+          eta_seconds: name === "rendering" ? 8076 : null,
+          all_frames_present: complete,
+          all_frames_verified: name === "complete"
+        },
+        current: {
+          shot_id: complete ? "shot_05" : "shot_03",
+          batch: name === "cooldown" ? "481–540 · PAUSED" : "481–540",
+          last_valid_frame: state.current,
+          median_frame_seconds: name === "rendering" ? 41.2 : null
+        },
+        health: {
+          heartbeat_at: new Date().toISOString(),
+          heartbeat_age_seconds: 2,
+          stale: false,
+          gpu: {percent: name === "cooldown" ? 8 : 72, vram_used_gb: 5.8, vram_total_gb: 8, vram_percent: 72.5, temperature_c: name === "cooldown" ? 64 : 72},
+          memory: {used_gb: 4.8, total_gb: 7.4, percent: 64.9},
+          active_pids: name === "cooldown" || name === "complete" ? [] : [28416]
+        },
+        recovery: {batch_retry_count: 1, total_crash_count: 1, auto_resume_enabled: true},
+        delivery: {
+          exists: deliveryExists,
+          filename: deliveryExists ? "demo-final.mp4" : "",
+          spec_passed: deliveryExists,
+          decode_passed: deliveryExists,
+          sha256_recorded: deliveryExists,
+          qa_passed: deliveryExists,
+          issues: deliveryExists ? [] : ["演示状态：最终媒体尚未生成"],
+          actual: deliveryExists ? {codec: "hevc", width: 2160, height: 3840, fps: 30} : {}
+        },
+        shots: demoShots(state.current, name === "complete"),
+        preview: {available: false, reason: "模拟模式不读取真实帧"}
+      };
+    }
+
+    function applyDemo(name) {
+      renderSummary(demoSummary(name));
+      document.querySelectorAll("[data-scenario]").forEach((button) => {
+        button.setAttribute("aria-pressed", String(button.dataset.scenario === name));
+      });
+    }
 
     function updateClock() {
-      document.querySelector("#clock").textContent = new Intl.DateTimeFormat("zh-CN", {
+      byId("clock").textContent = new Intl.DateTimeFormat("zh-CN", {
         hour: "2-digit",
         minute: "2-digit",
         second: "2-digit",
@@ -2091,18 +2233,19 @@
       }).format(new Date());
     }
 
+    document.querySelectorAll("[data-scenario]").forEach((button) => {
+      button.addEventListener("click", () => applyDemo(button.dataset.scenario));
+    });
+
     updateClock();
     window.setInterval(updateClock, 1000);
 
     const demoMode = new URLSearchParams(window.location.search).get("demo") === "1";
     if (demoMode) {
       elements.demoControls.hidden = false;
-      elements.dataStrip.dataset.tone = "warning";
-      elements.sourceTitle.textContent = "INTERACTIVE DEMO";
-      elements.sourceNote.textContent = "当前为明确标记的模拟状态，不作为生产完成证据。";
-      applyScenario("rendering");
+      applyDemo("rendering");
     } else {
-      showPending();
+      pendingState();
       fetchStatus();
       document.addEventListener("visibilitychange", () => {
         if (!document.hidden) {

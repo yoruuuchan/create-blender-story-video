@@ -771,9 +771,11 @@ class DashboardHandler(BaseHTTPRequestHandler):
         self.send_header("X-Frame-Options", "DENY")
         self.send_header(
             "Content-Security-Policy",
-            "default-src 'self'; img-src 'self' data:; style-src 'self' 'unsafe-inline'; "
-            "script-src 'self' 'unsafe-inline'; connect-src 'self'; base-uri 'none'; "
-            "form-action 'none'; frame-ancestors 'none'",
+            "default-src 'self'; img-src 'self' data:; "
+            "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; "
+            "font-src 'self' data: https://fonts.gstatic.com; "
+            "script-src 'self' 'unsafe-inline'; connect-src 'self'; "
+            "base-uri 'none'; form-action 'none'; frame-ancestors 'none'",
         )
 
     def _send_bytes(self, body: bytes, content_type: str, status=HTTPStatus.OK, no_cache=False):
