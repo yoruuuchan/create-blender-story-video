@@ -194,7 +194,7 @@ workflow-retrospective.md
 
 用户要求查看长时间渲染或剪辑状态时，完整读取 [monitor-dashboard.md](references/monitor-dashboard.md)。复制 `assets/render-monitor-dashboard/` 中的 `index.html`、`server.py` 和配置样例到项目的 `monitor/`。轻量只读服务优先读取 `render/render-state.json`、`shot-status.json` 和 `edit/resolve-run.json`，并用磁盘帧清单与最终媒体探测补足可验证事实；没有统一状态文件时必须标记为 `derived`。
 
-内置页面默认采用 KUNLUN Design System。若工作区 `AGENTS.md` 或用户指定了其他设计系统，以用户指定为先；视觉调整仍不得改变监控页的只读边界、真实数据标记和完成判定。
+内置页面默认采用 KUNLUN Design System，并使用中文主标签，只保留 Blender、GPU、HEVC、Rec.709 等必要技术缩写。若工作区 `AGENTS.md` 或用户指定了其他设计系统，以用户指定为先；视觉调整仍不得改变监控页的只读边界、真实数据标记和完成判定。
 
 页面每 5 秒读取一次状态，只展示进度、最近完整解码帧、ETA、心跳、资源负载、恢复次数、镜头队列、Resolve 阶段和最终媒体校验。只绑定 `127.0.0.1`，只开放必要的 GET 路由，不提供启动、停止、重试或任意命令入口。若用户明确要求通过 Cloudflare 域名远程查看，先按参考文件执行数据脱敏、身份保护和只读传输设计；不要把本机路径、命令行、原始日志或控制接口公开。
 

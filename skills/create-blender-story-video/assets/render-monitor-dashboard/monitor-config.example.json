@@ -7,35 +7,35 @@
   "shots": [
     {
       "id": "shot_01",
-      "label": "SHOT 01",
+      "label": "镜头 01",
       "start": 1,
       "end": 180,
       "directory": "shot_01"
     },
     {
       "id": "shot_02",
-      "label": "SHOT 02",
+      "label": "镜头 02",
       "start": 181,
       "end": 360,
       "directory": "shot_02"
     },
     {
       "id": "shot_03",
-      "label": "SHOT 03",
+      "label": "镜头 03",
       "start": 361,
       "end": 540,
       "directory": "shot_03"
     },
     {
       "id": "shot_04",
-      "label": "SHOT 04",
+      "label": "镜头 04",
       "start": 541,
       "end": 720,
       "directory": "shot_04"
     },
     {
       "id": "shot_05",
-      "label": "SHOT 05",
+      "label": "镜头 05",
       "start": 721,
       "end": 900,
       "directory": "shot_05"

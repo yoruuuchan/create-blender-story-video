@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="color-scheme" content="dark">
   <meta name="theme-color" content="#04060a">
-  <title>KUNLUN // Render Watch</title>
+  <title>KUNLUN // 渲染监控</title>
   <style>
     @import url("https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=VT323&family=Orbitron:wght@500;700;900&family=Noto+Sans+SC:wght@400;500;700&display=swap");
 
@@ -1392,29 +1392,29 @@
 
   <div class="shell">
     <header class="topbar">
-      <div class="brand" aria-label="KUNLUN Render Watch">
+      <div class="brand" aria-label="KUNLUN 渲染监控">
         <span class="brand-mark" aria-hidden="true">K</span>
         <span class="brand-copy">
-          <strong>KUNLUN // RENDER WATCH</strong>
+          <strong>KUNLUN // 渲染监控</strong>
           <span>渲 染 监 控 · 生 产 节 点</span>
         </span>
       </div>
       <div class="top-meta">
-        <span class="read-only">READ-ONLY · LOOPBACK</span>
+        <span class="read-only">只读 · 仅限本机</span>
         <time class="clock" id="clock">--:--:--</time>
       </div>
     </header>
 
     <div class="source-strip" id="source-strip" data-tone="warn" role="status" aria-live="polite">
       <div class="source-message">
-        <strong class="source-code" id="source-code">CONNECTING</strong>
+        <strong class="source-code" id="source-code">正在连接</strong>
         <span class="source-text" id="source-text">正在建立本机只读状态链路…</span>
       </div>
       <div class="demo-controls" id="demo-controls" role="group" aria-label="切换模拟状态" hidden>
-        <button type="button" data-scenario="rendering" aria-pressed="true">RENDER</button>
-        <button type="button" data-scenario="cooldown" aria-pressed="false">COOLDOWN</button>
-        <button type="button" data-scenario="editing" aria-pressed="false">EDIT</button>
-        <button type="button" data-scenario="complete" aria-pressed="false">COMPLETE</button>
+        <button type="button" data-scenario="rendering" aria-pressed="true">渲染中</button>
+        <button type="button" data-scenario="cooldown" aria-pressed="false">冷却</button>
+        <button type="button" data-scenario="editing" aria-pressed="false">剪辑中</button>
+        <button type="button" data-scenario="complete" aria-pressed="false">已完成</button>
       </div>
     </div>
 
@@ -1422,31 +1422,31 @@
       <section class="hero-grid" aria-label="生产任务总览">
         <article class="panel" id="mission-panel" data-tone="signal">
           <header class="panel-head">
-            <span class="panel-title">MISSION CONTROL</span>
-            <span class="panel-meta" id="project-name">NODE // CONNECTING</span>
+            <span class="panel-title">制作总览 // MISSION</span>
+            <span class="panel-meta" id="project-name">项目节点 // 正在连接</span>
           </header>
           <div class="panel-body">
             <div class="mission-head">
               <div>
-                <p class="mission-eyebrow">// ACTIVE PRODUCTION · BLENDER × RESOLVE</p>
+                <p class="mission-eyebrow">// 当前制作任务 · BLENDER × RESOLVE</p>
                 <h1 id="task-title">正在读取真实制作状态</h1>
-                <span class="project-file" id="project-file">PROJECT FILE // NOT RECORDED</span>
+                <span class="project-file" id="project-file">项目文件 // 未记录</span>
               </div>
               <span class="status-pill" id="status-pill" data-status="busy">
                 <i class="status-dot" aria-hidden="true"></i>
-                <span id="status-text">UPLINK</span>
+                <span id="status-text">连接中</span>
               </span>
             </div>
 
             <div class="progress-layout">
               <div class="progress-readout">
                 <strong id="progress-percent">—</strong>
-                <span>// RENDER FRAME PROGRESS</span>
+                <span>// 总体帧进度</span>
               </div>
               <div>
                 <div class="frame-count">
                   <strong id="frame-current">—</strong>
-                  <span id="frame-total">/ — FRAMES</span>
+                  <span id="frame-total">/ — 帧</span>
                 </div>
                 <div
                   class="progress-track"
@@ -1461,49 +1461,49 @@
                 </div>
                 <div class="mission-stats">
                   <div class="mission-stat">
-                    <span>// ETA</span>
-                    <strong id="eta">ESTIMATING</strong>
+                    <span>// 剩余时间</span>
+                    <strong id="eta">估算中</strong>
                   </div>
                   <div class="mission-stat">
-                    <span>// TARGET FRAME</span>
+                    <span>// 目标分辨率</span>
                     <strong id="output-resolution">— × —</strong>
                   </div>
                   <div class="mission-stat">
-                    <span>// DELIVERY</span>
+                    <span>// 交付规格</span>
                     <strong id="output-standard">30 FPS · HEVC · REC.709</strong>
                   </div>
                 </div>
                 <div class="batch-line">
-                  <span>BATCH <code id="batch">NOT RECORDED</code></span>
-                  <span id="heartbeat">STATUS SCAN // WAITING</span>
+                  <span>当前批次 <code id="batch">未记录</code></span>
+                  <span id="heartbeat">状态扫描 // 等待中</span>
                 </div>
               </div>
             </div>
           </div>
           <footer class="panel-foot">
-            <span id="frame-evidence">FRAME INVENTORY // WAITING</span>
-            <span>CONTROL ROUTES // DISABLED</span>
+            <span id="frame-evidence">帧清单 // 等待中</span>
+            <span>控制接口 // 已禁用</span>
           </footer>
         </article>
 
         <article class="panel preview-panel" data-tone="signal" aria-label="最近完整解码帧">
           <header class="panel-head">
-            <span class="panel-title">OPTICAL FEED</span>
-            <span class="panel-meta" id="preview-state">WAITING</span>
+            <span class="panel-title">最近画面 // OPTICAL</span>
+            <span class="panel-meta" id="preview-state">等待中</span>
           </header>
           <div class="preview-body">
             <img class="preview-image" id="preview-image" alt="最近一张已完整解码的渲染帧" hidden>
-            <div class="preview-empty" id="preview-empty">NO VALID FRAME<br>▮</div>
+            <div class="preview-empty" id="preview-empty">暂无有效画面<br>▮</div>
             <span class="hud-corner tl" aria-hidden="true"></span>
             <span class="hud-corner tr" aria-hidden="true"></span>
             <span class="hud-corner bl" aria-hidden="true"></span>
             <span class="hud-corner br" aria-hidden="true"></span>
             <div class="preview-overlay">
               <div class="preview-copy">
-                <strong id="preview-shot">FRAME CHANNEL // OFFLINE</strong>
+                <strong id="preview-shot">画面通道 // 离线</strong>
                 <span id="preview-frame">—</span>
               </div>
-              <span class="preview-badge" id="preview-meta">DECODE GATE</span>
+              <span class="preview-badge" id="preview-meta">解码检查</span>
             </div>
           </div>
         </article>
@@ -1511,7 +1511,7 @@
 
       <section class="kpi-grid" aria-label="设备负载">
         <article class="kpi-card">
-          <div class="kpi-label">// GPU LOAD</div>
+          <div class="kpi-label">// GPU 使用率</div>
           <div class="kpi-readout">
             <strong class="kpi-value" id="gpu-value">—</strong>
             <span class="kpi-unit" id="gpu-unit">%</span>
@@ -1519,11 +1519,11 @@
           <div class="metric-track" role="progressbar" aria-label="GPU 使用率" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
             <div class="metric-fill" id="gpu-fill"></div>
           </div>
-          <div class="kpi-meta"><span>ACCELERATOR</span><span id="gpu-meta">NO DATA</span></div>
+          <div class="kpi-meta"><span>图形处理器</span><span id="gpu-meta">暂无数据</span></div>
         </article>
 
         <article class="kpi-card">
-          <div class="kpi-label">// VRAM</div>
+          <div class="kpi-label">// 显存占用</div>
           <div class="kpi-readout">
             <strong class="kpi-value" id="vram-value">—</strong>
             <span class="kpi-unit" id="vram-unit">GB</span>
@@ -1531,11 +1531,11 @@
           <div class="metric-track" role="progressbar" aria-label="显存使用率" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
             <div class="metric-fill" id="vram-fill"></div>
           </div>
-          <div class="kpi-meta"><span>MEMORY BUS</span><span id="vram-meta">NO DATA</span></div>
+          <div class="kpi-meta"><span>显存总线</span><span id="vram-meta">暂无数据</span></div>
         </article>
 
         <article class="kpi-card">
-          <div class="kpi-label">// GPU THERMAL</div>
+          <div class="kpi-label">// GPU 温度</div>
           <div class="kpi-readout">
             <strong class="kpi-value" id="temp-value">—</strong>
             <span class="kpi-unit">°C</span>
@@ -1543,11 +1543,11 @@
           <div class="metric-track" role="progressbar" aria-label="GPU 温度" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
             <div class="metric-fill" id="temp-fill"></div>
           </div>
-          <div class="kpi-meta"><span>THERMAL SENSOR</span><span id="temp-meta">NO DATA</span></div>
+          <div class="kpi-meta"><span>温度传感器</span><span id="temp-meta">暂无数据</span></div>
         </article>
 
         <article class="kpi-card">
-          <div class="kpi-label">// WSL MEMORY</div>
+          <div class="kpi-label">// WSL 内存</div>
           <div class="kpi-readout">
             <strong class="kpi-value" id="memory-value">—</strong>
             <span class="kpi-unit" id="memory-unit">GB</span>
@@ -1555,91 +1555,91 @@
           <div class="metric-track" role="progressbar" aria-label="WSL 内存使用率" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
             <div class="metric-fill" id="memory-fill"></div>
           </div>
-          <div class="kpi-meta"><span>LINUX VM</span><span id="memory-meta">NO DATA</span></div>
+          <div class="kpi-meta"><span>Linux 虚拟机</span><span id="memory-meta">暂无数据</span></div>
         </article>
       </section>
 
       <section class="ops-grid" aria-label="镜头队列与制作流程">
         <article class="panel">
           <header class="panel-head">
-            <span class="panel-title">SHOT INVENTORY</span>
-            <span class="panel-meta" id="queue-caption">0 SHOTS · 0 FRAMES</span>
+            <span class="panel-title">镜头清单 // SHOTS</span>
+            <span class="panel-meta" id="queue-caption">0 个镜头 · 0 帧</span>
           </header>
           <div class="recovery-grid">
             <div class="recovery-cell">
-              <span>// LAST VALID</span>
+              <span>// 最近有效帧</span>
               <code id="last-valid-frame">—</code>
             </div>
             <div class="recovery-cell">
-              <span>// RETRIES</span>
-              <code id="batch-retries">NOT RECORDED</code>
+              <span>// 批次重试</span>
+              <code id="batch-retries">未记录</code>
             </div>
             <div class="recovery-cell">
-              <span>// CRASHES</span>
-              <code id="crash-count">NOT RECORDED</code>
+              <span>// 崩溃次数</span>
+              <code id="crash-count">未记录</code>
             </div>
             <div class="recovery-cell">
-              <span>// AUTO RESUME</span>
-              <code id="resume-state">NOT RECORDED</code>
+              <span>// 自动续跑</span>
+              <code id="resume-state">未记录</code>
             </div>
           </div>
           <div class="shot-table" role="table" aria-label="各镜头帧清单">
             <div class="shot-head" role="row">
-              <span role="columnheader">SHOT NODE</span>
-              <span role="columnheader">RANGE</span>
-              <span role="columnheader">INVENTORY</span>
-              <span role="columnheader">STATE</span>
+              <span role="columnheader">镜头</span>
+              <span role="columnheader">帧范围</span>
+              <span role="columnheader">完成进度</span>
+              <span role="columnheader">状态</span>
             </div>
             <div id="shot-queue" role="rowgroup"></div>
           </div>
           <footer class="panel-foot">
-            <span id="process-status">PROCESS SCAN // WAITING</span>
-            <span id="machine-status">TELEMETRY // WAITING</span>
+            <span id="process-status">进程扫描 // 等待中</span>
+            <span id="machine-status">设备数据 // 等待中</span>
           </footer>
         </article>
 
         <article class="panel" id="pipeline-panel">
           <header class="panel-head">
-            <span class="panel-title">PRODUCTION PIPELINE</span>
-            <span class="panel-meta">4K · HEVC · REC.709</span>
+            <span class="panel-title">制作流程 // PIPELINE</span>
+            <span class="panel-meta">交付目标 · 4K · HEVC · REC.709</span>
           </header>
           <div class="pipeline" id="pipeline" aria-label="制作流程">
             <div class="pipeline-step" data-step="idea">
               <span class="stage-node" aria-hidden="true"></span>
               <span class="stage-name">创意与风格锁定</span>
-              <span class="stage-state">QUEUED</span>
+              <span class="stage-state">排队中</span>
             </div>
             <div class="pipeline-step" data-step="storyboard">
               <span class="stage-node" aria-hidden="true"></span>
               <span class="stage-name">分镜与参考图</span>
-              <span class="stage-state">QUEUED</span>
+              <span class="stage-state">排队中</span>
             </div>
             <div class="pipeline-step" data-step="scene">
               <span class="stage-node" aria-hidden="true"></span>
               <span class="stage-name">Blender 场景构建</span>
-              <span class="stage-state">QUEUED</span>
+              <span class="stage-state">排队中</span>
             </div>
             <div class="pipeline-step" data-step="render">
               <span class="stage-node" aria-hidden="true"></span>
               <span class="stage-name">分批渲染与帧清单</span>
-              <span class="stage-state">QUEUED</span>
+              <span class="stage-state">排队中</span>
             </div>
             <div class="pipeline-step" data-step="edit">
               <span class="stage-node" aria-hidden="true"></span>
               <span class="stage-name">Resolve 剪辑与编码</span>
-              <span class="stage-state">QUEUED</span>
+              <span class="stage-state">排队中</span>
             </div>
             <div class="pipeline-step" data-step="delivery">
               <span class="stage-node" aria-hidden="true"></span>
               <span class="stage-name">交付规格与完整质检</span>
-              <span class="stage-state">QUEUED</span>
+              <span class="stage-state">排队中</span>
             </div>
           </div>
 
           <div class="qa-terminal" id="qa-terminal">
             <div class="terminal-head">
-              <strong>delivery.qa</strong>
-              <span id="qa-meta">AWAITING PROBE</span>
+              <strong>交付质检 // delivery.qa</strong>
+              <span id="qa-meta">等待媒体检查</span>
             </div>
             <ul class="qa-list" id="qa-list">
               <li>正在读取最终媒体校验记录</li>
@@ -1650,8 +1650,8 @@
     </main>
 
     <footer class="footer">
-      <span id="footer-source">REFRESH 05s · UPLINK NEGOTIATING</span>
-      <span>[ READ ONLY ] 页面故障不会中断 Blender、Resolve 或监督器</span>
+      <span id="footer-source">每 05 秒刷新 · 正在连接状态服务</span>
+      <span>[ 只读页面 ] 页面故障不会中断 Blender、Resolve 或监督器</span>
     </footer>
   </div>
 
@@ -1718,33 +1718,41 @@
 
     const statusLabels = {
       render: {
-        idle: "RENDER IDLE",
-        running: "RENDER ACTIVE",
-        cooldown: "COOLDOWN",
-        failed: "RENDER FAULT",
-        complete: "RENDER COMPLETE"
+        idle: "渲染待机",
+        running: "正在渲染",
+        cooldown: "冷却等待",
+        failed: "渲染故障",
+        complete: "渲染完成"
       },
       edit: {
-        idle: "EDIT QUEUED",
-        running: "EDIT ACTIVE",
-        cooldown: "EDIT PAUSED",
-        failed: "EDIT FAULT",
-        complete: "EDIT COMPLETE"
+        idle: "等待剪辑",
+        running: "正在剪辑",
+        cooldown: "剪辑暂停",
+        failed: "剪辑故障",
+        complete: "剪辑完成"
       },
       delivery: {
-        idle: "QA PENDING",
-        running: "QA ACTIVE",
-        cooldown: "QA PAUSED",
-        failed: "QA REJECTED",
-        complete: "QA VERIFIED"
+        idle: "等待质检",
+        running: "正在质检",
+        cooldown: "质检暂停",
+        failed: "质检未通过",
+        complete: "质检通过"
       }
     };
 
     const shotLabels = {
-      verified: "VERIFIED",
-      inventory_complete: "INVENTORY OK",
-      partial: "PARTIAL",
-      queued: "QUEUED"
+      verified: "已验证",
+      inventory_complete: "帧已齐",
+      partial: "渲染中",
+      queued: "排队中"
+    };
+
+    const workflowStatusLabels = {
+      idle: "待机",
+      running: "进行中",
+      cooldown: "冷却中",
+      failed: "故障",
+      complete: "完成"
     };
 
     let lastGoodSummary = null;
@@ -1769,7 +1777,7 @@
     }
 
     function formatEta(seconds) {
-      if (!finite(seconds)) return "ESTIMATING";
+      if (!finite(seconds)) return "估算中";
       const safe = Math.max(0, Math.round(seconds));
       const hours = Math.floor(safe / 3600);
       const minutes = Math.floor((safe % 3600) / 60);
@@ -1778,10 +1786,10 @@
     }
 
     function formatAge(seconds) {
-      if (!finite(seconds)) return "NOW";
-      if (seconds < 60) return `${Math.max(0, Math.round(seconds))}s AGO`;
-      if (seconds < 3600) return `${Math.round(seconds / 60)}m AGO`;
-      return `${Math.round(seconds / 3600)}h AGO`;
+      if (!finite(seconds)) return "刚刚";
+      if (seconds < 60) return `${Math.max(0, Math.round(seconds))} 秒前`;
+      if (seconds < 3600) return `${Math.round(seconds / 60)} 分钟前`;
+      return `${Math.round(seconds / 3600)} 小时前`;
     }
 
     function statusTone(status) {
@@ -1805,35 +1813,35 @@
       fill.style.width = `${safePercent}%`;
       fill.dataset.tone = tone;
       fill.parentElement.setAttribute("aria-valuenow", String(Math.round(safePercent)));
-      metaElement.textContent = available ? meta : "NO DATA";
+      metaElement.textContent = available ? meta : "暂无数据";
     }
 
     function setSource(data, stale = false) {
       if (stale || data?.health?.stale === true) {
         const age = lastGoodAt ? (Date.now() - lastGoodAt) / 1000 : null;
         elements.sourceStrip.dataset.tone = "danger";
-        elements.sourceCode.textContent = "DATA STALE";
-        elements.sourceText.textContent = `状态链路中断；保留最后一次有效数据 // ${formatAge(age)}`;
+        elements.sourceCode.textContent = "数据已过期";
+        elements.sourceText.textContent = `状态链路中断；保留最后一次有效数据 · 更新时间 ${formatAge(age)}`;
         return;
       }
 
       elements.sourceStrip.dataset.tone = data.status === "failed" ? "danger" : "live";
       if (data.source === "derived") {
-        elements.sourceCode.textContent = "REAL · DERIVED";
+        elements.sourceCode.textContent = "真实数据 · 磁盘推导";
         elements.sourceText.textContent = "真实磁盘证据；统一状态 JSON 缺失，恢复计数等字段保持未记录。";
       } else if (data.source === "simulated") {
         elements.sourceStrip.dataset.tone = "warn";
-        elements.sourceCode.textContent = "SIMULATION";
+        elements.sourceCode.textContent = "模拟数据";
         elements.sourceText.textContent = "明确标记的界面演示数据，不作为生产完成证据。";
       } else {
-        elements.sourceCode.textContent = data.source === "mixed" ? "REAL · MIXED" : "REAL · LIVE";
+        elements.sourceCode.textContent = data.source === "mixed" ? "真实数据 · 混合来源" : "真实数据 · 实时";
         elements.sourceText.textContent = "持久化状态与磁盘校验已接入；观察面保持只读。";
       }
     }
 
     function renderShots(data) {
       const shots = Array.isArray(data.shots) ? data.shots : [];
-      elements.queueCaption.textContent = `${shots.length} SHOTS · ${data.progress.total || 0} FRAMES`;
+      elements.queueCaption.textContent = `${shots.length} 个镜头 · ${data.progress.total || 0} 帧`;
       elements.shotQueue.replaceChildren();
 
       for (const shot of shots) {
@@ -1868,7 +1876,7 @@
         const state = document.createElement("span");
         state.className = "shot-state";
         state.setAttribute("role", "cell");
-        state.textContent = shotLabels[shot.status] || String(shot.status || "UNKNOWN").toUpperCase();
+        state.textContent = shotLabels[shot.status] || "状态未知";
         row.append(name, range, progress, state);
         elements.shotQueue.append(row);
       }
@@ -1881,34 +1889,34 @@
       document.querySelectorAll(".pipeline-step").forEach((step) => {
         const name = step.dataset.step;
         let className = "pipeline-step";
-        let label = "QUEUED";
+        let label = "排队中";
 
         if (["idea", "storyboard", "scene"].includes(name)) {
           className += " is-done";
-          label = "DONE";
+          label = "已完成";
         } else if (name === "render") {
           if (renderDone) {
             className += " is-done";
-            label = data.progress.all_frames_verified ? "VERIFIED" : "INVENTORY OK";
+            label = data.progress.all_frames_verified ? "已验证" : "帧已齐";
           } else if (data.stage === "render") {
             className += data.status === "failed"
               ? " is-error"
               : data.status === "cooldown" || data.status === "idle"
                 ? " is-warn"
                 : " is-active";
-            label = data.status.toUpperCase();
+            label = workflowStatusLabels[data.status] || "状态未知";
           }
         } else if (name === "edit") {
           if (editDone) {
             className += " is-done";
-            label = "MEDIA EXISTS";
+            label = "成片已生成";
           } else if (data.stage === "edit") {
             className += data.status === "failed"
               ? " is-error"
               : data.status === "cooldown" || data.status === "idle"
                 ? " is-warn"
                 : " is-active";
-            label = data.status.toUpperCase();
+            label = workflowStatusLabels[data.status] || "状态未知";
           }
         } else if (name === "delivery" && data.stage === "delivery") {
           className += data.status === "complete"
@@ -1918,7 +1926,9 @@
               : data.status === "idle" || data.status === "cooldown"
                 ? " is-warn"
                 : " is-active";
-          label = data.status === "complete" ? "VERIFIED" : data.status.toUpperCase();
+          label = data.status === "complete"
+            ? "已验证"
+            : workflowStatusLabels[data.status] || "状态未知";
         }
 
         step.className = className;
@@ -1937,7 +1947,7 @@
       if (delivery.qa_passed) {
         issues = [
           `${String(actual.codec || "HEVC").toUpperCase()} · ${actual.width}×${actual.height} · ${number(actual.fps)} FPS`,
-          "REC.709 · FULL DECODE · SHA-256 // VERIFIED"
+          "REC.709 · 全片解码通过 · SHA-256 已记录"
         ];
       } else if (!issues.length) {
         issues = ["等待最终媒体规格、全片解码与 SHA-256 记录"];
@@ -1946,10 +1956,10 @@
       elements.qaList.dataset.passed = String(delivery.qa_passed === true);
       elements.qaTerminal.dataset.tone = delivery.qa_passed ? "success" : delivery.spec_passed === false ? "danger" : "signal";
       elements.qaMeta.textContent = delivery.qa_passed
-        ? "STATUS: VERIFIED"
+        ? "状态：已验证"
         : delivery.exists
-          ? "STATUS: ACTION REQUIRED"
-          : "STATUS: MEDIA ABSENT";
+          ? "状态：需要处理"
+          : "状态：尚无成片";
       elements.qaList.replaceChildren();
 
       for (const message of issues.slice(0, 6)) {
@@ -1973,43 +1983,43 @@
       const tone = statusTone(data.status);
 
       elements.missionPanel.dataset.tone = tone;
-      elements.projectName.textContent = `NODE // ${String(data.project_name || "UNKNOWN").toUpperCase()}`;
-      elements.projectFile.textContent = `PROJECT FILE // ${data.project_file || "NOT RECORDED"}`;
-      elements.taskTitle.textContent = data.title || "STATUS UNKNOWN";
+      elements.projectName.textContent = `项目节点 // ${String(data.project_name || "未知项目").toUpperCase()}`;
+      elements.projectFile.textContent = `项目文件 // ${data.project_file || "未记录"}`;
+      elements.taskTitle.textContent = data.title || "制作状态未知";
       elements.statusPill.dataset.status = pillStatus(data.status);
-      elements.statusText.textContent = statusLabels[data.stage]?.[data.status] || String(data.status || "UNKNOWN").toUpperCase();
+      elements.statusText.textContent = statusLabels[data.stage]?.[data.status] || workflowStatusLabels[data.status] || "状态未知";
 
       document.documentElement.style.setProperty("--progress", `${percent}%`);
       elements.progressPercent.textContent = `${number(percent, 1)}%`;
       elements.progressTrack.setAttribute("aria-valuenow", String(Math.round(percent)));
       elements.progressFill.dataset.tone = tone;
       elements.frameCurrent.textContent = progress.current ?? "—";
-      elements.frameTotal.textContent = `/ ${progress.total ?? "—"} FRAMES`;
+      elements.frameTotal.textContent = `/ ${progress.total ?? "—"} 帧`;
       elements.eta.textContent = data.status === "complete" ? "00:00:00" : formatEta(progress.eta_seconds);
       elements.outputResolution.textContent = `${expected.width || "—"} × ${expected.height || "—"}`;
       elements.outputStandard.textContent = `${expected.fps || "—"} FPS · ${String(expected.codec || "HEVC").toUpperCase()} · REC.709`;
       elements.batch.textContent = progress.all_frames_present
-        ? "FRAME INVENTORY · COMPLETE"
-        : data.current?.batch || data.current?.shot_id || "NOT RECORDED";
+        ? "全部帧已齐"
+        : data.current?.batch || data.current?.shot_id || "未记录";
       elements.heartbeat.textContent = health.heartbeat_at
-        ? `SUPERVISOR HEARTBEAT // ${formatAge(health.heartbeat_age_seconds)}`
-        : "DISK STATUS SCAN // NOW";
+        ? `监督器心跳 // ${formatAge(health.heartbeat_age_seconds)}`
+        : "磁盘状态扫描 // 刚刚";
       elements.frameEvidence.textContent = progress.all_frames_verified
-        ? "FRAME SEQUENCE // VERIFIED"
+        ? "帧序列 // 已完整验证"
         : progress.all_frames_present
-          ? "FRAME INVENTORY // 100% PRESENT"
-          : `FRAME INVENTORY // ${number(percent, 1)}%`;
+          ? "帧清单 // 100% 已存在"
+          : `帧清单 // ${number(percent, 1)}%`;
 
-      elements.previewState.textContent = preview.available ? "DECODE GATE: PASS" : "DECODE GATE: NO FRAME";
+      elements.previewState.textContent = preview.available ? "解码检查：通过" : "解码检查：暂无画面";
       elements.previewShot.textContent = preview.shot_id
-        ? `CHANNEL // ${String(preview.shot_id).replace("_", "-").toUpperCase()}`
-        : "FRAME CHANNEL // OFFLINE";
+        ? `镜头通道 // ${String(preview.shot_id).replace("_", "-").toUpperCase()}`
+        : "画面通道 // 离线";
       elements.previewFrame.textContent = preview.filename || preview.reason || "—";
       elements.previewMeta.textContent = finite(data.current?.median_frame_seconds)
-        ? `${number(data.current.median_frame_seconds, 1)}s / FRAME`
+        ? `每帧 ${number(data.current.median_frame_seconds, 1)} 秒`
         : progress.all_frames_present
-          ? "INVENTORY OK"
-          : "TIME UNSET";
+          ? "帧清单已齐"
+          : "耗时未记录";
 
       if (preview.available && preview.url) {
         const nextKey = `${preview.filename}|${preview.version}`;
@@ -2035,7 +2045,7 @@
         elements.gpuMeta,
         finite(gpu.percent) ? number(gpu.percent) : null,
         gpu.percent,
-        "LIVE SAMPLE"
+        "实时采样"
       );
       elements.gpuUnit.textContent = "%";
       setMetric(
@@ -2044,7 +2054,7 @@
         elements.vramMeta,
         finite(gpu.vram_used_gb) ? number(gpu.vram_used_gb, 1) : null,
         gpu.vram_percent,
-        finite(gpu.vram_total_gb) ? `${number(gpu.vram_total_gb, 1)} GB TOTAL` : "NO TOTAL"
+        finite(gpu.vram_total_gb) ? `总计 ${number(gpu.vram_total_gb, 1)} GB` : "总量未记录"
       );
       elements.vramUnit.textContent = "GB";
       setMetric(
@@ -2053,7 +2063,7 @@
         elements.tempMeta,
         finite(gpu.temperature_c) ? number(gpu.temperature_c) : null,
         gpu.temperature_c,
-        gpuTone === "danger" ? "THERMAL CRITICAL" : gpuTone === "warn" ? "THERMAL WATCH" : "NOMINAL",
+        gpuTone === "danger" ? "温度危险" : gpuTone === "warn" ? "注意温度" : "温度正常",
         gpuTone
       );
       setMetric(
@@ -2062,31 +2072,31 @@
         elements.memoryMeta,
         finite(memory.used_gb) ? number(memory.used_gb, 1) : null,
         memory.percent,
-        finite(memory.total_gb) ? `${number(memory.total_gb, 1)} GB TOTAL` : "NO TOTAL"
+        finite(memory.total_gb) ? `总计 ${number(memory.total_gb, 1)} GB` : "总量未记录"
       );
       elements.memoryUnit.textContent = "GB";
 
       const pids = Array.isArray(health.active_pids) ? health.active_pids : [];
       elements.processStatus.textContent = pids.length
-        ? `PROCESS SCAN // ACTIVE PID ${pids.join(",")}`
-        : "PROCESS SCAN // NO BLENDER · RESOLVE · FFMPEG";
+        ? `进程扫描 // 运行中 PID ${pids.join(",")}`
+        : "进程扫描 // 未发现 BLENDER · RESOLVE · FFMPEG";
       elements.machineStatus.textContent = health.gpu && health.memory
-        ? "TELEMETRY // LIVE SAMPLE"
-        : "TELEMETRY // PARTIAL";
+        ? "设备数据 // 实时采样"
+        : "设备数据 // 部分可用";
       elements.lastValidFrame.textContent = finite(data.current?.last_valid_frame)
         ? pad(data.current.last_valid_frame, 6)
         : "—";
       elements.batchRetries.textContent = finite(recovery.batch_retry_count)
         ? String(recovery.batch_retry_count)
-        : "NOT RECORDED";
+        : "未记录";
       elements.crashCount.textContent = finite(recovery.total_crash_count)
-        ? `${recovery.total_crash_count} EVENTS`
-        : "NOT RECORDED";
+        ? `${recovery.total_crash_count} 次`
+        : "未记录";
       elements.resumeState.textContent = recovery.auto_resume_enabled === true
-        ? "ARMED"
+        ? "已启用"
         : recovery.auto_resume_enabled === false
-          ? "DISABLED"
-          : "NOT RECORDED";
+          ? "已停用"
+          : "未记录";
 
       renderShots(data);
       renderPipeline(data);
@@ -2094,17 +2104,17 @@
       setSource(data);
 
       const media = delivery.exists
-        ? `${delivery.filename} · ${actual.width || "—"}×${actual.height || "—"} · ${String(actual.codec || "UNKNOWN").toUpperCase()}`
-        : "FINAL MEDIA // ABSENT";
+        ? `${delivery.filename} · ${actual.width || "—"}×${actual.height || "—"} · ${String(actual.codec || "未知编码").toUpperCase()}`
+        : "最终成片 // 尚未生成";
       const generated = data.generated_at
         ? new Date(data.generated_at).toLocaleTimeString("zh-CN", {hour12: false})
         : "—";
-      elements.footerSource.textContent = `REFRESH 05s · ${media} · STATUS ${generated}`;
+      elements.footerSource.textContent = `每 05 秒刷新 · ${media} · 状态时间 ${generated}`;
     }
 
     function pendingState() {
       elements.taskTitle.textContent = "正在读取真实制作状态";
-      elements.statusText.textContent = "UPLINK";
+      elements.statusText.textContent = "连接中";
       elements.shotQueue.replaceChildren();
     }
 
@@ -2128,10 +2138,10 @@
           setSource(lastGoodSummary, true);
         } else {
           elements.sourceStrip.dataset.tone = "danger";
-          elements.sourceCode.textContent = "UPLINK LOST";
+          elements.sourceCode.textContent = "连接中断";
           elements.sourceText.textContent = "无法读取本机状态服务；未显示模拟数据。使用 ?demo=1 查看界面演示。";
           elements.statusPill.dataset.status = "error";
-          elements.statusText.textContent = "OFFLINE";
+          elements.statusText.textContent = "离线";
         }
       } finally {
         window.clearTimeout(timeout);
@@ -2146,7 +2156,7 @@
         const total = end - start + 1;
         return {
           id: `shot_0${index + 1}`,
-          label: `SHOT 0${index + 1}`,
+          label: `镜头 0${index + 1}`,
           start,
           end,
           present,
@@ -2189,7 +2199,7 @@
         },
         current: {
           shot_id: complete ? "shot_05" : "shot_03",
-          batch: name === "cooldown" ? "481–540 · PAUSED" : "481–540",
+          batch: name === "cooldown" ? "481–540 · 已暂停" : "481–540",
           last_valid_frame: state.current,
           median_frame_seconds: name === "rendering" ? 41.2 : null
         },

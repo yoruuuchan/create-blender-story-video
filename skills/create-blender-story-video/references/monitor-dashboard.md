@@ -31,7 +31,7 @@ monitor/
 └── monitor-config.json
 ```
 
-内置模板默认使用 KUNLUN Design System：深色工业操作台、青蓝主信号、琥珀与红色只表达警告或故障、等宽字体、切角面板和阶梯式动效；不要加入紫色、圆角卡片或弹性动画。若本机存在 `D:\DESIGN\KUNLUN Design System`（WSL：`/mnt/d/DESIGN/KUNLUN Design System`），修改页面前先读取其中的 `SKILL.md`、指南、tokens、组件和 UI kit，以它们为视觉事实来源。发布模板应内嵌所需 tokens 与字体回退，不在运行时依赖该磁盘目录。
+内置模板默认使用 KUNLUN Design System：深色工业操作台、青蓝主信号、琥珀与红色只表达警告或故障、等宽字体、切角面板和阶梯式动效；不要加入紫色、圆角卡片或弹性动画。可见文案使用中文主标签，仅保留 Blender、GPU、HEVC、Rec.709 等必要技术缩写，避免让中文用户依赖英文状态码理解进度。若本机存在 `D:\DESIGN\KUNLUN Design System`（WSL：`/mnt/d/DESIGN/KUNLUN Design System`），修改页面前先读取其中的 `SKILL.md`、指南、tokens、组件和 UI kit，以它们为视觉事实来源。发布模板应内嵌所需 tokens 与字体回退，不在运行时依赖该磁盘目录。
 
 其中 `monitor-config.json` 从 `monitor-config.example.json` 复制后修改。路径都相对项目根目录，且必须留在项目根目录内：
 

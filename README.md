@@ -25,7 +25,7 @@ An Agent Skill for Codex and Claude Code that turns an idea or visual reference 
 
 ## 可选监控页
 
-Skill 内置采用 KUNLUN Design System 的无框架页面、只读 Python 状态服务与配置样例：
+Skill 内置采用 KUNLUN Design System 的中文主界面、只读 Python 状态服务与配置样例：
 
 ```text
 skills/create-blender-story-video/assets/render-monitor-dashboard/
