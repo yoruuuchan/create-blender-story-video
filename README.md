@@ -97,4 +97,4 @@ skills/create-blender-story-video/
 
 ## Licensing
 
-This repository currently does not include an open-source license.
+This repository is licensed under the [MIT License](LICENSE).
