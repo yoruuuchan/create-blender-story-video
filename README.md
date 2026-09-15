@@ -100,6 +100,10 @@ skills/create-blender-story-video/
 - 自动重启续跑必须由用户明确批准，并设置重试预算，避免循环重启。
 - 没有通过逐帧校验和最终媒体解码时，不把中间产物当作交付成果。
 
+## 事实源与副本关系
+
+本仓库是 `create-blender-story-video` 技能的唯一事实源：内容改动在这里提交、推送，再同步到运行副本（本机 agent 技能库的 `3d-game\create-blender-story-video`，2026-09-15 核对时与其源文件一致）。技能库副本是运行时镜像，不是第二个上游，也不要把两者当成两个项目。
+
 ## Licensing
 
 This repository is licensed under the [MIT License](LICENSE).
