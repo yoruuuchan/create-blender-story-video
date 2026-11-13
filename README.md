@@ -1,8 +1,8 @@
 # Create Blender Story Video
 
-面向 Codex 与 Claude Code 的端到端 3D 视频制作 Skill：把一句创意或视觉参考推进为风格锁定、分镜、AI 参考图、Blender 场景、可恢复渲染、只读进度监控、DaVinci Resolve 剪辑和经过媒体校验的成片。
+给 Codex 和 Claude Code 用的 3D 视频制作 Skill，从头做到尾。给它一句创意或一张视觉参考，它会一路往下推：锁定风格、出分镜、生成 AI 参考图、搭 Blender 场景、做能断点恢复的渲染、开只读的进度监控、在 DaVinci Resolve 里剪辑，最后交出经过媒体校验的成片。
 
-An Agent Skill for Codex and Claude Code that turns an idea or visual reference into a style-locked storyboard, reference images, a Blender production, resilient rendering, a read-only progress dashboard, DaVinci Resolve editing, and a verified final video.
+An Agent Skill for Codex and Claude Code. Give it an idea or a visual reference and it carries the work through to a verified final video: a style-locked storyboard, reference images, a Blender production, rendering that can recover from interruptions, a read-only progress dashboard, and DaVinci Resolve editing.
 
 ## 默认交付
 
@@ -10,22 +10,22 @@ An Agent Skill for Codex and Claude Code that turns an idea or visual reference 
 - 30 fps
 - H.265/HEVC Main，`yuv420p`
 - 有限范围 Rec.709，MP4 `hvc1`
-- 原生 4K 正式渲染；只有用户明确批准时才允许标记为 `upscaled_4k` 的放大路线
+- 正式渲染用原生 4K；放大路线要标记为 `upscaled_4k`，而且只有用户明确批准才允许
 
-## 工作流
+## 制作流程
 
-1. 选择自主创作、共同创作或参考复刻模式。
-2. 固定创意、风格和可生产分镜。
-3. 生成风格母图和逐镜头参考图。
-4. 使用 Blender MCP 与可复现脚本建模、布光、放置摄像机并完成阶段验收。
-5. 使用短批次、持久化状态和独立监督进程完成可断点、可重启恢复的逐帧渲染。
-6. 按需启用本地只读页面，查看帧进度、最近画面、硬件负载、恢复次数和剪辑阶段。
-7. 选择当前更方便且经过验证的 Resolve MCP 或官方脚本 API 完成剪辑。
-8. 验证帧数、编码、色彩标签、全片解码和 SHA-256 后交付。
+1. 选模式：自主创作、共同创作，或参考复刻。
+2. 定下创意、风格，和能直接拿去生产的分镜。
+3. 生成风格母图，再逐个镜头出参考图。
+4. 用 Blender MCP 和可复现的脚本建模、布光、摆摄像机，每个阶段做完验收。
+5. 逐帧渲染：短批次跑，状态持久化，另有一个独立的监督进程。中断了能从断点接着渲，重启后也能恢复。
+6. 需要的话，开一个本地只读页面，看帧进度、最近画面、硬件负载、恢复次数和剪辑阶段。
+7. 剪辑用 Resolve MCP 或官方脚本 API，挑当下更方便、而且验证过的那个。
+8. 核对帧数、编码、色彩标签，全片解码一遍，校验 SHA-256，然后交付。
 
-## 可选监控页
+## 进度监控页（可选）
 
-Skill 内置采用 KUNLUN Design System 的中文主界面、只读 Python 状态服务与配置样例：
+Skill 里自带一个用 KUNLUN Design System 做的中文界面、一个只读的 Python 状态服务，还有配置样例：
 
 ```text
 skills/create-blender-story-video/assets/render-monitor-dashboard/
@@ -34,13 +34,21 @@ skills/create-blender-story-video/assets/render-monitor-dashboard/
 └── monitor-config.example.json
 ```
 
-复制配置样例为 `monitor-config.json` 并填写项目路径后，运行 `python3 server.py --project-root <项目目录>`，再打开 `http://127.0.0.1:4876/`；若改用其他端口，以启动日志打印的 URL 为准。服务默认只监听回环地址，只开放状态、健康检查和最近已完整解码帧的 GET 路由；关闭页面或服务不会影响 Blender、Resolve 或渲染监督进程。若要通过 Cloudflare 域名远程查看，应额外配置只读数据传输与身份保护，不直接公开本机路径、日志或命令入口。
+用法：
 
-## 安装
+1. 把配置样例复制成 `monitor-config.json`，填上项目路径。
+2. 运行 `python3 server.py --project-root <项目目录>`。
+3. 打开 `http://127.0.0.1:4876/`。如果换了端口，以启动日志里打印的 URL 为准。
+
+服务默认只监听回环地址，只开放这几个 GET 路由：状态、健康检查、最近已完整解码的帧。关掉页面或服务，不会影响 Blender、Resolve 或渲染监督进程。
+
+想通过 Cloudflare 域名远程查看的话，要另外配置只读的数据传输和身份保护，不直接公开本机路径、日志或命令入口。
+
+## 怎么装
 
 ### Codex
 
-使用 Codex 自带的 Skill 安装脚本：
+用 Codex 自带的 Skill 安装脚本：
 
 ```bash
 python ~/.codex/skills/.system/skill-installer/scripts/install-skill-from-github.py \
@@ -48,7 +56,7 @@ python ~/.codex/skills/.system/skill-installer/scripts/install-skill-from-github
   --path skills/create-blender-story-video
 ```
 
-安装后在下一轮对话中使用：
+装好后，在下一轮对话里这样调用：
 
 ```text
 $create-blender-story-video
@@ -56,7 +64,7 @@ $create-blender-story-video
 
 ### Claude Code
 
-Claude Code 会从个人 Skill 目录自动发现：
+Claude Code 会自动发现个人 Skill 目录里的 Skill，复制进去就行：
 
 ```bash
 git clone https://github.com/yoruuuchan/create-blender-story-video.git
@@ -65,13 +73,13 @@ cp -R create-blender-story-video/skills/create-blender-story-video \
   ~/.claude/skills/create-blender-story-video
 ```
 
-然后使用：
+然后这样调用：
 
 ```text
 /create-blender-story-video
 ```
 
-Claude Code 的个人 Skill 路径规则见其[官方文档](https://code.claude.com/docs/en/slash-commands).
+个人 Skill 目录的路径规则，见 Claude Code 的[官方文档](https://code.claude.com/docs/en/slash-commands)。
 
 ## 文件结构
 
@@ -93,16 +101,16 @@ skills/create-blender-story-video/
     └── stability-and-recovery.md
 ```
 
-## 运行边界
+## 边界
 
-- 本仓库不自动安装 Blender MCP、DaVinci Resolve MCP、Blender、Resolve 或 FFmpeg。
-- 不会未经允许修改驱动、BIOS、超频、电压或系统开机任务。
-- 自动重启续跑必须由用户明确批准，并设置重试预算，避免循环重启。
-- 没有通过逐帧校验和最终媒体解码时，不把中间产物当作交付成果。
+- 本仓库不会自动安装 Blender MCP、DaVinci Resolve MCP、Blender、Resolve 或 FFmpeg。
+- 未经允许，不会改驱动、BIOS、超频、电压或系统开机任务。
+- 自动重启续跑必须由用户明确批准，还要设好重试预算，免得陷入循环重启。
+- 逐帧校验和最终媒体解码都通过之前，中间产物不算交付成果。
 
-## 事实源与副本关系
+## 这个仓库和运行副本的关系
 
-本仓库是 `create-blender-story-video` 技能的唯一事实源：内容改动在这里提交、推送，再同步到运行副本（本机 agent 技能库的 `3d-game\create-blender-story-video`，2026-09-15 核对时与其源文件一致）。技能库副本是运行时镜像，不是第二个上游，也不要把两者当成两个项目。
+`create-blender-story-video` 技能以这个仓库为唯一事实源。改内容先在这里提交、推送，再同步到运行副本，也就是本机 agent 技能库里的 `3d-game\create-blender-story-video`（2026-09-15 核对过，和这里的源文件一致）。技能库那份只是运行时镜像，不是第二个上游，也别把两者当成两个项目。
 
 ## Licensing
 
