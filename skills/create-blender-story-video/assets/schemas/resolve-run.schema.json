@@ -1,0 +1,59 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "resolve-run.schema.json",
+  "title": "DaVinci Resolve execution record",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "status", "route", "project_name", "backup_path", "timeline", "source_plan", "render_job", "readback_passed", "updated_at"],
+  "properties": {
+    "schema_version": {"const": 1},
+    "status": {"enum": ["pending", "running", "failed", "complete"]},
+    "route": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["type", "reason", "capabilities"],
+      "properties": {
+        "type": {"enum": ["mcp", "script_api"]},
+        "reason": {"type": "string", "minLength": 1},
+        "capabilities": {"type": "object"}
+      }
+    },
+    "project_name": {"type": "string", "minLength": 1},
+    "backup_path": {"type": "string", "minLength": 1},
+    "timeline": {"type": "string", "minLength": 1},
+    "source_plan": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["shot_id", "source_path", "timeline_frame_start", "timeline_frame_end", "source_frame_start", "source_frame_end", "record_frame", "duration_frames", "track_index"],
+        "properties": {
+          "shot_id": {"type": "string", "minLength": 1},
+          "source_path": {"type": "string", "minLength": 1},
+          "timeline_frame_start": {"type": "integer", "minimum": 1},
+          "timeline_frame_end": {"type": "integer", "minimum": 1},
+          "source_frame_start": {"type": "integer", "minimum": 0},
+          "source_frame_end": {"type": "integer", "minimum": 0},
+          "record_frame": {"type": "integer", "minimum": 0},
+          "duration_frames": {"type": "integer", "minimum": 1},
+          "track_index": {"type": "integer", "minimum": 1}
+        }
+      }
+    },
+    "render_job": {
+      "type": ["object", "null"],
+      "additionalProperties": false,
+      "required": ["id", "status", "output_path", "started_at", "finished_at"],
+      "properties": {
+        "id": {"type": "string"},
+        "status": {"enum": ["queued", "running", "complete", "failed"]},
+        "output_path": {"type": "string"},
+        "started_at": {"type": ["string", "null"], "format": "date-time"},
+        "finished_at": {"type": ["string", "null"], "format": "date-time"}
+      }
+    },
+    "readback_passed": {"type": "boolean"},
+    "updated_at": {"type": "string", "format": "date-time"}
+  }
+}

@@ -37,16 +37,13 @@ const REMOTE = /^[a-zA-Z][a-zA-Z\d+.\-]*:/; // http:, mailto:, tel:, data:, ...
 // compares the requested spelling against the real one.
 
 const files = new Map(); // lowercase relative posix path -> real relative posix path
-const dirs = new Map(); // lowercase relative posix path -> lowercase child names
 
 (function index(dir, rel) {
-  dirs.set(rel.toLowerCase(), new Set());
   files.set(rel.toLowerCase(), rel === '' ? '.' : rel);
   for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
     if (SKIP_DIRS.has(entry.name)) continue;
     const childRel = rel ? `${rel}/${entry.name}` : entry.name;
     const childKey = childRel.toLowerCase();
-    dirs.get(rel.toLowerCase()).add(entry.name.toLowerCase());
     files.set(childKey, childRel);
     if (entry.isDirectory()) index(path.join(dir, entry.name), childRel);
   }
@@ -67,6 +64,30 @@ function frontmatterLines(source) {
   return 0;
 }
 
+function maskHtmlComments(line, inComment) {
+  let out = '';
+  let cursor = 0;
+  while (cursor < line.length) {
+    if (inComment) {
+      const end = line.indexOf('-->', cursor);
+      if (end === -1) return { line: out + ' '.repeat(line.length - cursor), inComment: true };
+      out += ' '.repeat(end + 3 - cursor);
+      cursor = end + 3;
+      inComment = false;
+    } else {
+      const start = line.indexOf('<!--', cursor);
+      if (start === -1) {
+        out += line.slice(cursor);
+        break;
+      }
+      out += line.slice(cursor, start) + '    ';
+      cursor = start + 4;
+      inComment = true;
+    }
+  }
+  return { line: out, inComment };
+}
+
 /** Blank out everything that is not Markdown content, preserving line count and offsets. */
 function visibleLines(source) {
   const skip = frontmatterLines(source);
@@ -83,14 +104,9 @@ function visibleLines(source) {
       continue; // the fence line itself holds no link we care about
     }
     if (fence) continue;
-    if (inComment) {
-      const end = line.indexOf('-->');
-      if (end === -1) continue;
-      line = ' '.repeat(end + 3) + line.slice(end + 3);
-      inComment = false;
-    }
-    line = line.replace(/<!--[\s\S]*?(?:-->|$)/g, (m) => (m.endsWith('-->') ? ' '.repeat(m.length) : ''));
-    inComment = /<!--/.test(line);
+    const comments = maskHtmlComments(line, inComment);
+    line = comments.line;
+    inComment = comments.inComment;
     // Blank out code spans in place, so [`path`](./target) still parses as a
     // link while `](./not-a-link)` inside a span does not.
     out[i] = line.replace(/(`+)(.*?)\1/g, (m) => ' '.repeat(m.length));
@@ -101,8 +117,9 @@ function visibleLines(source) {
 // ---------------------------------------------------------------- link syntax ---
 
 /** `[ref]: ./target` and `[ref]: <./target with space>`, keyed by lowercased label. */
-function referenceDefinitions(source) {
+function referenceDefinitions(lines) {
   const defs = new Map();
+  const source = lines.join('\n');
   const pattern = /^ {0,3}\[([^\]]+)\]:\s*(?:<([^<>\n]*)>|(\S+))(?:\s+(?:"[^"]*"|'[^']*'))?\s*$/gm;
   for (const m of source.matchAll(pattern)) defs.set(m[1].toLowerCase(), m[2] ?? m[3]);
   return defs;
@@ -139,9 +156,11 @@ function* targetsIn(line, definitions) {
   }
 
   // Reference-style links: [text][ref], [text][] and [ref].
-  for (const m of line.matchAll(/\]\[([^\]]*)\]/g)) {
-    const label = m[1];
-    if (label && definitions.has(label.toLowerCase())) yield definitions.get(label.toLowerCase());
+  for (const m of line.matchAll(/\[([^\]]+)\](?:\[([^\]]*)\])?/g)) {
+    const next = line[m.index + m[0].length];
+    if (next === '(' || next === ':') continue;
+    const label = m[2] === undefined ? m[1] : (m[2] || m[1]);
+    if (definitions.has(label.toLowerCase())) yield definitions.get(label.toLowerCase());
   }
   // HTML attributes.
   for (const m of line.matchAll(/<[a-zA-Z][^>]*\s(?:href|src)\s*=\s*(?:"([^"]*)"|'([^']*)'|([^\s>]+))/gi)) {
@@ -227,8 +246,8 @@ const stats = { local: 0, anchors: 0, skipped: 0 };
 
 for (const rel of markdownFiles) {
   const source = fs.readFileSync(path.join(ROOT, rel), 'utf8');
-  const definitions = referenceDefinitions(source);
   const lines = visibleLines(source);
+  const definitions = referenceDefinitions(lines);
   const base = frontmatterLines(source);
   const own = anchorsOf(rel);
   const dir = path.posix.dirname(rel);
@@ -290,14 +309,6 @@ for (const rel of markdownFiles) {
       }
       if (real !== requested && requested !== '.') {
         problems.push({ rel, line: i + 1, raw, why: `wrong case: link says ${requested}, repo has ${real}` });
-        continue;
-      }
-
-      // GitHub serves a directory link only when the directory has a README or
-      // an index file to render; otherwise it 404s like a missing file.
-      const children = dirs.get(key);
-      if (children && !children.has('readme.md') && !children.has('index.md')) {
-        problems.push({ rel, line: i + 1, raw, why: `directory ${real} has no README.md or index.md, so GitHub cannot render it` });
         continue;
       }
 

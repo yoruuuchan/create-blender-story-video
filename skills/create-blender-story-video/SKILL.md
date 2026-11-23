@@ -1,58 +1,52 @@
 ---
 name: create-blender-story-video
-description: 将一句视频创意或既有视觉参考推进为风格锁定、分镜、AI 参考图、Blender MCP 建模与摄像机、低负载可断点渲染、只读渲染与剪辑监控页、DaVinci Resolve MCP 或脚本 API 剪辑，以及经过媒体校验的 4K 30 fps H.265 Rec.709 MP4。支持自主创作、共同创作和参考复刻三种模式。用于制作 3D 短片、竖屏氛围片、产品或概念视频，把想法、参考图、Blender、达芬奇串成可重复工作流，或为长时间渲染与剪辑建立安全进度页面时。
+description: 将一句视频创意或既有视觉参考推进为风格锁定、分镜、AI 参考图、Blender MCP 建模与摄像机、可断点渲染、只读监控、DaVinci Resolve MCP 或官方脚本 API 剪辑，以及经过真实媒体校验的 4K 30 fps H.265 Rec.709 MP4。支持自主创作、共同创作、参考复刻和中断项目恢复；用于 3D 短片、竖屏氛围片、产品或概念视频，以及长时间渲染与剪辑的进度页面。
 ---
 
 # Create Blender Story Video
 
-先选择创作模式，再把昂贵的 3D 制作拆成逐步变贵的阶段：确定创意与风格，完成分镜和参考图，建立可验证的 Blender 场景，最后正式渲染与剪辑。把关键状态写入项目文件，不依赖聊天上下文续跑。
+把昂贵的 3D 制作拆成逐步变贵的阶段。创作方向由所选模式决定，生产状态由版本化 JSON 和随包脚本决定；不要依赖聊天上下文、临时编写的渲染器或文字声明续跑。
 
 ## 核心约束
 
-- 默认交付竖屏 9:16、2160×3840、30 fps、H.265/HEVC Main、`yuv420p`、有限范围 Rec.709；横屏项目使用 3840×2160。只有用户明确要求时才改为其他规格。
-- 在制作前确定自主创作、共同创作或参考复刻模式；不要一边声称自主推进，一边继续要求逐阶段确认。
-- 先锁定风格，再生成各镜头参考图；不要在镜头之间临时改写风格形容词。
-- 共同创作在风格与分镜、参考图、Blender 预览设置三个用户确认点；其他模式仍执行相同技术闸门，但按模式决定是否暂停。
-- 使用 Blender MCP 做 GUI 内的交互建模、观察和调整；使用可复现的 Blender Python 脚本保存构建和动画操作；使用后台 Blender 进程做正式渲染。
-- 同时使用参考图对照和可测量的场景事实验收 Blender 结果；不要把视觉模型判断或 MCP 成功返回当成唯一证据。
-- 正式渲染输出逐帧 PNG，不直接输出 MP4。只有完整校验帧序列后才编码镜头视频。
-- 让正式渲染由独立监督进程管理，把心跳、批次、重试和已验证帧写入磁盘；Blender、Codex 或整机重启后都从真实状态恢复，不依赖前台会话。
-- 监控页是可选的只读观察面，不是控制面。页面或本地服务退出不得影响 Blender、Resolve 或渲染监督进程；默认只监听 `127.0.0.1`。
-- DaVinci Resolve MCP 和官方脚本 API 均可使用。选择当前已验证、覆盖任务完整且步骤更少的入口，不固定偏好；不要自行安装第三方 MCP，也不要在 Resolve 连接失败时静默换成其他剪辑器。
-- 保存源文件、脚本、日志、帧序列和项目备份。不要把唯一成果留在 Blender 或 Resolve 的未保存会话中。
+- 默认交付竖屏 9:16、2160×3840、30 fps、H.265/HEVC Main、`yuv420p`、有限范围 Rec.709 和 `hvc1`；横屏默认 3840×2160。用户明确要求的画幅、帧率和时长由 `storyboard.json` 统一派生到渲染、监控、编码和验收。
+- 正式渲染输出逐帧 PNG。只有完整解码、尺寸、颜色布局和编号集合均通过后才编码镜头 MP4。
+- Blender MCP 用于 GUI 交互建模、观察和调整；项目内 Blender Python 保存可复现的构建与动画；随包 `blender_batch_render.py` 和 `render_supervisor.py` 负责正式渲染。
+- 监督器单实例运行，区分周期心跳与帧进度，原子提交帧和状态。它不会终止无法确认归属的 PID，也不会覆盖已有成片，除非显式使用 `--replace`。
+- 同时使用参考图对照和可测量的场景事实验收。MCP 成功返回、单张截图或视觉模型判断都不能单独证明场景正确。
+- 监控页只读。最终“完成”只接受与当前 storyboard、成片身份、媒体探测和 SHA-256 绑定的 `delivery/delivery-report.json`；`render-state.json` 的 `complete` 只表示渲染完成。
+- DaVinci Resolve MCP 和官方脚本 API 均可使用。不要自行安装第三方 MCP，不要在连接失败时静默换剪辑器。
+- 保存源文件、项目脚本、日志、帧序列、状态、QA 报告和工程备份。
 
-## 启动与默认值
+## 支持环境与预检
 
-先读取工作区的 `AGENTS.md` 和已有项目文件，再检查 Blender、Blender MCP、GPU、磁盘、图像生成能力、Resolve 进程、Resolve MCP 与脚本 API。若用户已有 `.blend`、分镜、参考图、镜头视频或 Resolve 项目，先恢复真实进度，不要从头重建。
+正式监督器目前支持 Windows 和 PowerShell。校验、编码和监控脚本可在其他平台运行，但未验证的平台不得宣称支持自动恢复正式渲染。
 
-只询问会改变创作方向或交付规格的问题，最多一次提出五个。优先确认：
+准备 Python 3.11+、Blender、FFmpeg/FFprobe，以及依赖：
 
-1. 核心对象或故事是什么。
-2. 希望观众感受到什么。
-3. 时长、平台和画幅是否有硬性要求。
-4. 必须出现或绝不能出现什么。
-5. 是否需要对白、字幕、音乐或音效。
+```bash
+python -m pip install -r /path/to/skill/scripts/requirements.txt
+ffmpeg -hide_banner -h filter=zscale
+ffmpeg -hide_banner -encoders
+```
 
-若用户未指定，采用以下建议值并明确告知：
+`sRGB → Rec.709` 的实际转换需要 `zscale`，最终编码需要 `libx265`。启动时检查 Blender MCP、GPU、磁盘、图像生成能力、Resolve 进程、Resolve MCP 与官方 API；只阻塞当前阶段所需的缺失能力。已有项目先运行 `validate_project.py` 并恢复真实进度。
 
-- 30 秒、5 个镜头、竖屏 9:16、30 fps。
-- 风格化 Eevee 制作；预览使用 540×960 或 1080×1920，批准后的正式帧默认原生渲染为 2160×3840。
-- 只有原生 4K 基准测试显示不可接受的稳定性或耗时风险、且用户明确同意时，才使用 1080×1920 渲染后 2× 放大，并把交付标记为 `upscaled_4k`，不冒充原生 4K。
-- 无对白；只在用户提供或批准声音方案后制作音轨。
+只询问会改变创作方向或交付规格的问题。未指定时采用 30 秒、5 个镜头、竖屏 9:16、30 fps、风格化 Eevee、无对白，并明确告知。只有基准测试证明原生 4K 有不可接受的稳定性或耗时风险且用户明确同意，才使用 2× 放大并标记 `upscaled_4k`。
 
 ## 选择工作模式
 
-把所选模式写入 `creative-brief.md` 和 `storyboard.json` 的 `production_mode`，分别使用 `autonomous`、`co_create`、`reference_rebuild`。用户已经明确模式时直接采用；只有不同模式会实质改变参与方式时才询问。
+把模式写入 `creative-brief.md` 和 `storyboard.json.production_mode`：
 
-1. **自主创作：** 用户明确全权交付创意和工程决策时使用。连续推进各阶段，把方案与取舍写入 `creative-decisions.md`，不为三个创作确认点暂停。遇到新增费用、缺少必要凭据或无法安全推断的输入时再停下。
-2. **共同创作：** 用户希望参与方向判断，或未表达完整授权时默认使用。在三个确认点暂停，集中展示廉价的决策材料；确认后不重复询问已经放行的内容。
-3. **参考复刻：** 用户提供影片、图片、品牌规范或现有镜头并希望沿用其视觉语言时使用。先拆解可迁移的构图、材质、灯光、节奏和摄像机语法，再写成本项目自己的风格锁定与分镜；不要复制无授权资产。除非用户另行授权自主推进，否则沿用共同创作的确认行为。
+1. `autonomous`：用户明确授权创意和工程决策。连续推进，把取舍写入 `creative-decisions.md`；新增费用、缺少凭据或无法安全推断时再停下。
+2. `co_create`：默认模式。在风格与分镜、参考图、Blender 预览三个确认点暂停；确认后不重复询问。
+3. `reference_rebuild`：拆解用户参考的构图、材质、灯光、节奏和摄像机语法，不复制无授权资产。除非用户明确授权自主推进，否则沿用共同创作确认行为。
 
-模式只控制谁做决定，不降低技术验收标准。切换模式时记录原因、已确认内容和下一阶段，不重新完成已经通过的工作。
+模式只控制谁做决定，不降低技术验收标准。切换模式时记录原因、已确认内容和下一阶段，不重复已通过的工作。
 
-## 建立项目状态
+## 项目状态与工具
 
-在项目根目录持久化这些成果，沿用已有命名时不要另建平行结构：
+沿用已有目录，不创建平行的状态体系：
 
 ```text
 creative-brief.md
@@ -60,176 +54,127 @@ creative-decisions.md
 style-lock.md
 storyboard.md
 storyboard.json
-references/shot_01.png
 references/generation-manifest.json
 shot-status.json
 blender/*.blend
 blender/scripts/*.py
-previews/shot_01/
 production-renders/shot_01/frame_000001.png
 render/render-state.json
-render/resume-render.ps1
+render/validation/
 render/logs/
+render/quarantine/
 monitor/index.html
 monitor/server.py
 monitor/monitor-config.json
-edit/*.lua
 edit/resolve-run.json
-backups/
 delivery/final.mp4
+delivery/delivery-report.json
 workflow-retrospective.md
 ```
 
-自主创作时创建 `creative-decisions.md`，进入 Resolve 时创建 `edit/resolve-run.json`；不为未采用的路径创建空占位文件。
+随包机器可读契约位于 `assets/schemas/`，工具位于 `scripts/`：
 
-让 `storyboard.json` 成为生产事实的机器可读来源。根级至少记录 `production_mode`、画幅、交付分辨率、帧率、总帧数、编码器、像素格式、色彩空间和声音方案；每个镜头至少记录：
+| 工具 | 用途 |
+| --- | --- |
+| `validate_project.py` | 校验全部 JSON schema、连续帧号、source/record 映射和跨文件一致性 |
+| `generate_monitor_config.py` | 生成只引用 storyboard 的最小监控配置 |
+| `render_supervisor.py` / `resume-render.ps1` | 单实例、可恢复、带重试预算的正式渲染 |
+| `blender_batch_render.py` | Blender 内执行临时帧渲染、完整校验和原子提交 |
+| `verify_frames.py` | 完整解码 PNG，更新 `frames_validated` 闸门 |
+| `encode_media.py` | 参数化编码镜头 H.264 或最终 H.265，并处理输入色彩转换 |
+| `verify_media.py` | 全片解码、媒体规格检查和绑定文件身份的 QA 报告 |
 
-- `id`、`frame_start`、`frame_end`、`duration_frames`。
-- `subject_action`、`camera_action`、`hold_frames`。
-- `camera`、`reference_path`、`output_path`。
-- `audio_cue`、`acceptance_checks`、`status`。
+修改任何状态后运行：
 
-让 Markdown 文件供用户审阅。让 `shot-status.json` 保存各镜头技术闸门、证据路径、未解决问题和下一动作，不把瞬时进度只留在聊天里。
+```bash
+python /path/to/skill/scripts/validate_project.py --project-root /path/to/project
+```
+
+### 帧号契约
+
+- `timeline_frame_start/end`：全片连续、从 1 开始、包含结束帧，也用于 PNG 文件名。
+- `source_frame_start/end`：单个镜头 MP4 的素材帧号；本流水线生成的素材从 0 开始。
+- `record_frame`：Resolve 的零基时间线写入位置，等于 `timeline_frame_start - 1`。
+- `duration_frames = timeline_end - timeline_start + 1 = source_end - source_start + 1`。
+
+不要在 storyboard 中另存运行状态。创作和技术闸门进入 `shot-status.json`，渲染运行状态进入 `render-state.json`，剪辑执行进入 `resolve-run.json`，最终证据进入 `delivery-report.json`。
 
 ## 工作流
 
 ### 1. 形成创意并锁定风格
 
-先提出一个推荐方向，而不是列出无穷选项。把方向写入 `creative-brief.md`：
-
-- 一句话前提与核心情绪。
-- 目标观众、平台、时长和画幅。
-- 视觉叙事弧线与结尾。
-- 必须保留的内容和禁区。
-
-再写 `style-lock.md`，固定：
-
-- 类型与时代。
-- 主色、辅色和材质语言。
-- 光源方向、色温、雾与对比度。
-- 镜头焦段族、机位高度、构图和运动速度。
-- 建筑或角色比例规则。
-- 纹理、颗粒、后期和字体规则。
-- 明确的负面约束。
-
-在文件末尾生成一段可逐字复用的 `STYLE_CAPSULE`。后续每张参考图只增加镜头内容，不改写该段风格。
-
-参考复刻模式先从用户素材提取风格规则，再生成 `STYLE_CAPSULE`；自主创作模式把选定方向和放弃其他方向的理由写入 `creative-decisions.md`。
+先提出一个推荐方向。把前提、核心情绪、观众、平台、时长、画幅、叙事弧线、必须保留内容和禁区写入 `creative-brief.md`。在 `style-lock.md` 固定色彩、材质、光向、镜头焦段族、机位、比例、纹理、后期、字体和负面约束，并生成可逐字复用的 `STYLE_CAPSULE`。
 
 ### 2. 写成可生产的分镜
 
-若已确定音乐，先分析 BPM、拍点相位、段落和重音，把可用切点映射到准确帧号，再确定镜头时长。不要先定死分镜再强行把音乐塞进去。
+若已确定音乐，先把 BPM、拍点相位、段落和重音映射到准确帧号。每个镜头只承担一个主要视觉动作，并记录主体动作、摄像机、焦段、机位、构图、连续性、转场、字幕、音频和可验证验收条件。
 
-按 30 fps 把时长换算为连续、不重叠、不缺口的帧范围。每个镜头至少写明：
-
-- 镜头编号、叙事目的、起止帧和时长。
-- 单一主要主体动作、景别、焦段、机位、摄像机动作和主体阻挡关系。
-- 场景、动作、灯光变化与连续性要求。
-- 入点、出点、落定后的停留帧、转场、字幕、音乐和音效提示。
-- 参考图提示词与 Blender 摄像机名。
-- 可验证的构图、比例、轮廓、遮挡和连续性验收条件。
-
-让每个镜头只承担一个主要视觉动作，并给关键信息留出呼吸时间。默认用少而清晰的镜头，不用快速切镜掩盖尚未确定的空间。对 30 秒氛围片，优先 4–6 个镜头。
-
-**确认点 1：** 用一屏内的创意摘要、风格锁定和完整分镜请用户确认，或按当前模式记录内部放行。
+使用 `assets/schemas/storyboard.schema.json` 规定的字段。参考图画幅与 storyboard 一致，不在参考图里生成字幕、UI 或片名。确认点 1 按当前模式完成用户确认或内部放行。
 
 ### 3. 生成一致的参考图
 
-开始生成前完整读取 [reference-gates.md](references/reference-gates.md)。
-
-调用可用的图像生成能力，优先使用用户指定的 Image 2：
-
-1. 先生成一张代表全片的风格母图。
-2. 母图通过当前模式对应的用户确认或内部放行后，把母图和同一 `STYLE_CAPSULE` 作为各镜头的共同参考。
-3. 为每个镜头生成独立的 9:16 图片，不把多镜头画进同一张图。
-4. 不在参考图里生成字幕、UI 或片名；把文字留给剪辑阶段。
-5. 保存原图并生成一张带镜头编号的联系表。
-6. 在 `references/generation-manifest.json` 记录模型、尺寸、提示词、输入参考、输出路径和生成任务 ID；记录服务返回的 seed 时一并保存，不虚构不存在的 seed。
-
-若风格漂移，回到母图作为图像参考，不要只靠堆叠更多形容词修补。
-
-通过参考图就绪闸门后再进入 Blender。
-
-**确认点 2：** 展示母图和逐镜头联系表，确认空间、镜头和风格，或按当前模式记录内部放行。
+完整读取 [reference-gates.md](references/reference-gates.md)。先生成风格母图，再把母图和同一 `STYLE_CAPSULE` 用作各镜头共同参考；保存原图、联系表和 `generation-manifest.json`，记录真实模型、尺寸、提示词、输入参考、输出路径、任务 ID 和服务实际返回的 seed。风格漂移时回到母图，不靠堆形容词补救。确认点 2 按模式放行。
 
 ### 4. 用 Blender MCP 建立场景
 
-先在 Blender GUI 中确认 MCP 连接、活动文件、场景、版本和当前摄像机。不要在后台模式启动 Blender MCP。
+在 GUI 确认 MCP 连接、活动文件、场景、版本和摄像机。按共享世界与材质 → 独立镜头 Collection → 几何块面与主光 → 低分辨率定帧 → 材质灯光细节与动画 → 可复现脚本的顺序制作，保存 blockout、approved 和 animation 检查点。
 
-按以下顺序制作：
-
-1. 建立共享世界、色彩管理和材质调色板。
-2. 每个镜头建立独立 Collection，使用 `SHOT_01_*` 命名。
-3. 只做几何块面和主光，建立 `CAM_SHOT_01_<lens>mm` 摄像机。
-4. 渲染目标摄像机和必要辅助视角的低分辨率定帧，先验证构图、尺度、遮挡和轮廓。
-5. 再补材质、灯光、关键细节与动画。
-6. 把重复操作写成项目内 Blender Python 脚本。
-7. 保存 blockout、approved 和 animation 三个检查点。
-
-按 [reference-gates.md](references/reference-gates.md) 执行“对照 → 定位差异 → 单次定向修正 → 复测”，并在每轮后更新 `shot-status.json`。优先使用尺寸、比例、画面占比、居中、出框和遮挡等确定性检查；视觉判断用于解释差异，不替代场景事实。
-
-不要在构图未确认前雕刻细节。不要仅凭 MCP 返回成功就认为场景正确；实际打开或渲染定帧检查。若同一问题连续出现，先检查对象层级、变换、约束和摄像机状态，不要继续盲目微调。
-
-**确认点 3：** 提交每个镜头的预览定帧或 playblast。共同创作和参考复刻等待用户确认；自主创作记录内部放行后继续。
+按“对照 → 定位差异 → 单次定向修正 → 同条件复测”执行，并更新 `shot-status.json`。确认点 3 提交逐镜头预览定帧或 playblast。正式渲染前，所有创作闸门必须为 `pass`，或有用户明确批准的 `accepted_deviation`。
 
 ### 5. 正式渲染并断点续跑
 
-进入正式渲染前，完整读取 [render-and-delivery.md](references/render-and-delivery.md) 和 [stability-and-recovery.md](references/stability-and-recovery.md)。
+完整读取 [render-and-delivery.md](references/render-and-delivery.md) 和 [stability-and-recovery.md](references/stability-and-recovery.md)。固定 approved `.blend` 并记录 SHA-256，先用目标设置做 5–10 帧基准测试。
 
-为每个镜头输出独立 PNG 序列和日志。先渲染短批次测量帧耗时、显存和画质，再选择正式 4K 档位。使用短批次、低优先级、有限线程、批间冷却和可校验的跳帧逻辑。让独立监督进程维护 `render/render-state.json`，不要把渲染生命周期绑定到 Codex 工具调用。若使用经批准的放大路线，在项目状态和最终报告中同时记录源分辨率与交付分辨率。
+```bash
+python /path/to/skill/scripts/render_supervisor.py \
+  --project-root /path/to/project \
+  --blender /path/to/blender
+```
 
-若 Blender 或驱动崩溃：
+Windows 也可使用 `scripts/resume-render.ps1`。监督器每批启动新 Blender 进程，保存独立日志、活动进程身份、最近 20 个帧耗时和逐镜头已验证帧；失败后缩小批次并按预算重试。渲染完成后再运行：
 
-- 先确认进程、最后成功帧、stderr 和 crash 文件。
-- 保留全部已完成帧。
-- 只终止精确识别的挂起进程。
-- 缩短批次并从已有帧续跑。
-- 不因 Codex 窗口中断而把渲染进程绑定到前台工具调用。
-
-若整机重启，先读取持久化状态、验证已有帧并检查 Windows 事件和崩溃证据，再重新启动监督进程。自动登录后续跑属于可选系统改动，只有用户明确批准并设置重启预算后才启用；不要无限自动重试导致循环重启。
-
-完整校验帧数、编号、尺寸、颜色模式和每张 PNG 的可解码性后，再编码镜头 MP4。
+```bash
+python /path/to/skill/scripts/verify_frames.py \
+  --project-root /path/to/project --update-status
+```
 
 ### 6. 可选只读监控页
 
-用户要求查看长时间渲染或剪辑状态时，完整读取 [monitor-dashboard.md](references/monitor-dashboard.md)。复制 `assets/render-monitor-dashboard/` 中的 `index.html`、`server.py` 和配置样例到项目的 `monitor/`。轻量只读服务优先读取 `render/render-state.json`、`shot-status.json` 和 `edit/resolve-run.json`，并用磁盘帧清单与最终媒体探测补足可验证事实；没有统一状态文件时必须标记为 `derived`。
+完整读取 [monitor-dashboard.md](references/monitor-dashboard.md)。复制 `assets/render-monitor-dashboard/` 的页面、服务和配置样例到项目 `monitor/`，再生成真实配置：
 
-内置页面默认采用 KUNLUN Design System，并使用中文主标签，只保留 Blender、GPU、HEVC、Rec.709 等必要技术缩写。若工作区 `AGENTS.md` 或用户指定了其他设计系统，以用户指定为先；视觉调整仍不得改变监控页的只读边界、真实数据标记和完成判定。
+```bash
+python /path/to/skill/scripts/generate_monitor_config.py --project-root /path/to/project
+python /path/to/project/monitor/server.py --project-root /path/to/project
+```
 
-页面每 5 秒读取一次状态，只展示进度、最近完整解码帧、ETA、心跳、资源负载、恢复次数、镜头队列、Resolve 阶段和最终媒体校验。只绑定 `127.0.0.1`，只开放必要的 GET 路由，不提供启动、停止、重试或任意命令入口。若用户明确要求通过 Cloudflare 域名远程查看，先按参考文件执行数据脱敏、身份保护和只读传输设计；不要把本机路径、命令行、原始日志或控制接口公开。
+配置只指向 `storyboard.json`，不另写镜头范围或交付规格。页面展示真实、派生、模拟和过期状态，不提供控制接口。
 
 ### 7. 使用 Resolve 剪辑
 
-进入 Resolve 前完整读取 [resolve-routing.md](references/resolve-routing.md)。同时探测 Resolve MCP 和项目内 Lua/Python 官方脚本 API，选择当前连接更稳定、覆盖操作完整且需要未验证步骤更少的入口。
+完整读取 [resolve-routing.md](references/resolve-routing.md)。探测 MCP 与官方脚本 API，选择已验证、覆盖完整且读回更强的入口；备份工程，用递增版本时间线，按 storyboard 的 timeline/source/record 映射生成 `resolve-run.json`。每次写操作后读回，恢复时跳过已一致的素材，避免重复导入或追加。
 
-按 `storyboard.json` 构建明确的时间线计划，先备份工程，再导入已验证镜头并编辑。把路由、能力探测、备份路径、时间线版本、媒体映射、渲染任务和结果写入 `edit/resolve-run.json`。
+### 8. 编码、验证并交付
 
-若两个接口都不可用，停在“已验证镜头 MP4”状态并报告具体阻塞；不要擅自安装第三方 MCP，也不要改用 Remotion、剪映或手工 GUI。
+镜头先通过 `verify_frames.py`，再编码：
 
-### 8. 验证并交付
+```bash
+python /path/to/skill/scripts/encode_media.py shot \
+  --project-root /path/to/project --shot-id shot_01
+```
 
-至少验证：
+Resolve 导出高质量母版后，按母版真实色彩属性执行最终编码；下列参数必须按实际母版修改：
 
-- H.265/HEVC Main、2160×3840、30/1 fps、预期时长与准确帧数；已批准横屏项目改查 3840×2160。
-- `yuv420p`、有限范围、Rec.709 matrix/transfer/primaries，以及 MP4 中的 `hvc1` 兼容标签。
-- 音轨数量符合声音方案。
-- 全片从头到尾可解码。
-- 每个镜头中段和每个切点都有抽样帧。
-- 最终文件大小、绝对路径和 SHA-256。
+```bash
+python /path/to/skill/scripts/encode_media.py final \
+  --project-root /path/to/project --master /path/to/edit-master.mov \
+  --input-primaries bt709 --input-transfer bt709 \
+  --input-matrix bt709 --input-range tv
+python /path/to/skill/scripts/verify_media.py --project-root /path/to/project
+python /path/to/skill/scripts/validate_project.py --project-root /path/to/project
+```
 
-向用户交付最终 MP4、Resolve 项目备份或时间线导出、关键源文件路径，以及任何尚未完成的声音或字幕项。
-
-## 完成标准
-
-只有同时满足以下条件才宣布完成：
-
-- 三个确认点已按所选模式通过、被明确跳过或完成内部放行。
-- `shot-status.json` 中的必要技术闸门均为通过，或记录了用户明确接受的偏差。
-- `.blend`、构建脚本、逐帧序列和剪辑工程均已保存。
-- 帧序列和最终 MP4 均经过实际解码验证。
-- 最终视频符合已确认的画幅、时长、帧率、色彩和音频方案。
-- 没有把占位图、占位视频或测试导出误当成交付文件。
+只有最终报告为 `complete`、当前文件 SHA-256 与报告一致、必要闸门通过且源文件和工程备份已保存，才宣布完成。交付最终 MP4、Resolve 备份或时间线导出、关键源文件路径、QA 报告及任何尚未完成的声音或字幕项。
 
 ## 持续改进
 
-每次交付后，把实测设置、平均帧耗时、崩溃原因、恢复方法、Resolve 接口差异和最终验证结果写入 `workflow-retrospective.md`。区分项目特例与可复用规律，向用户提出最小的技能修订建议；只有用户要求更新技能时才修改技能包。
+每次交付后，把实测设置、帧耗时、崩溃原因、恢复方法、Resolve 接口差异和最终验证结果写入 `workflow-retrospective.md`。区分项目特例与可复用规律；只有用户要求更新技能时才修改技能包。

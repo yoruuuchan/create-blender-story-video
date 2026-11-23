@@ -1,0 +1,70 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "shot-status.schema.json",
+  "title": "Creative and technical shot gates",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "shots"],
+  "properties": {
+    "schema_version": {"const": 1},
+    "shots": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["shot_id", "gates", "issues", "next_action", "updated_at"],
+        "properties": {
+          "shot_id": {"type": "string", "minLength": 1},
+          "gates": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["reference_ready", "blockout", "lookdev", "camera_animation", "frames_validated"],
+            "properties": {
+              "reference_ready": {"$ref": "#/$defs/creativeGate"},
+              "blockout": {"$ref": "#/$defs/creativeGate"},
+              "lookdev": {"$ref": "#/$defs/creativeGate"},
+              "camera_animation": {"$ref": "#/$defs/creativeGate"},
+              "frames_validated": {"$ref": "#/$defs/frameGate"}
+            }
+          },
+          "issues": {"type": "array", "items": {"type": "string"}},
+          "next_action": {"type": "string"},
+          "updated_at": {"type": "string", "format": "date-time"}
+        }
+      }
+    }
+  },
+  "$defs": {
+    "evidence": {"type": "array", "items": {"type": "string", "minLength": 1}},
+    "creativeGate": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status", "evidence", "method", "checked_at"],
+      "properties": {
+        "status": {"enum": ["pending", "pass", "fail", "accepted_deviation"]},
+        "evidence": {"$ref": "#/$defs/evidence"},
+        "method": {"type": "string"},
+        "checked_at": {"type": "string", "format": "date-time"},
+        "accepted_reason": {"type": "string", "minLength": 1},
+        "approved_by": {"type": "string", "minLength": 1}
+      },
+      "allOf": [
+        {
+          "if": {"properties": {"status": {"const": "accepted_deviation"}}},
+          "then": {"required": ["accepted_reason", "approved_by"]}
+        }
+      ]
+    },
+    "frameGate": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status", "evidence", "method", "checked_at"],
+      "properties": {
+        "status": {"enum": ["pending", "pass", "fail"]},
+        "evidence": {"$ref": "#/$defs/evidence"},
+        "method": {"type": "string"},
+        "checked_at": {"type": "string", "format": "date-time"}
+      }
+    }
+  }
+}

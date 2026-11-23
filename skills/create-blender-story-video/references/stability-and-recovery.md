@@ -2,137 +2,97 @@
 
 在机器容易卡死、Blender 无响应、显卡驱动崩溃或整机可能重启时读取本文件。
 
-## 目录
-
-1. 区分故障层级
-2. 渲染前稳定性基线
-3. 独立监督进程
-4. 安全提交逐帧结果
-5. 崩溃与重启恢复
-6. 按证据降载
-7. 重启后诊断
-8. 完成条件
-
 ## 1. 区分故障层级
 
-先确定观察到的是哪一类故障，不把“卡住”都当成同一原因：
+- **Blender 崩溃：** 进程退出，系统仍正常。
+- **Blender 无响应：** 进程仍在，但输出和帧进度停止。
+- **驱动复位：** 画面闪黑、进程消失或日志出现 `nvoglv64.dll`、`nvlddmkm`、`EXCEPTION_ACCESS_VIOLATION`。
+- **系统冻结或重启：** 整机失去响应、蓝屏或重启。
 
-- **Blender 进程崩溃：** 进程退出，Windows 和其他程序仍正常。
-- **Blender 无响应：** 进程仍在，但心跳、日志和输出文件停止增长。
-- **显卡驱动复位：** 画面闪黑、Blender 消失或日志出现 `nvoglv64.dll`、`nvlddmkm`、`EXCEPTION_ACCESS_VIOLATION`。
-- **系统冻结或重启：** 整机失去响应、蓝屏或意外重新开机；可能涉及驱动、温度、功耗、内存或硬件稳定性。
+只根据日志、事件、转储和资源数据判断原因。Kernel-Power 41 只表示上次关机不正常，不等于已经找到根因。
 
-只根据日志、事件、转储和资源数据判断原因。Windows 的 Kernel-Power 41 只表示上次关机不正常，不等于已经找到根因。
+## 2. 渲染前基线
 
-## 2. 渲染前稳定性基线
+- 固定 approved `.blend`，由监督器记录路径和 SHA-256；渲染期间不要让 GUI 改写同一文件。
+- 估算 PNG、临时文件和日志空间，至少预留 1.3 倍。
+- 检查内存、显存、GPU 温度和其他占用程序；不要自动关闭用户应用。
+- 使用原厂稳定设置，不自动修改超频、电压、BIOS、驱动或电源策略。
+- 用正式设置渲染 5 帧并记录资源与稳定性。基准出现 WHEA、蓝屏或整机重启时停止自动重试。
+- 修改睡眠策略或自动登录续跑必须获得用户批准，并在结束后恢复或禁用。
 
-在正式 4K 渲染前：
+## 3. 独立监督器
 
-- 固定并保存 approved `.blend`，记录绝对路径、文件大小、修改时间和 SHA-256。渲染期间不要让 GUI 会话继续改写同一文件。
-- 估算全部 PNG、临时文件和日志所需磁盘，至少预留估算值的 1.3 倍。
-- 检查可用内存、显存、GPU 温度和正在占用 GPU 的其他程序。只报告高占用程序，不自动关闭用户应用。
-- 使用原厂稳定设置；不要由 Skill 自动修改超频、电压、BIOS、驱动或系统电源策略。
-- 用目标场景、目标摄像机和正式设置渲染 5 帧。记录逐帧时间、峰值内存、峰值显存、温度趋势和是否出现驱动错误。
-- 已有卡死或重启记录时，原生 4K 从每批 5 帧、4 个 Blender 线程、`BelowNormal` 优先级和批间 15 秒冷却开始。
-- 暂停会打断渲染的睡眠策略只在用户同意后调整，并在项目完成后恢复。
+Windows 使用：
 
-若基准阶段已出现 WHEA 硬件错误、蓝屏或整机重启，不继续长时间自动重试；先保留证据并报告。
-
-## 3. 独立监督进程
-
-让项目内 `render/resume-render.ps1` 作为独立监督进程运行，不把它挂在 Codex 前台命令或 Blender GUI 上。监督进程负责：
-
-- 为每批启动新的后台 Blender 进程，并保存精确 PID、可执行文件和完整命令行。
-- 将 stdout、stderr 和 Blender crash 文件写入批次独立日志。
-- 每个已验证帧完成后更新心跳；每批结束后关闭 Blender、冷却并启动下一批。
-- 只终止 PID、可执行文件和命令行都匹配本项目的进程，不使用模糊名称批量结束 Blender。
-- 每次启动时读取已有状态和帧目录，能够在 Codex 关闭后继续工作。
-
-使用原子替换更新 `render/render-state.json`，至少保存：
-
-```json
-{
-  "blend_path": "",
-  "blend_sha256": "",
-  "status": "idle",
-  "frame_start": 1,
-  "frame_end": 900,
-  "next_frame": 1,
-  "batch_size": 5,
-  "cooldown_seconds": 15,
-  "max_batch_retries": 4,
-  "max_reboot_resumes": 2,
-  "active_pid": null,
-  "last_valid_frame": null,
-  "last_heartbeat": "",
-  "batch_retry_count": 0,
-  "total_crash_count": 0,
-  "reboot_resume_count": 0,
-  "auto_resume_enabled": false,
-  "last_error_signature": ""
-}
+```powershell
+& /path/to/skill/scripts/resume-render.ps1 -ProjectRoot /path/to/project -Blender /path/to/blender.exe
 ```
 
-`status` 只使用 `idle`、`running`、`cooldown`、`failed`、`complete`。写状态时先写同目录临时文件，刷新到磁盘后再替换正式 JSON，避免重启留下半个状态文件。
+或直接运行 `render_supervisor.py`。监督器与交互式 Agent、Blender GUI 和监控服务解耦。
+
+`render/render-state.json` 使用 `assets/schemas/render-state.schema.json`，核心字段包括：
+
+- `supervisor_id`、storyboard/approved blend SHA-256。
+- `current.shot_id`、批次范围、下一缺失帧和最后有效帧。
+- `current.recent_frame_durations_seconds`：最多 20 个真实渲染耗时样本，用于 ETA 和动态超时。
+- `current.active_process`：PID、可执行文件、参数数组和启动时间。
+- `frames.verified_by_shot`：逐镜头已完整验证的帧集合。
+- `health.heartbeat_at`：监督器周期心跳。
+- `health.last_progress_at`：最近有效帧进度，不与心跳混用。
+- `recovery`：批次重试、崩溃、自动续跑次数和错误签名。
+
+状态写同目录临时文件，flush/fsync 后原子替换。单实例锁位于 `render/.render-supervisor.lock`；锁文件存在不代表任务运行，只有持有锁的进程才拥有项目。
 
 ## 4. 安全提交逐帧结果
 
-- 先把新帧写到临时路径或临时目录，完成后完整解码并检查尺寸、颜色模式，再原子移动到正式帧名。
-- 无法使用临时路径时，重启后先验证正式目录中的最后若干帧；把不可完整解码的帧移入带时间戳的 quarantine 目录后再重渲。
-- 跳过现有帧前必须完整解码，不能只看文件存在、大小或时间戳。
-- 每批结束时核对预期编号与实际有效编号，将 `next_frame` 指向第一个缺失或无效帧。
-- 保留最后一个成功批次和最后一个失败批次的日志，不让新重试覆盖证据。
+- Blender 写入 `render/.pending/<shot>/`，验证 PNG 后原子替换正式帧。
+- 已存在帧必须完整解码才跳过；不可解码帧移入 `render/quarantine/`。
+- 每批结束后重新盘点批次，进程崩溃但已提交的完整帧仍可计入。
+- 每个镜头完成后再次全量验证，并写 `frames_validated` 闸门。
+- 重复文件名、额外编号或混合颜色布局需要明确处理，监督器不会擅自删除。
 
-## 5. 崩溃与重启恢复
+## 5. 崩溃、超时与重启恢复
 
 Blender 崩溃或无响应时：
 
-1. 读取最后心跳、日志和文件增长时间，确认不是单帧仍在正常计算。
-2. 核对活动 PID 与项目命令行；只有心跳和输出均超过动态超时才终止该精确进程。
-3. 验证并保留所有完整帧，隔离部分帧。
-4. 对同一批最多尝试 4 次；每次减小批次并增加冷却。
-5. 同一帧反复失败时单独渲染该帧，并检查该帧启用的对象、粒子、几何节点、合成和摄像机状态。
-6. 4 次仍失败时把状态设为 `failed`，停止自动循环并报告错误签名和最后有效帧。
+1. 读取最后心跳、最后进度、日志和文件增长时间，区分正常长帧与挂起。
+2. 动态超时以最近帧耗时中位数为依据；监督器只终止本次自己创建的子进程。
+3. 验证并保留完整帧，隔离部分帧。
+4. 同一批按 storyboard 预算重试，每次缩小批次并延长冷却。
+5. 固定帧反复失败时单独检查该帧的对象、粒子、几何节点、合成和摄像机状态。
+6. 超过预算后状态设为 `failed`，停止自动循环并报告错误签名。
+
+启动时如果旧 `active_pid` 仍存活，监督器会停止并请求人工核实可执行文件和命令；它不会用 `os.kill(pid, 0)` 探测 Windows 进程，也不会杀死无法确认归属的进程。
 
 整机重启后：
 
-1. 读取 `render-state.json`，确认 approved `.blend` 的 SHA-256 没有变化。
-2. 检查 Windows 事件、转储、Blender crash 文件和最后失败批次日志。
-3. 重新清点并解码已有帧，从第一个缺失或无效帧恢复。
-4. 默认由用户或 Codex 重新启动 `resume-render.ps1`。
-5. 只有用户明确批准时才创建登录后自动续跑任务；任务至少延迟 5 分钟、检查 `auto_resume_enabled=true`，最多允许 2 次重启续跑，并在完成、失败或超出预算后禁用。
-
-不要在每次开机后无条件启动 Blender。重复重启可能是硬件或驱动故障，无限续跑会让机器进入循环。
+1. 运行 `validate_project.py`，核对 storyboard 和 approved blend 哈希。
+2. 检查 Windows 事件、转储、Blender crash 文件和失败批次日志。
+3. 重新完整清点已有帧，从第一个缺失或无效帧恢复。
+4. 默认由用户或 Agent 重新启动监督器。
+5. 只有明确批准时才使用 `--enable-auto-resume`，登录任务使用 `--reboot-resume`；任务至少延迟 5 分钟，并受 `max_reboot_resumes` 限制。完成、失败或预算耗尽后禁用任务。
 
 ## 6. 按证据降载
 
 | 证据 | 优先处理 |
 | --- | --- |
-| `nvoglv64.dll`、`nvlddmkm` 或驱动复位 | 每批重启 Blender，缩短批次，关闭非必要的高显存程序，使用 factory startup；驱动升级或回退只作为用户决定的维护动作 |
-| 显存接近上限 | 保持交付分辨率，先减少纹理尺寸、额外 render pass、重型几何和同时驻留的镜头；仍不稳定时再请求批准 `upscaled_4k` |
-| 内存耗尽或大量换页 | 减少同批镜头、缓存、粒子和几何节点峰值，关闭非必要应用；不要通过增加超时掩盖资源耗尽 |
-| 温度持续逼近设备限制或明显降频 | 延长批间冷却、降低并发和样本；不要自动修改功耗墙或风扇固件 |
-| “线程未能启动” | 保持线程数限制，移除 CPU affinity，不反复启动更多并行 Blender |
-| WHEA、BugCheck、蓝屏或同批整机重启 | 停止自动重试，保存事件与转储，要求先排查驱动、温度、供电、内存或硬件 |
-| 固定帧稳定复现失败 | 隔离单帧和该帧场景状态，定位对象或效果；不要重做全部已验证帧 |
+| 驱动复位或随机 Blender 崩溃 | 每批重启 Blender、缩短批次、factory startup、减少非必要显存占用 |
+| 显存接近上限 | 减少纹理、额外 pass、重型几何和驻留镜头；仍不稳定再请求放大路线 |
+| 内存耗尽或大量换页 | 减少同批镜头、缓存、粒子和几何节点峰值 |
+| 温度逼近限制或明显降频 | 延长冷却、降低并发和样本，不修改固件 |
+| 固定帧稳定复现失败 | 隔离单帧与场景状态，不重做全部有效帧 |
+| WHEA、BugCheck、蓝屏或整机重启 | 停止自动重试，保存证据并排查硬件、供电、驱动和温度 |
 
 ## 7. 重启后诊断
 
-从故障前后时间窗口收集：
+收集故障前后窗口的 `Display`、`nvlddmkm`、`WHEA-Logger`、`BugCheck` 和 `Kernel-Power` 事件，以及 `C:\Windows\Minidump`、Blender crash 文件、最后心跳、最后有效帧和批次 stderr。把时间、事件 ID、错误模块和批次写入日志或状态，不只记录“又卡了”。
 
-- Windows System 日志中的 `Display`、`nvlddmkm`、`WHEA-Logger`、`BugCheck` 和 `Kernel-Power` 事件。
-- `C:\Windows\Minidump`、Blender crash 文件和显卡驱动日志是否产生新文件。
-- 最后心跳、最后有效 PNG、最后 stderr 行和发生故障的帧。
-- 故障前最近一次显存、内存、温度和功耗记录。
+## 8. 渲染完成条件
 
-把时间、事件 ID、错误模块和批次写入 `render-state.json` 或批次日志。不要只记录“又卡了”，否则无法区分场景问题、驱动问题和硬件问题。
-
-## 8. 完成条件
-
-只有以下条件同时成立时结束监督进程：
-
-- `render-state.json.status` 为 `complete`，且没有仍属于本项目的 Blender 子进程。
-- 预期帧编号集合与有效帧集合完全一致，每张图都能完整解码。
-- approved `.blend` 的 SHA-256 与渲染状态一致。
-- 最后一个批次日志完整，崩溃次数、恢复次数和任何降载决定已记录。
+- `render-state.json.status=complete`，且没有本项目活动 Blender 子进程。
+- 每个镜头的预期编号集合与有效帧集合完全一致，颜色布局一致。
+- approved `.blend` 与 storyboard 哈希未变化。
+- 所有 `frames_validated` 闸门为 `pass`，验证报告和批次日志已保存。
 - 自动续跑任务若曾启用，已经禁用并向用户报告。
+
+这只是渲染完成，不等于最终成片 QA 通过；最终完成另需有效的 `delivery-report.json`。

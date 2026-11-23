@@ -1,0 +1,85 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "render-state.schema.json",
+  "title": "Resumable render supervisor state",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "supervisor_id", "storyboard_sha256", "blend_path", "blend_sha256", "stage", "status", "current", "frames", "health", "recovery", "updated_at"],
+  "properties": {
+    "schema_version": {"const": 1},
+    "supervisor_id": {"type": "string", "minLength": 1},
+    "storyboard_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "blend_path": {"type": "string", "minLength": 1},
+    "blend_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "stage": {"enum": ["render", "edit", "delivery"]},
+    "status": {"enum": ["idle", "running", "cooldown", "failed", "complete"]},
+    "current": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["shot_id", "batch_id", "batch_start", "batch_end", "next_frame", "last_valid_frame", "recent_frame_durations_seconds", "active_process"],
+      "properties": {
+        "shot_id": {"type": ["string", "null"]},
+        "batch_id": {"type": ["string", "null"]},
+        "batch_start": {"type": ["integer", "null"], "minimum": 1},
+        "batch_end": {"type": ["integer", "null"], "minimum": 1},
+        "next_frame": {"type": ["integer", "null"], "minimum": 1},
+        "last_valid_frame": {"type": ["integer", "null"], "minimum": 1},
+        "recent_frame_durations_seconds": {
+          "type": "array",
+          "maxItems": 20,
+          "items": {"type": "number", "exclusiveMinimum": 0}
+        },
+        "active_process": {
+          "type": ["object", "null"],
+          "additionalProperties": false,
+          "required": ["pid", "executable", "command", "started_at"],
+          "properties": {
+            "pid": {"type": "integer", "minimum": 1},
+            "executable": {"type": "string", "minLength": 1},
+            "command": {"type": "array", "items": {"type": "string"}},
+            "started_at": {"type": "string", "format": "date-time"}
+          }
+        }
+      }
+    },
+    "frames": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["expected_total", "verified_by_shot"],
+      "properties": {
+        "expected_total": {"type": "integer", "minimum": 1},
+        "verified_by_shot": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "array",
+            "uniqueItems": true,
+            "items": {"type": "integer", "minimum": 1}
+          }
+        }
+      }
+    },
+    "health": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["heartbeat_at", "last_progress_at", "stale_after_seconds"],
+      "properties": {
+        "heartbeat_at": {"type": ["string", "null"], "format": "date-time"},
+        "last_progress_at": {"type": ["string", "null"], "format": "date-time"},
+        "stale_after_seconds": {"type": "integer", "minimum": 5}
+      }
+    },
+    "recovery": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["batch_retry_count", "total_crash_count", "reboot_resume_count", "auto_resume_enabled", "last_error_signature"],
+      "properties": {
+        "batch_retry_count": {"type": "integer", "minimum": 0},
+        "total_crash_count": {"type": "integer", "minimum": 0},
+        "reboot_resume_count": {"type": "integer", "minimum": 0},
+        "auto_resume_enabled": {"type": "boolean"},
+        "last_error_signature": {"type": "string"}
+      }
+    },
+    "updated_at": {"type": "string", "format": "date-time"}
+  }
+}

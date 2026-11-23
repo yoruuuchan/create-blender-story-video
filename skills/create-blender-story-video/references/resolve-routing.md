@@ -4,54 +4,49 @@
 
 ## 1. 选择控制入口
 
-先同时检查两个入口，不固定优先级：
+1. 检查当前会话是否有可实际调用的 Resolve MCP 工具，不凭配置名称推断成功。
+2. 检查项目内已验证的 Lua/Python 入口和官方脚本 API 是否能连接当前 Resolve。
+3. MCP 复合操作覆盖任务且读回完整时使用 MCP；需要精确 API 方法或已有可靠脚本时使用官方 API。
+4. 两者都可用时，选择未验证步骤更少、状态读回更强且最容易避免重复写入的入口，并把理由写入 `resolve-run.json.route`。
+5. 两条路径都不可用时停止剪辑，保留已验证镜头 MP4。
 
-1. 检查当前 Codex 会话是否已有可实际调用的 Resolve MCP 工具，不凭配置文件名称推断连接成功。
-2. 检查项目内已验证的 Lua 或 Python 入口以及官方脚本 API 是否能连接当前 Resolve。
-3. MCP 已连接、复合操作覆盖整个任务且读回能力完整时，使用 MCP。
-4. 项目已有可靠脚本、需要精确的 API 方法或 MCP 缺少关键操作时，使用脚本 API。
-5. 两者都可用时，选择未验证步骤更少、状态读回更强、最容易避免重复写入的入口，并把理由写入 `edit/resolve-run.json`。
-6. 两条路径都不可用时停止剪辑，保留已验证镜头 MP4 并报告缺少的能力。
-
-不要未经用户允许安装、升级或替换第三方 Resolve MCP。不要把手工 GUI 操作、Remotion 或其他剪辑器当作静默后备。
-
-选定入口后不要在同一次写操作中途混用。若入口失败，先保存并重新读取项目、时间线和媒体状态，记录最后一个确认成功的操作，再决定是否切换；切换后必须避免重复导入或重复追加镜头。
+不要未经用户允许安装、升级或替换第三方 Resolve MCP，不要静默改用其他剪辑器。选定入口后不要在同一次写操作中途混用；失败时先读回项目和时间线，再决定如何避免重复写入。
 
 ## 2. 修改前保护现场
 
-先只读检查，再修改：
+先只读检查 Resolve Studio、外部脚本设置、当前项目、项目数据库、时间线、媒体池、轨道、分辨率、帧率和渲染预设。保存项目，用 `ProjectManager:ExportProject()` 导出带时间戳的 `.drp`，为本次剪辑创建递增版本时间线。
 
-- 确认 Resolve Studio、外部脚本设置、当前项目和项目数据库。
-- 读取现有时间线、媒体池、轨道、项目分辨率、帧率和渲染预设。
-- 保存当前项目。
-- 使用 `ProjectManager:ExportProject()` 导出带时间戳的 `.drp` 备份。
-- 为本次剪辑使用递增版本时间线，例如 `main_v001`；若同名时间线已有素材，不直接覆盖。
+`edit/resolve-run.json` 使用 `assets/schemas/resolve-run.schema.json`，记录入口、能力、项目名、备份、时间线、源计划、渲染任务和读回结果。
 
-把入口类型、能力结果、项目名、备份路径和目标时间线写入 `edit/resolve-run.json`。源镜头只读使用，不重写或原地转码。
+## 3. 帧号与素材映射
 
-## 3. 建立确定的时间线计划
+storyboard 的三种帧号不得混用：
 
-从 `storyboard.json` 生成逐镜头计划，至少包含：
+| 字段 | 含义 |
+| --- | --- |
+| `timeline_frame_start/end` | 全片一基、包含结束帧的时间线范围，也用于 PNG 文件名 |
+| `source_frame_start/end` | 编码后单镜头 MP4 的零基素材入出点 |
+| `record_frame` | Resolve 零基时间线写入位置 |
 
-- 源文件绝对路径和预期媒体属性。
-- 源入点、源出点、`recordFrame`、持续帧数和目标轨道。
-- 转场、字幕、标记、音效和音乐事件的准确帧号。
-- 期望的时间线总帧数、视频轨、音频轨和字幕轨数量。
-- 默认竖屏时间线 2160×3840、30 fps；已批准横屏项目使用 3840×2160。
+`validate_project.py` 会检查连续范围、持续帧数、`record_frame = timeline_frame_start - 1` 和 `resolve-run.source_plan` 是否与 storyboard 完全一致。
 
-在导入媒体前设置时间线分辨率和帧率。官方脚本 API 常用设置键包括：
+例如第二个镜头的时间线范围为 181–360、时长 180 帧，则其生成 MP4 的素材范围为 0–179，`record_frame` 为 180。不要把 181 当作这个 MP4 的源入点。
 
-- `timelineFrameRate`
-- `timelineResolutionWidth`
-- `timelineResolutionHeight`
-- `timelineOutputResMatchTimelineRes`
-- `timelinePixelAspectRatio`
+## 4. 建立时间线计划
 
-按当前 Resolve 版本实际读回设置，不因 API 返回真值就假定生效。
+从 storyboard 生成 `source_plan`，每项包含：
 
-## 4. 执行与复测
+- `shot_id` 和镜头 MP4 绝对 `source_path`。
+- `timeline_frame_start/end`、`source_frame_start/end`、`record_frame`。
+- `duration_frames` 和 `track_index`。
 
-MCP 路径使用其受控导入、时间线、字幕、音频和渲染操作；脚本路径优先复用项目内已验证入口。典型连接为：
+在导入媒体前设置时间线分辨率、fps 和输出匹配设置。常用键包括 `timelineFrameRate`、`timelineResolutionWidth`、`timelineResolutionHeight`、`timelineOutputResMatchTimelineRes` 和 `timelinePixelAspectRatio`；必须按当前 Resolve 版本读回，不因返回真值就假定生效。
+
+转场、字幕、标记、音乐和音效也使用明确的时间线帧号。期望总帧数必须与 storyboard 相同。
+
+## 5. 执行与复测
+
+典型官方入口：
 
 ```lua
 local resolve = Resolve()
@@ -59,34 +54,24 @@ local projectManager = resolve:GetProjectManager()
 local project = projectManager:GetCurrentProject()
 ```
 
-使用 `MediaPool:ImportMedia()` 导入已验证镜头；使用 `MediaPool:AppendToTimeline()` 时明确指定 `startFrame`、`endFrame`、`trackIndex` 和 `recordFrame`。每次写操作后读回并核对：
+使用 `MediaPool:ImportMedia()` 导入已验证镜头；使用 `AppendToTimeline()` 时明确区分 source 入出点与 `recordFrame`。每次写操作后读回：
 
-- 时间线名、分辨率、帧率、起止帧和总帧数。
-- TimelineItem 的名称、起点、终点、持续帧数和源文件。
-- 视频、音频和字幕轨的数量、名称与启用状态。
-- 转场、字幕、标记、音乐和音效是否落在计划帧。
-- 是否出现间隙、重叠、离线媒体或重复导入。
+- 时间线名、分辨率、fps、起止帧和总帧数。
+- TimelineItem 名称、起点、终点、持续帧数和源文件。
+- 视频、音频和字幕轨数量、名称与启用状态。
+- 转场、字幕、标记、音乐和音效位置。
+- 间隙、重叠、离线媒体和重复导入。
 
-让执行可重复：继续中断任务前先读取现状，跳过已经与计划一致的项目，不重复追加同一镜头。
+恢复中断任务前先读取现状，跳过已经与计划一致的素材。
 
-## 5. 声音与节奏
+## 6. 声音与节奏
 
-用户没有批准声音方案时不要擅自添加音乐。已有音乐时，保持分镜中的节拍帧；设置对白、音乐和音效的独立轨道，避免把唯一音频烘焙进不可逆的中间文件。
+用户未批准声音方案时不要添加音乐。已有音乐时保持分镜节拍帧，对白、音乐和音效使用独立轨道，避免把唯一音频烘焙进不可逆中间文件。检查削波、突兀切断、静音空洞、声画错位和结尾余音；需要用户后续配乐时保留无 BGM 版本或可独立静音音乐轨。
 
-至少检查削波、突兀切断、静音空洞、声画错位和结尾余音。用户需要后续自行配乐时，同时保留无 BGM 版本或可独立静音的音乐轨。
+## 7. 渲染与交付
 
-## 6. 渲染与交付
+先探测当前 Resolve 支持的格式、编码器和设置。记录 job ID、目标路径、设置和开始时间；轮询到明确完成或失败终态，不把“已加入队列”当作完成，不静默降级为 H.264。
 
-先探测当前 Resolve 支持的格式、编码器和渲染设置，再建立渲染任务。最终目标为 MP4、H.265/HEVC Main、`yuv420p`、30 fps、有限范围 Rec.709，并保留 `hvc1` 兼容标签。记录 job ID、目标路径、设置和开始时间；轮询到明确的完成或失败终态，不把“已加入队列”当作完成，也不要静默降级为 H.264。
+若 Resolve 无法直接产生合格 HEVC，先导出已验证的高质量母版，再按渲染与交付细则使用 `encode_media.py final`。按母版实际色彩属性传入输入参数。
 
-若 Resolve 无法直接产生合格的 HEVC 文件，先从 Resolve 导出已验证的高质量剪辑母版，再按渲染与交付细则编码 H.265。把该路径记录为 `master_then_hevc`；它不改变 Resolve 作为剪辑器的角色。
-
-导出后：
-
-1. 确认目标文件存在且停止增长。
-2. 读取媒体规格和实际帧数。
-3. 执行全片解码与切点抽帧检查。
-4. 保存项目，并导出 `.drt` 时间线或最终 `.drp` 备份。
-5. 把渲染终态、输出路径、媒体探测结果和备份路径写回 `edit/resolve-run.json`。
-
-Resolve 返回成功但文件校验失败时，保留失败产物和日志，修正渲染计划后输出新文件；不要覆盖最后一个已验证版本。
+导出后确认文件停止增长，执行 `verify_media.py` 全片探测与解码，保存项目并导出 `.drt` 或最终 `.drp`。把渲染终态、输出和备份写回 `resolve-run.json`，最后运行 `validate_project.py`。校验失败时保留失败产物和最后已验证版本；只有显式 `--replace` 才允许编码器替换现有成片。

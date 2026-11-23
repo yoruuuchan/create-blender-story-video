@@ -1,0 +1,119 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "storyboard.schema.json",
+  "title": "Blender story video production plan",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "production_mode", "project", "delivery", "render", "shots"],
+  "properties": {
+    "schema_version": {"const": 1},
+    "production_mode": {"enum": ["autonomous", "co_create", "reference_rebuild"]},
+    "project": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name", "approved_blend"],
+      "properties": {
+        "name": {"type": "string", "minLength": 1},
+        "approved_blend": {"type": "string", "minLength": 1}
+      }
+    },
+    "delivery": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "aspect_ratio", "source_width", "source_height", "width", "height", "fps",
+        "total_frames", "codec", "profile", "pixel_format", "color_space", "color_range",
+        "codec_tag", "audio_streams", "upscaled_4k", "final_media", "input_color"
+      ],
+      "properties": {
+        "aspect_ratio": {"type": "string", "pattern": "^[1-9][0-9]*:[1-9][0-9]*$"},
+        "source_width": {"type": "integer", "minimum": 2},
+        "source_height": {"type": "integer", "minimum": 2},
+        "width": {"type": "integer", "minimum": 2},
+        "height": {"type": "integer", "minimum": 2},
+        "fps": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["numerator", "denominator"],
+          "properties": {
+            "numerator": {"type": "integer", "minimum": 1},
+            "denominator": {"type": "integer", "minimum": 1}
+          }
+        },
+        "total_frames": {"type": "integer", "minimum": 1},
+        "codec": {"enum": ["hevc", "h265"]},
+        "profile": {"const": "Main"},
+        "pixel_format": {"const": "yuv420p"},
+        "color_space": {"const": "bt709"},
+        "color_range": {"const": "tv"},
+        "codec_tag": {"const": "hvc1"},
+        "audio_streams": {"type": "integer", "minimum": 0},
+        "upscaled_4k": {"type": "boolean"},
+        "final_media": {"type": "string", "minLength": 1},
+        "input_color": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["primaries", "transfer", "matrix", "range"],
+          "properties": {
+            "primaries": {"type": "string", "minLength": 1},
+            "transfer": {"type": "string", "minLength": 1},
+            "matrix": {"type": "string", "minLength": 1},
+            "range": {"enum": ["pc", "tv"]}
+          }
+        }
+      }
+    },
+    "render": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "threads", "batch_size", "cooldown_seconds", "max_batch_retries",
+        "max_reboot_resumes", "heartbeat_seconds", "stale_after_seconds"
+      ],
+      "properties": {
+        "threads": {"type": "integer", "minimum": 1, "maximum": 256},
+        "batch_size": {"type": "integer", "minimum": 1},
+        "cooldown_seconds": {"type": "integer", "minimum": 0},
+        "max_batch_retries": {"type": "integer", "minimum": 0, "maximum": 20},
+        "max_reboot_resumes": {"type": "integer", "minimum": 0, "maximum": 20},
+        "heartbeat_seconds": {"type": "integer", "minimum": 1, "maximum": 60},
+        "stale_after_seconds": {"type": "integer", "minimum": 5}
+      }
+    },
+    "shots": {
+      "type": "array",
+      "minItems": 1,
+      "items": {"$ref": "#/$defs/shot"}
+    }
+  },
+  "$defs": {
+    "shot": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id", "timeline_frame_start", "timeline_frame_end", "source_frame_start",
+        "source_frame_end", "record_frame", "duration_frames", "subject_action",
+        "camera_action", "hold_frames", "camera", "reference_path", "frame_directory",
+        "clip_path", "audio_cue", "acceptance_checks"
+      ],
+      "properties": {
+        "id": {"type": "string", "pattern": "^[a-z][a-z0-9_]*$"},
+        "timeline_frame_start": {"type": "integer", "minimum": 1},
+        "timeline_frame_end": {"type": "integer", "minimum": 1},
+        "source_frame_start": {"type": "integer", "minimum": 0},
+        "source_frame_end": {"type": "integer", "minimum": 0},
+        "record_frame": {"type": "integer", "minimum": 0},
+        "duration_frames": {"type": "integer", "minimum": 1},
+        "subject_action": {"type": "string"},
+        "camera_action": {"type": "string"},
+        "hold_frames": {"type": "integer", "minimum": 0},
+        "camera": {"type": "string", "minLength": 1},
+        "reference_path": {"type": "string"},
+        "frame_directory": {"type": "string", "minLength": 1},
+        "clip_path": {"type": "string", "minLength": 1},
+        "audio_cue": {"type": "string"},
+        "acceptance_checks": {"type": "array", "items": {"type": "string", "minLength": 1}}
+      }
+    }
+  }
+}

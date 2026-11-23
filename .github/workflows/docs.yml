@@ -1,4 +1,4 @@
-name: Docs
+name: Tests
 
 on:
   push:
@@ -10,14 +10,40 @@ permissions:
   contents: read
 
 jobs:
-  check-links:
+  links:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
-
       - uses: actions/setup-node@v7
         with:
           node-version: '24'
-
       - name: Check Markdown links and path casing
         run: node scripts/check-links.mjs
+
+  python:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+          cache: pip
+      - name: Install FFmpeg with zscale and HEVC support
+        run: sudo apt-get update && sudo apt-get install -y ffmpeg
+      - name: Install Python dependencies
+        run: python -m pip install -r skills/create-blender-story-video/scripts/requirements.txt
+      - name: Compile Python sources
+        run: python -m compileall -q skills/create-blender-story-video
+      - name: Run workflow, monitor and real media tests
+        run: python -m unittest discover -s tests -p 'test_*.py' -v
+
+  javascript:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '24'
+      - name: Run dashboard and Markdown checker regression tests
+        run: node --test tests/test-dashboard.mjs tests/test-check-links.mjs

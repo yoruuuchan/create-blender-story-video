@@ -4,13 +4,16 @@
 from __future__ import annotations
 
 import argparse
+import copy
 import csv
+import hashlib
 import json
 import math
 import mimetypes
 import os
 import re
 import shutil
+import statistics
 import subprocess
 import threading
 import time
@@ -104,61 +107,84 @@ class Monitor:
 
     def _load_config(self) -> dict:
         raw = read_json(self.config_path)
-        if not isinstance(raw, dict):
+        if not isinstance(raw, dict) or raw.get("schema_version") != 1:
             raise ValueError(f"Missing or invalid monitor config: {self.config_path}")
-
-        shots = raw.get("shots")
-        if not isinstance(shots, list) or not shots:
-            raise ValueError("monitor-config.json must contain a non-empty shots array")
+        storyboard_reference = raw.get("storyboard")
+        if not isinstance(storyboard_reference, str) or not storyboard_reference:
+            raise ValueError("monitor-config.json must reference storyboard.json")
+        storyboard_path = relative_project_path(
+            self.project_root, storyboard_reference, "storyboard"
+        )
+        storyboard = read_json(storyboard_path)
+        if not isinstance(storyboard, dict) or storyboard.get("schema_version") != 1:
+            raise ValueError(f"Missing or invalid storyboard: {storyboard_path}")
+        shots = storyboard.get("shots")
+        delivery = storyboard.get("delivery")
+        project = storyboard.get("project")
+        if not isinstance(shots, list) or not shots or not isinstance(delivery, dict) or not isinstance(project, dict):
+            raise ValueError("storyboard.json must contain project, delivery and non-empty shots")
 
         normalized_shots = []
-        for index, shot in enumerate(shots, start=1):
+        expected_start = 1
+        for index, shot in enumerate(shots):
             if not isinstance(shot, dict):
-                raise ValueError(f"shots[{index - 1}] must be an object")
-            shot_id = str(shot.get("id") or f"shot_{index:02d}")
-            start = safe_int(shot.get("start"))
-            end = safe_int(shot.get("end"))
-            directory = str(shot.get("directory") or shot_id)
-            if start is None or end is None or start > end:
-                raise ValueError(f"Invalid frame range for {shot_id}")
-            normalized_shots.append(
-                {
-                    "id": shot_id,
-                    "label": str(shot.get("label") or shot_id.replace("_", " ").upper()),
-                    "start": start,
-                    "end": end,
-                    "directory": directory,
-                }
-            )
+                raise ValueError(f"shots[{index}] must be an object")
+            shot_id = str(shot.get("id") or "")
+            start = safe_int(shot.get("timeline_frame_start"))
+            end = safe_int(shot.get("timeline_frame_end"))
+            directory = str(shot.get("frame_directory") or "")
+            if not shot_id or start != expected_start or end is None or end < start or not directory:
+                raise ValueError(f"Invalid or non-contiguous frame range for {shot_id or index}")
+            duration = safe_int(shot.get("duration_frames"))
+            if duration != end - start + 1:
+                raise ValueError(f"Invalid duration_frames for {shot_id}")
+            relative_project_path(self.project_root, directory, f"frame_directory for {shot_id}")
+            normalized_shots.append({
+                "id": shot_id,
+                "label": shot_id.replace("_", " ").upper(),
+                "start": start,
+                "end": end,
+                "directory": directory,
+            })
+            expected_start = end + 1
 
-        expected = raw.get("expected") if isinstance(raw.get("expected"), dict) else {}
-        render_root = str(raw.get("render_root") or "render/frames")
-        final_media = str(raw.get("final_media") or "delivery/final.mp4")
-
-        relative_project_path(self.project_root, render_root, "render_root")
+        fps_data = delivery.get("fps") if isinstance(delivery.get("fps"), dict) else {}
+        fps_numerator = finite_number(fps_data.get("numerator"))
+        fps_denominator = finite_number(fps_data.get("denominator"))
+        if not fps_numerator or not fps_denominator:
+            raise ValueError("storyboard delivery.fps must contain positive numerator and denominator")
+        total_frames = safe_int(delivery.get("total_frames"))
+        if total_frames != expected_start - 1:
+            raise ValueError("delivery.total_frames does not match shot ranges")
+        if safe_int(delivery.get("width"), 0) < 2 or safe_int(delivery.get("height"), 0) < 2:
+            raise ValueError("delivery width and height must be positive")
+        required_text = ("codec", "profile", "pixel_format", "color_space", "color_range", "codec_tag")
+        if any(field not in delivery or not str(delivery[field]) for field in required_text):
+            raise ValueError("delivery codec, profile and color fields are required")
+        if safe_int(delivery.get("audio_streams"), -1) < 0:
+            raise ValueError("delivery.audio_streams must be zero or greater")
+        final_media = str(delivery.get("final_media") or "")
         relative_project_path(self.project_root, final_media, "final_media")
 
         return {
-            "project_name": str(raw.get("project_name") or self.project_root.name),
-            "project_file": Path(str(raw.get("project_file") or "")).name,
-            "render_root": render_root,
+            "project_name": str(project.get("name") or self.project_root.name),
+            "project_file": Path(str(project.get("approved_blend") or "")).name,
+            "storyboard_sha256": hashlib.sha256(storyboard_path.read_bytes()).hexdigest(),
             "final_media": final_media,
             "ffprobe": str(raw.get("ffprobe") or ""),
             "shots": normalized_shots,
             "expected": {
-                "width": safe_int(expected.get("width"), 2160),
-                "height": safe_int(expected.get("height"), 3840),
-                "fps": finite_number(expected.get("fps"), 30.0),
-                "frames": safe_int(
-                    expected.get("frames"),
-                    sum(item["end"] - item["start"] + 1 for item in normalized_shots),
-                ),
-                "codec": str(expected.get("codec") or "hevc").lower(),
-                "pix_fmt": str(expected.get("pix_fmt") or "yuv420p").lower(),
-                "color": str(expected.get("color") or "bt709").lower(),
-                "color_range": str(expected.get("color_range") or "tv").lower(),
-                "codec_tag": str(expected.get("codec_tag") or "hvc1").lower(),
-                "audio_streams": safe_int(expected.get("audio_streams"), 0),
+                "width": safe_int(delivery.get("width")),
+                "height": safe_int(delivery.get("height")),
+                "fps": fps_numerator / fps_denominator,
+                "frames": total_frames,
+                "codec": str(delivery.get("codec") or "").lower(),
+                "profile": str(delivery.get("profile") or ""),
+                "pix_fmt": str(delivery.get("pixel_format") or "").lower(),
+                "color": str(delivery.get("color_space") or "").lower(),
+                "color_range": str(delivery.get("color_range") or "").lower(),
+                "codec_tag": str(delivery.get("codec_tag") or "").lower(),
+                "audio_streams": safe_int(delivery.get("audio_streams"), -1),
             },
         }
 
@@ -168,13 +194,14 @@ class Monitor:
             if force or self.summary is None or now - self.last_refresh >= REFRESH_SECONDS:
                 self.summary = self._build_summary()
                 self.last_refresh = now
-            return self.summary
+            return copy.deepcopy(self.summary)
 
     def _canonical_state(self):
         render_state = read_json(self.project_root / "render" / "render-state.json")
         shot_state = read_json(self.project_root / "shot-status.json")
         resolve_state = read_json(self.project_root / "edit" / "resolve-run.json")
-        return render_state, shot_state, resolve_state
+        delivery_report = read_json(self.project_root / "delivery" / "delivery-report.json")
+        return render_state, shot_state, resolve_state, delivery_report
 
     def _validated_shots(self, raw) -> set[str]:
         if isinstance(raw, dict):
@@ -188,17 +215,13 @@ class Monitor:
         for entry in entries:
             if not isinstance(entry, dict):
                 continue
-            state = str(entry.get("status") or "").lower()
-            if entry.get("validated") is True or state in {"verified", "validated", "complete"}:
-                shot_id = entry.get("id") or entry.get("shot_id")
-                if shot_id:
-                    validated.add(str(shot_id))
+            gates = entry.get("gates") if isinstance(entry.get("gates"), dict) else {}
+            frame_gate = gates.get("frames_validated") if isinstance(gates.get("frames_validated"), dict) else {}
+            if frame_gate.get("status") == "pass" and entry.get("shot_id"):
+                validated.add(str(entry["shot_id"]))
         return validated
 
     def _scan_shots(self, validated_shots: set[str]):
-        render_root = relative_project_path(
-            self.project_root, self.config["render_root"], "render_root"
-        )
         shots = []
         preview_candidates = []
         newest_evidence = None
@@ -206,7 +229,7 @@ class Monitor:
 
         for shot in self.config["shots"]:
             directory = relative_project_path(
-                render_root, shot["directory"], f"directory for {shot['id']}"
+                self.project_root, shot["directory"], f"directory for {shot['id']}"
             )
             frame_numbers = set()
             if directory.is_dir():
@@ -307,35 +330,39 @@ class Monitor:
         return {"available": False, "reason": "没有找到可完整解码的 PNG 帧"}
 
     def _processes(self) -> dict:
-        tasklist = shutil.which("tasklist.exe")
-        if not tasklist:
-            return {"blender": [], "ffmpeg": [], "resolve": []}
+        found = {"blender": [], "ffmpeg": [], "resolve": []}
+        if os.name == "nt":
+            executable = shutil.which("tasklist.exe")
+            command = [executable, "/FO", "CSV", "/NH"] if executable else None
+        else:
+            executable = shutil.which("ps")
+            command = [executable, "-eo", "pid=,comm="] if executable else None
+        if not command:
+            return found
         try:
             result = subprocess.run(
-                [tasklist, "/FO", "CSV", "/NH"],
-                capture_output=True,
-                text=True,
-                errors="replace",
-                timeout=3,
-                check=False,
+                command, capture_output=True, text=True, errors="replace", timeout=3, check=False,
             )
         except (OSError, subprocess.TimeoutExpired):
-            return {"blender": [], "ffmpeg": [], "resolve": []}
+            return found
 
-        found = {"blender": [], "ffmpeg": [], "resolve": []}
-        for row in csv.reader(result.stdout.splitlines()):
+        rows = csv.reader(result.stdout.splitlines()) if os.name == "nt" else (
+            line.strip().split(None, 1) for line in result.stdout.splitlines()
+        )
+        for row in rows:
             if len(row) < 2:
                 continue
-            image_name = row[0].lower()
-            pid = safe_int(row[1])
+            if os.name == "nt":
+                image_name = row[0].lower()
+                pid = safe_int(row[1])
+            else:
+                pid = safe_int(row[0])
+                image_name = Path(row[1]).name.lower()
             if pid is None:
                 continue
-            if image_name == "blender.exe":
-                found["blender"].append(pid)
-            elif image_name == "ffmpeg.exe":
-                found["ffmpeg"].append(pid)
-            elif image_name == "resolve.exe":
-                found["resolve"].append(pid)
+            for name in found:
+                if image_name in {name, f"{name}.exe"}:
+                    found[name].append(pid)
         return found
 
     def _memory(self):
@@ -424,7 +451,7 @@ class Monitor:
             str(probe) if probe else "",
         )
         if cache_key == self.probe_cache_key:
-            return self.probe_cache_result
+            return copy.deepcopy(self.probe_cache_result)
 
         if probe is None:
             result = {
@@ -452,8 +479,8 @@ class Monitor:
                     (
                         "format=duration,size:"
                         "stream=index,codec_type,codec_name,profile,width,height,"
-                        "r_frame_rate,pix_fmt,color_range,color_space,color_transfer,"
-                        "color_primaries,codec_tag_string,nb_read_frames"
+                        "r_frame_rate,avg_frame_rate,duration,pix_fmt,color_range,color_space,"
+                        "color_transfer,color_primaries,codec_tag_string,nb_read_frames"
                     ),
                     "-of",
                     "json",
@@ -489,6 +516,13 @@ class Monitor:
             "height": safe_int(video.get("height")),
             "fps": parse_rate(video.get("r_frame_rate")),
             "fps_raw": video.get("r_frame_rate"),
+            "avg_fps": parse_rate(video.get("avg_frame_rate")),
+            "avg_fps_raw": video.get("avg_frame_rate"),
+            "video_duration_seconds": finite_number(video.get("duration")),
+            "audio_durations": [
+                finite_number(item.get("duration"))
+                for item in streams if isinstance(item, dict) and item.get("codec_type") == "audio"
+            ],
             "pix_fmt": video.get("pix_fmt"),
             "color_range": video.get("color_range"),
             "color_space": video.get("color_space"),
@@ -510,6 +544,8 @@ class Monitor:
             issues.append(
                 f"编码为 {(actual['codec'] or '未知').upper()}，要求 H.265/HEVC"
             )
+        if str(actual["profile"] or "").lower() != expected["profile"].lower():
+            issues.append(f"编码 Profile 为 {actual['profile'] or '未知'}，要求 {expected['profile']}")
         if (actual["width"], actual["height"]) != (expected["width"], expected["height"]):
             issues.append(
                 f"分辨率为 {actual['width'] or '—'}×{actual['height'] or '—'}，"
@@ -519,6 +555,8 @@ class Monitor:
             issues.append(
                 f"帧率为 {actual['fps_raw'] or '未知'}，要求 {expected['fps']:g} fps"
             )
+        if actual["avg_fps"] is None or abs(actual["avg_fps"] - expected["fps"]) > 0.001:
+            issues.append(f"平均帧率为 {actual['avg_fps_raw'] or '未知'}，要求 {expected['fps']:g} fps")
         if str(actual["pix_fmt"] or "").lower() != expected["pix_fmt"]:
             issues.append(
                 f"像素格式为 {actual['pix_fmt'] or '未知'}，要求 {expected['pix_fmt']}"
@@ -541,6 +579,17 @@ class Monitor:
                 f"实际帧数为 {actual['frames'] if actual['frames'] is not None else '未知'}，"
                 f"要求 {expected['frames']}"
             )
+        expected_duration = expected["frames"] / expected["fps"]
+        tolerance = max(1.0 / expected["fps"], 0.05)
+        duration = actual["duration_seconds"]
+        if duration is None or abs(duration - expected_duration) > tolerance:
+            issues.append(f"容器时长为 {duration if duration is not None else '未知'}，应约为 {expected_duration:.6f} 秒")
+        video_duration = actual["video_duration_seconds"]
+        if video_duration is not None and abs(video_duration - expected_duration) > tolerance:
+            issues.append(f"视频流时长为 {video_duration}，应约为 {expected_duration:.6f} 秒")
+        for index, audio_duration in enumerate(actual["audio_durations"]):
+            if audio_duration is not None and abs(audio_duration - expected_duration) > tolerance:
+                issues.append(f"音轨 {index} 时长为 {audio_duration}，应约为 {expected_duration:.6f} 秒")
         if actual["audio_streams"] != expected["audio_streams"]:
             issues.append(
                 f"音轨数为 {actual['audio_streams']}，要求 {expected['audio_streams']}"
@@ -560,6 +609,70 @@ class Monitor:
         self.probe_cache_result = result
         return result
 
+    def _apply_delivery_report(self, delivery: dict, report) -> dict:
+        delivery = copy.deepcopy(delivery)
+        decode_passed = None
+        sha256_recorded = False
+        report_valid = False
+        if not delivery["exists"]:
+            delivery["issues"].append("尚无绑定当前成片的交付 QA 报告")
+        elif not isinstance(report, dict):
+            delivery["issues"].append("尚无有效 delivery-report.json")
+        else:
+            media = report.get("media") if isinstance(report.get("media"), dict) else {}
+            verification = report.get("verification") if isinstance(report.get("verification"), dict) else {}
+            final_path = relative_project_path(
+                self.project_root, self.config["final_media"], "final_media"
+            )
+            stat = final_path.stat()
+            expected_path = self.config["final_media"].replace("\\", "/")
+            actual_path = str(media.get("path") or "").replace("\\", "/")
+            sha256_value = media.get("sha256")
+            sha_is_hex = isinstance(sha256_value, str) and re.fullmatch(r"[0-9a-f]{64}", sha256_value) is not None
+            identity_matches = (
+                actual_path == expected_path
+                and media.get("size_bytes") == stat.st_size
+                and media.get("mtime_ns") == stat.st_mtime_ns
+                and media.get("ctime_ns") == stat.st_ctime_ns
+                and media.get("inode") == getattr(stat, "st_ino", 0)
+            )
+            expected_matches = report.get("expected") == self.config["expected"]
+            probe_matches = report.get("actual") == delivery["actual"]
+            storyboard_matches = report.get("storyboard_sha256") == self.config["storyboard_sha256"]
+            if not identity_matches:
+                delivery["issues"].append("QA 报告与当前成片路径或文件身份不一致")
+            if not expected_matches or not probe_matches or not storyboard_matches:
+                delivery["issues"].append("QA 报告与当前 storyboard 或媒体探测结果不一致")
+            if not sha_is_hex:
+                delivery["issues"].append("QA 报告没有有效的 SHA-256")
+            elif identity_matches:
+                digest = hashlib.sha256()
+                with final_path.open("rb") as handle:
+                    for chunk in iter(lambda: handle.read(1024 * 1024), b""):
+                        digest.update(chunk)
+                sha256_recorded = digest.hexdigest() == sha256_value
+                if not sha256_recorded:
+                    delivery["issues"].append("当前成片 SHA-256 与 QA 报告不一致")
+            verification_passed = (
+                report.get("status") == "complete"
+                and verification.get("spec_passed") is True
+                and verification.get("decode_passed") is True
+                and verification.get("stable_file") is True
+            )
+            if not verification_passed:
+                delivery["issues"].append("尚无当前成片的全片解码通过记录")
+            report_valid = (
+                identity_matches and expected_matches and probe_matches and storyboard_matches
+                and sha256_recorded and verification_passed
+            )
+            if report_valid:
+                decode_passed = True
+
+        delivery["decode_passed"] = decode_passed
+        delivery["sha256_recorded"] = sha256_recorded
+        delivery["qa_passed"] = bool(delivery["spec_passed"] and report_valid)
+        return delivery
+
     def _live_field(self, data, *keys, default=None):
         value = data
         for key in keys:
@@ -570,7 +683,7 @@ class Monitor:
 
     def _build_summary(self) -> dict:
         generated_at = iso_timestamp()
-        render_state, shot_state, resolve_state = self._canonical_state()
+        render_state, shot_state, resolve_state, delivery_report = self._canonical_state()
         validated_shots = self._validated_shots(shot_state)
         shots, frame_count, newest_frame_at, preview = self._scan_shots(validated_shots)
         processes = self._processes()
@@ -579,40 +692,22 @@ class Monitor:
         final_path = relative_project_path(
             self.project_root, self.config["final_media"], "final_media"
         )
-        delivery = self._probe_media(final_path)
+        delivery = self._apply_delivery_report(self._probe_media(final_path), delivery_report)
 
         source_files = sum(
-            item is not None for item in (render_state, shot_state, resolve_state)
+            item is not None for item in (render_state, shot_state, resolve_state, delivery_report)
         )
         source = "mixed" if source_files else "derived"
         render_state = render_state if isinstance(render_state, dict) else {}
         resolve_state = resolve_state if isinstance(resolve_state, dict) else {}
-        delivery_state = (
-            render_state.get("delivery")
-            if isinstance(render_state.get("delivery"), dict)
-            else {}
-        )
-
         expected_frames = self.config["expected"]["frames"]
         frame_count = min(frame_count, expected_frames)
         percent = round(clamp(100 * frame_count / expected_frames), 1)
         all_frames_present = bool(shots) and all(item["inventory_complete"] for item in shots)
         all_frames_verified = bool(shots) and all(item["verified"] for item in shots)
-
-        decode_passed = delivery_state.get("decode_passed")
-        if not isinstance(decode_passed, bool):
-            decode_passed = None
-        sha256_value = delivery_state.get("sha256")
-        sha256_recorded = isinstance(sha256_value, str) and len(sha256_value.strip()) == 64
-        delivery["decode_passed"] = decode_passed
-        delivery["sha256_recorded"] = sha256_recorded
-        delivery["qa_passed"] = bool(
-            delivery["spec_passed"] and decode_passed is True and sha256_recorded
-        )
-        if delivery["spec_passed"] and decode_passed is not True:
-            delivery["issues"].append("尚无全片解码通过记录")
-        if delivery["spec_passed"] and not sha256_recorded:
-            delivery["issues"].append("尚无 SHA-256 记录")
+        if delivery["qa_passed"] and not (all_frames_present and all_frames_verified):
+            delivery["issues"].append("全部镜头 frames_validated 通过后才能判定最终完成")
+            delivery["qa_passed"] = False
 
         canonical_stage = str(render_state.get("stage") or "").lower()
         canonical_status = str(render_state.get("status") or "").lower()
@@ -621,18 +716,27 @@ class Monitor:
             self._live_field(render_state, "health", "stale_after_seconds"), 90
         )
         heartbeat_age = None
-        stale = False
+        active_canonical = canonical_status in {"running", "cooldown"}
+        stale = active_canonical
         if isinstance(heartbeat_at, str):
             try:
                 heartbeat_time = datetime.fromisoformat(heartbeat_at).timestamp()
                 heartbeat_age = max(0, int(time.time() - heartbeat_time))
-                stale = heartbeat_age > stale_after
-            except ValueError:
+                stale = active_canonical and heartbeat_age > stale_after
+            except (ValueError, OverflowError):
                 heartbeat_at = None
+        else:
+            heartbeat_at = None
 
-        if (
-            canonical_stage in ALLOWED_STAGES
-            and canonical_status in ALLOWED_STATUSES
+        if delivery["qa_passed"]:
+            stage = "delivery"
+            status = "complete"
+        elif canonical_status == "failed" and canonical_stage in ALLOWED_STAGES:
+            stage = canonical_stage
+            status = "failed"
+        elif (
+            active_canonical
+            and canonical_stage in ALLOWED_STAGES
             and not stale
         ):
             stage = canonical_stage
@@ -645,9 +749,10 @@ class Monitor:
             status = "running" if processes["resolve"] or processes["ffmpeg"] else "idle"
         else:
             stage = "delivery"
-            status = "complete" if delivery["qa_passed"] else (
-                "failed" if not delivery["spec_passed"] else "idle"
-            )
+            status = "failed" if (
+                not delivery["spec_passed"]
+                or isinstance(delivery_report, dict) and delivery_report.get("status") == "failed"
+            ) else "idle"
 
         if stage == "render" and status == "running":
             title = "Blender 正在渲染"
@@ -664,9 +769,11 @@ class Monitor:
         else:
             title = "成片待完成最终质检"
 
-        median_frame_seconds = finite_number(
-            self._live_field(render_state, "current", "median_frame_seconds")
+        samples = self._live_field(
+            render_state, "current", "recent_frame_durations_seconds", default=[]
         )
+        samples = [value for item in samples if (value := finite_number(item)) is not None and value > 0] if isinstance(samples, list) else []
+        median_frame_seconds = statistics.median(samples) if samples else None
         eta_seconds = None
         if status == "running" and stage == "render" and median_frame_seconds is not None:
             eta_seconds = int(max(0, expected_frames - frame_count) * median_frame_seconds)
@@ -676,16 +783,24 @@ class Monitor:
             if isinstance(render_state.get("recovery"), dict)
             else {}
         )
+        active_shot_id = self._live_field(render_state, "current", "shot_id")
         current_shot = next(
-            (item for item in shots if not item["inventory_complete"]),
-            shots[-1] if shots else None,
+            (item for item in shots if item["id"] == active_shot_id),
+            next(
+                (item for item in shots if not item["inventory_complete"]),
+                shots[-1] if shots else None,
+            ),
         )
+        batch_start = self._live_field(render_state, "current", "batch_start")
+        batch_end = self._live_field(render_state, "current", "batch_end")
+        batch_label = f"{batch_start}–{batch_end}" if batch_start is not None and batch_end is not None else None
         active_pids = processes["blender"] + processes["resolve"] + processes["ffmpeg"]
         state_mtimes = []
         for path in (
             self.project_root / "render" / "render-state.json",
             self.project_root / "shot-status.json",
             self.project_root / "edit" / "resolve-run.json",
+            self.project_root / "delivery" / "delivery-report.json",
             final_path,
         ):
             try:
@@ -715,7 +830,7 @@ class Monitor:
             },
             "current": {
                 "shot_id": current_shot["id"] if current_shot else None,
-                "batch": self._live_field(render_state, "current", "batch"),
+                "batch": batch_label,
                 "last_valid_frame": preview.get("frame"),
                 "median_frame_seconds": median_frame_seconds,
             },
@@ -742,7 +857,7 @@ class Monitor:
             },
             "resolve": {
                 "timeline": str(resolve_state.get("timeline") or ""),
-                "render_job_status": str(resolve_state.get("render_job_status") or ""),
+                "render_job_status": str(self._live_field(resolve_state, "render_job", "status", default="") or ""),
             },
             "delivery": delivery,
             "shots": shots,
@@ -794,7 +909,50 @@ class DashboardHandler(BaseHTTPRequestHandler):
         body = json.dumps(payload, ensure_ascii=False, separators=(",", ":")).encode("utf-8")
         self._send_bytes(body, "application/json; charset=utf-8", status, no_cache=True)
 
+    def _request_allowed(self) -> bool:
+        host_values = self.headers.get_all("Host") or []
+        fetch_site = self.headers.get("Sec-Fetch-Site", "").lower()
+        allowed = len(host_values) == 1 and fetch_site in {"", "none", "same-origin"}
+        host = host_values[0].strip().lower() if allowed else ""
+        extra_hosts = self.server.allowed_hosts
+        if allowed and host not in extra_hosts:
+            try:
+                parsed = urlsplit("//" + host)
+                port = parsed.port
+                allowed = (
+                    parsed.hostname in {"127.0.0.1", "localhost", "::1"}
+                    and not parsed.username and not parsed.path
+                    and port in {None, self.server.server_address[1]}
+                )
+            except ValueError:
+                allowed = False
+        origin_values = self.headers.get_all("Origin") or []
+        if allowed and origin_values:
+            if len(origin_values) != 1:
+                allowed = False
+            else:
+                try:
+                    origin = urlsplit(origin_values[0])
+                    origin_host = origin.hostname
+                    origin_port = origin.port
+                    local_origin = origin_host in {"127.0.0.1", "localhost", "::1"} and origin_port in {
+                        None, self.server.server_address[1]
+                    }
+                    extra_origin = origin.netloc.lower() in extra_hosts
+                    allowed = (
+                        origin.scheme in {"http", "https"}
+                        and (local_origin or extra_origin)
+                        and not origin.username and not origin.path
+                    )
+                except ValueError:
+                    allowed = False
+        if not allowed:
+            self._send_json({"error": "forbidden request origin"}, HTTPStatus.FORBIDDEN)
+        return allowed
+
     def do_GET(self):
+        if not self._request_allowed():
+            return
         path = urlsplit(self.path).path
         if path in {
             "/",
@@ -836,22 +994,34 @@ class DashboardHandler(BaseHTTPRequestHandler):
         self._send_json({"error": "not found"}, HTTPStatus.NOT_FOUND)
 
     def do_HEAD(self):
+        if not self._request_allowed():
+            return
         self.send_response(HTTPStatus.METHOD_NOT_ALLOWED)
         self.send_header("Allow", "GET")
+        self._security_headers()
         self.end_headers()
 
     def do_POST(self):
+        if not self._request_allowed():
+            return
         self.send_response(HTTPStatus.METHOD_NOT_ALLOWED)
         self.send_header("Allow", "GET")
+        self._security_headers()
         self.end_headers()
+
+    do_PUT = do_POST
+    do_DELETE = do_POST
+    do_PATCH = do_POST
+    do_OPTIONS = do_POST
 
 
 class DashboardServer(ThreadingHTTPServer):
     daemon_threads = True
 
-    def __init__(self, address, handler, monitor):
+    def __init__(self, address, handler, monitor, allowed_hosts=None):
         super().__init__(address, handler)
         self.monitor = monitor
+        self.allowed_hosts = {value.strip().lower() for value in (allowed_hosts or []) if value.strip()}
 
 
 def arguments():
@@ -870,6 +1040,10 @@ def arguments():
     )
     parser.add_argument("--host", default="127.0.0.1")
     parser.add_argument("--port", type=int, default=4876)
+    parser.add_argument(
+        "--allowed-host", action="append", default=[],
+        help="Additional exact Host for an authenticated tunnel; repeat as needed",
+    )
     return parser.parse_args()
 
 
@@ -879,7 +1053,9 @@ def main():
         raise SystemExit("Refusing non-loopback bind; use a protected tunnel explicitly.")
     monitor = Monitor(args.project_root, args.config)
     monitor.snapshot(force=True)
-    server = DashboardServer((args.host, args.port), DashboardHandler, monitor)
+    server = DashboardServer(
+        (args.host, args.port), DashboardHandler, monitor, allowed_hosts=args.allowed_host
+    )
     print(f"Render Watch: http://{args.host}:{args.port}/", flush=True)
     print(f"Project: {monitor.config['project_name']} (read-only)", flush=True)
     try:

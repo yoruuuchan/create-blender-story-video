@@ -1,0 +1,65 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "delivery-report.schema.json",
+  "title": "Final media verification evidence",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "status", "storyboard_sha256", "media", "expected", "actual", "verification", "tool_versions", "issues", "created_at"],
+  "properties": {
+    "schema_version": {"const": 1},
+    "status": {"enum": ["complete", "failed"]},
+    "storyboard_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "media": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "size_bytes", "mtime_ns", "ctime_ns", "inode", "sha256"],
+      "properties": {
+        "path": {"type": "string", "minLength": 1},
+        "size_bytes": {"type": "integer", "minimum": 1},
+        "mtime_ns": {"type": "integer", "minimum": 0},
+        "ctime_ns": {"type": "integer", "minimum": 0},
+        "inode": {"type": "integer", "minimum": 0},
+        "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+      }
+    },
+    "expected": {
+      "type": "object",
+      "required": ["width", "height", "fps", "frames", "codec", "profile", "pix_fmt", "color", "color_range", "codec_tag", "audio_streams"],
+      "properties": {
+        "width": {"type": "integer"},
+        "height": {"type": "integer"},
+        "fps": {"type": "number"},
+        "frames": {"type": "integer"},
+        "codec": {"type": "string"},
+        "profile": {"type": "string"},
+        "pix_fmt": {"type": "string"},
+        "color": {"type": "string"},
+        "color_range": {"type": "string"},
+        "codec_tag": {"type": "string"},
+        "audio_streams": {"type": "integer"}
+      }
+    },
+    "actual": {"type": "object"},
+    "verification": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["spec_passed", "decode_passed", "stable_file"],
+      "properties": {
+        "spec_passed": {"type": "boolean"},
+        "decode_passed": {"type": "boolean"},
+        "stable_file": {"type": "boolean"}
+      }
+    },
+    "tool_versions": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["ffprobe", "ffmpeg"],
+      "properties": {
+        "ffprobe": {"type": "string"},
+        "ffmpeg": {"type": "string"}
+      }
+    },
+    "issues": {"type": "array", "items": {"type": "string"}},
+    "created_at": {"type": "string", "format": "date-time"}
+  }
+}
