@@ -10,14 +10,12 @@ An Agent Skill for creating or resuming a Blender film with schema-backed produc
 
 ```mermaid
 flowchart LR
-    A[一句创意或视觉参考] --> B[风格锁定 + 分镜]
+    A[创意 / 参考] --> B[风格锁定 + 分镜]
     B --> C[AI 参考图]
-    C --> D[Blender 场景]
-    D --> E[断点渲染 + 帧校验]
-    E --> F[DaVinci Resolve 剪辑]
-    F --> G[编码 + 最终 QA]
-    G --> H[4K 成片]
-    E -.-> M[只读监控页]
+    C --> D[Blender + 渲染]
+    D --> E[Resolve + QA]
+    E --> F[4K 成片]
+    D -.-> M[只读监控页]
 ```
 
 每一步都有对应的脚本和校验门禁。渲染中断后从当前帧继续，最终“完成”必须由帧序列、媒体探测和 SHA-256 共同证明。
