@@ -194,12 +194,12 @@ python /path/to/skill/scripts/validate_project.py --project-root /path/to/projec
 
 ```mermaid
 flowchart TB
-    A["全片时间线<br/>shot_02：181–360<br/>含结束帧，共 180 帧"]
-    B["单镜头 MP4 素材<br/>0–179<br/>零基，共 180 帧"]
-    C["Resolve 时间线<br/>record_frame：180"]
-    A -->|"起点：181 - 1"| C
-    A -->|"帧数：360 - 181 + 1"| B
-    B -->|"按 180 帧写入"| C
+    A["全片时间线<br/>shot_02 181–360<br/>共 180 帧"]
+    B["单镜头 MP4<br/>0–179<br/>共 180 帧"]
+    C["Resolve<br/>record_frame 180"]
+    A -->|"起点 181-1"| C
+    A -->|"帧数 360-181+1"| B
+    B -->|"写入 180 帧"| C
 ```
 
 例如第二镜头全片范围是 181–360，则它的 MP4 素材范围是 0–179，`record_frame` 是 180。不要把全片帧号直接当作单镜头素材入点。
