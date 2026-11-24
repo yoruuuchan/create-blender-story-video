@@ -4,7 +4,7 @@
 
 An Agent Skill for creating or resuming a Blender film with schema-backed production state, resilient rendering, optional read-only monitoring, DaVinci Resolve editing, and hash-bound final media verification.
 
-**目录：** [生产管线](#生产管线) · [默认交付](#默认交付) · [可执行能力](#这次包含的可执行能力) · [安装](#安装-skill) · [三种创作模式](#三种创作模式) · [生产工具](#生产工具) · [帧号契约](#帧号契约) · [只读监控页](#只读监控页) · [测试](#测试) · [边界](#边界)
+**目录：** [生产管线](#生产管线) · [演示短片](#演示短片) · [默认交付](#默认交付) · [可执行能力](#这次包含的可执行能力) · [安装](#安装-skill) · [三种创作模式](#三种创作模式) · [生产工具](#生产工具) · [帧号契约](#帧号契约) · [只读监控页](#只读监控页) · [测试](#测试) · [边界](#边界)
 
 ## 生产管线
 
@@ -18,6 +18,12 @@ flowchart LR
 ```
 
 每一步都有对应的脚本和校验门禁。渲染中断后从当前帧继续，最终“完成”必须由帧序列、媒体探测和 SHA-256 共同证明。
+
+## 演示短片
+
+![Poolcore：空无一人的泳池，4 秒 1080p 真实渲染](docs/media/poolcore.gif)
+
+4 秒 / 1920×1080 / 30 fps / HEVC / 无声。由本仓库的正式渲染、帧校验、编码和最终 QA 流程实际生成；场景按 `core` 设计系统的 poolcore / frost 语言制作。[下载 MP4](docs/media/poolcore-demo.mp4)
 
 ## 默认交付
 
@@ -208,9 +214,9 @@ flowchart TB
 
 复制 `assets/render-monitor-dashboard/` 到项目 `monitor/`，再生成最小配置：
 
-![Paper Lanterns 试跑：只读监控页显示 93.3% 渲染进度和真实帧预览](docs/images/render-monitor-paper-lanterns.png)
+![Poolcore 试跑：只读监控页显示 18.3% 渲染进度和真实帧预览](docs/images/render-monitor-poolcore.png)
 
-*真实试跑：Paper Lanterns 演示片渲染中。*
+*真实试跑：Poolcore 演示片渲染中。*
 
 ```bash
 python /path/to/skill/scripts/generate_monitor_config.py --project-root /path/to/project
