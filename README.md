@@ -210,7 +210,7 @@ flowchart TB
 
 ![只读监控页：总体进度、最近帧预览、逐镜头状态、生产管线与交付 QA](docs/images/render-monitor-demo.png)
 
-*演示数据；预览帧为占位图。*
+*截图使用演示项目与占位帧；界面是真实监控页。*
 
 ```bash
 python /path/to/skill/scripts/generate_monitor_config.py --project-root /path/to/project
