@@ -15,6 +15,13 @@ test('all inline dashboard scripts parse', () => {
   for (const script of scripts) new vm.Script(script[1]);
 });
 
+test('delivery target is derived from the storyboard, not hardcoded', () => {
+  assert.ok(html.includes('id="pipeline-delivery"'));
+  assert.ok(html.includes('pipelineDelivery'));
+  assert.ok(html.includes('shortSide'));
+  assert.ok(!html.includes('交付目标 · 4K'));
+});
+
 test('polling never overlaps requests or schedules duplicate timers', async () => {
   const start = html.indexOf('    async function fetchStatus()');
   const end = html.indexOf('    function demoShots', start);

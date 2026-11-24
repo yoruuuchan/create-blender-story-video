@@ -35,7 +35,7 @@ from production import (
     validate_storyboard,
     write_json_atomic,
 )
-from render_supervisor import SingleInstanceLock, Supervisor, pid_exists
+from render_supervisor import SingleInstanceLock, Supervisor, pid_exists, pool_event
 from verify_frames import inspect_shot_frames, record_frame_gate
 
 
@@ -242,6 +242,19 @@ class MediaContractTests(unittest.TestCase):
 
 
 class ProcessAndEncodingContractTests(unittest.TestCase):
+    def test_supervisor_ignores_normal_blender_stdout(self):
+        self.assertIsNone(pool_event("Read blend: D:\\project\\scene.blend\n"))
+        self.assertIsNone(pool_event(""))
+        self.assertIsNone(pool_event("POOL_PROGRESS_WRONG {\"frame\": 1}\n"))
+
+    def test_supervisor_parses_pool_events_and_protocol_errors(self):
+        event = pool_event('POOL_PROGRESS {"shot_id": "shot_01", "frame": 3, "seconds": 1.2}\n')
+        self.assertEqual(event[0], "POOL_PROGRESS")
+        self.assertEqual(event[1]["frame"], 3)
+        broken = pool_event("POOL_PROGRESS not-json\n")
+        self.assertEqual(broken[0], "POOL_PROTOCOL_ERROR")
+        self.assertIn("not-json", broken[1]["line"])
+
     def test_single_instance_lock_rejects_second_owner(self):
         with tempfile.TemporaryDirectory() as temporary:
             path = Path(temporary) / "render.lock"

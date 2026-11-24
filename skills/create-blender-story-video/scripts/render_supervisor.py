@@ -28,6 +28,18 @@ from production import (
 )
 from verify_frames import GATE_NAMES, ensure_shot_status, inspect_shot_frames, record_frame_gate
 
+POOL_EVENT_PREFIXES = ("POOL_PROGRESS", "POOL_COMPLETE", "POOL_QUARANTINE")
+
+
+def pool_event(line: str):
+    for prefix in POOL_EVENT_PREFIXES:
+        if line.startswith(prefix + " "):
+            try:
+                return (prefix, json.loads(line[len(prefix) + 1:]))
+            except json.JSONDecodeError:
+                return ("POOL_PROTOCOL_ERROR", {"line": line.strip()[:500]})
+    return None
+
 
 class SingleInstanceLock:
     def __init__(self, path: Path):
@@ -337,14 +349,7 @@ class Supervisor:
                 for line in child.stdout:
                     stdout_log.write(line)
                     stdout_log.flush()
-                    event = None
-                    for prefix in ("POOL_PROGRESS", "POOL_COMPLETE", "POOL_QUARANTINE"):
-                        if line.startswith(prefix + " "):
-                            try:
-                                event = (prefix, json.loads(line[len(prefix) + 1:]))
-                            except json.JSONDecodeError:
-                                event = ("POOL_PROTOCOL_ERROR", {"line": line.strip()[:500]})
-                            break
+                    event = pool_event(line)
                     if event is not None:
                         events.put((time.monotonic(), event))
                 events.put((time.monotonic(), None))
