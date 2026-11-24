@@ -345,7 +345,8 @@ class Supervisor:
                             except json.JSONDecodeError:
                                 event = ("POOL_PROTOCOL_ERROR", {"line": line.strip()[:500]})
                             break
-                    events.put((time.monotonic(), event))
+                    if event is not None:
+                        events.put((time.monotonic(), event))
                 events.put((time.monotonic(), None))
 
             reader = threading.Thread(target=read_output, name="blender-stdout", daemon=True)
