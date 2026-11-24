@@ -4,6 +4,24 @@
 
 An Agent Skill for creating or resuming a Blender film with schema-backed production state, resilient rendering, optional read-only monitoring, DaVinci Resolve editing, and hash-bound final media verification.
 
+**目录：** [生产管线](#生产管线) · [默认交付](#默认交付) · [可执行能力](#这次包含的可执行能力) · [安装](#安装-skill) · [三种创作模式](#三种创作模式) · [生产工具](#生产工具) · [帧号契约](#帧号契约) · [只读监控页](#只读监控页) · [测试](#测试) · [边界](#边界)
+
+## 生产管线
+
+```mermaid
+flowchart LR
+    A[一句创意或视觉参考] --> B[风格锁定 + 分镜]
+    B --> C[AI 参考图]
+    C --> D[Blender 场景]
+    D --> E[断点渲染 + 帧校验]
+    E --> F[DaVinci Resolve 剪辑]
+    F --> G[编码 + 最终 QA]
+    G --> H[4K 成片]
+    E -.-> M[只读监控页]
+```
+
+每一步都有对应的脚本和校验门禁。渲染中断后从当前帧继续，最终“完成”必须由帧序列、媒体探测和 SHA-256 共同证明。
+
 ## 默认交付
 
 - 竖屏 2160×3840，横屏 3840×2160；用户批准的其他规格由 storyboard 统一派生
@@ -177,11 +195,25 @@ python /path/to/skill/scripts/validate_project.py --project-root /path/to/projec
 | `record_frame` | Resolve 零基时间线写入位置，等于 `timeline_frame_start - 1` |
 | `duration_frames` | 两种包含式范围的一致持续帧数 |
 
+```mermaid
+flowchart TB
+    A["全片时间线<br/>shot_02：181–360<br/>含结束帧，共 180 帧"]
+    B["单镜头 MP4 素材<br/>0–179<br/>零基，共 180 帧"]
+    C["Resolve 时间线<br/>record_frame：180"]
+    A -->|"起点：181 - 1"| C
+    A -->|"帧数：360 - 181 + 1"| B
+    B -->|"按 180 帧写入"| C
+```
+
 例如第二镜头全片范围是 181–360，则它的 MP4 素材范围是 0–179，`record_frame` 是 180。不要把全片帧号直接当作单镜头素材入点。
 
 ## 只读监控页
 
 复制 `assets/render-monitor-dashboard/` 到项目 `monitor/`，再生成最小配置：
+
+![只读监控页：总体进度、最近帧预览、逐镜头状态、生产管线与交付 QA](docs/images/render-monitor-demo.png)
+
+*演示数据；预览帧为占位图。*
 
 ```bash
 python /path/to/skill/scripts/generate_monitor_config.py --project-root /path/to/project
