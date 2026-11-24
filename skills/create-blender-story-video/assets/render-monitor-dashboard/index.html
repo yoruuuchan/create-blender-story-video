@@ -1602,7 +1602,7 @@
         <article class="panel" id="pipeline-panel">
           <header class="panel-head">
             <span class="panel-title">制作流程 // PIPELINE</span>
-            <span class="panel-meta">交付目标 · 4K · HEVC · REC.709</span>
+            <span class="panel-meta" id="pipeline-delivery">交付目标 · —</span>
           </header>
           <div class="pipeline" id="pipeline" aria-label="制作流程">
             <div class="pipeline-step" data-step="idea">
@@ -1678,6 +1678,7 @@
       eta: byId("eta"),
       outputResolution: byId("output-resolution"),
       outputStandard: byId("output-standard"),
+      pipelineDelivery: byId("pipeline-delivery"),
       batch: byId("batch"),
       heartbeat: byId("heartbeat"),
       frameEvidence: byId("frame-evidence"),
@@ -2000,6 +2001,11 @@
       elements.eta.textContent = data.status === "complete" ? "00:00:00" : formatEta(progress.eta_seconds);
       elements.outputResolution.textContent = `${expected.width || "—"} × ${expected.height || "—"}`;
       elements.outputStandard.textContent = `${expected.fps || "—"} FPS · ${String(expected.codec || "HEVC").toUpperCase()} · REC.709`;
+      const shortSide = Math.min(Number(expected.width) || 0, Number(expected.height) || 0);
+      const targetLabel = shortSide >= 2000 ? "4K" : shortSide ? `${shortSide}p` : "—";
+      if (elements.pipelineDelivery) {
+        elements.pipelineDelivery.textContent = `交付目标 · ${targetLabel} · ${String(expected.codec || "HEVC").toUpperCase()} · REC.709`;
+      }
       elements.batch.textContent = progress.all_frames_present
         ? "全部帧已齐"
         : data.current?.batch || data.current?.shot_id || "未记录";
